@@ -1,0 +1,29 @@
+<?xml version="1.1" encoding="ISO-8859-1" ?>
+<task:task xmlns:task="http://cancerresearchuk.org/workflow/task"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://cancerresearchuk.org/workflow/task http://uk-cri-lbio01/schema/workflow/task-1.4.xsd">
+
+    <name>exonerate</name>
+    <description>Task for aligning two sets of sequences using exonerate.</description>
+
+    <program type="commandLine">
+        <executable>${exonerateExecutable} ${model} ${bestn} ${score} --showalignment no --showvulgar no --verbose 0 --ryo "%qi\t%qab\t%qae\t%qS\t%ti\t%tab\t%tae\t%tS\t%pi\t%s\n" ${queryFastaFile} ${targetFastaFile} > ${alignmentFile}</executable>
+    </program>
+
+    <inputs>
+        <input name="queryFastaFile" required="true" quoted="true"/>
+        <input name="targetFastaFile" required="true" quoted="true"/>
+    </inputs>
+
+    <outputs>
+        <output name="alignmentFile" quoted="true"/>
+    </outputs>
+
+    <arguments>
+        <arg name="model" flag="--model" type="string" required="false" description="The alignment model to use."/>
+        <arg name="bestn" flag="--bestn" type="integer" required="false" description="Report the best N results for each query."/>
+        <arg name="score" flag="--score" type="integer" required="false" description="The overall score threshold for reporting alignment hits."/>
+        <arg name="exonerateExecutable" required="false" description="Path to the exonerate executable" default="exonerate" quoted="true"/>
+    </arguments>
+
+</task:task>

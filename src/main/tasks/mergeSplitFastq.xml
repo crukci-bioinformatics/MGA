@@ -1,0 +1,32 @@
+<?xml version="1.1" encoding="ISO-8859-1" ?>
+<task:task xmlns:task="http://cancerresearchuk.org/workflow/task"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://cancerresearchuk.org/workflow/task http://uk-cri-lbio01/schema/workflow/task-1.4.xsd">
+
+    <name>mergeAndSplitFastq</name>
+    <description>Task for combining FASTQ files and splitting into files with a specified number of records in each.</description>
+
+    <program type="commandLine">
+        <executable>@{java.home}/bin/java ${jvmargs} ${classpath} org.cruk.seq.MergeAndSplitFastq ${outputFilePrefix} ${recordsPerFile} ${fastqFiles}</executable>
+    </program>
+
+    <inputs>
+        <input name="fastqFiles" required="true" plurality="multiple" quoted="true"
+            description="The input FASTQ files."/>
+    </inputs>
+
+    <outputs>
+        <output name="outputFastqFiles" required="true" plurality="multiple"
+            description="The file naming pattern for output FASTQ files."/>
+    </outputs>
+
+    <arguments>
+        <arg name="outputFilePrefix" flag="-p" required="false"
+            description="The prefix to use for output FASTQ file names."/>
+        <arg name="recordsPerFile" flag="-n" type="integer" required="false"
+            description="The maximum number of records per FASTQ output file."/>
+        <arg name="classpath" flag="-classpath" required="false" quoted="true" default="@{java.class.path}" />
+        <arg name="jvmargs" required="false" description="Java Virtual Machine arguments."/>
+    </arguments>
+
+</task:task>

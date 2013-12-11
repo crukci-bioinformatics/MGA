@@ -1,0 +1,28 @@
+<?xml version="1.1" encoding="ISO-8859-1" ?>
+<task:task xmlns:task="http://cancerresearchuk.org/workflow/task"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://cancerresearchuk.org/workflow/task http://uk-cri-lbio01/schema/workflow/task-1.4.xsd">
+
+    <name>trimFastq</name>
+    <description>Task for trimming sequences in a FASTQ file from the 3' end to the specified length</description>
+
+    <program type="commandLine">
+        <executable>@{java.home}/bin/java ${jvmargs} ${classpath} org.cruk.seq.TrimFastq ${length} ${fastqFile} ${outputFastqFile} ${trimmingSummaryFile}</executable>
+    </program>
+
+    <inputs>
+        <input name="fastqFile" required="true" quoted="true"/>
+    </inputs>
+
+    <outputs>
+        <output name="outputFastqFile" flag="-o" quoted="true"/>
+        <output name="trimmingSummaryFile" flag="-x" quoted="true" required="false"/>
+    </outputs>
+
+    <arguments>
+        <arg name="length" flag="-l" type="integer" required="false" description="Length of sequences following trimming from the 3' end."/>
+        <arg name="classpath" flag="-classpath" required="false" quoted="true" default="@{java.class.path}" />
+        <arg name="jvmargs" required="false" description="Java Virtual Machine arguments."/>
+    </arguments>
+
+</task:task>

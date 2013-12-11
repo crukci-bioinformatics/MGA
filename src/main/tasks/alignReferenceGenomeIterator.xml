@@ -1,0 +1,20 @@
+<?xml version="1.1" encoding="ISO-8859-1" ?>
+<task:task xmlns:task="http://cancerresearchuk.org/workflow/task"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://cancerresearchuk.org/workflow/task http://uk-cri-lbio01/schema/workflow/task-1.4.xsd">
+
+    <name>alignReferenceGenomeIterator</name>
+    <description>Aligns a given FASTQ file against multiple reference genomes using Bowtie.</description>
+
+    <program type="inbuilt"/>
+
+    <inputs>
+        <input name="referenceGenome" required="true"/>
+        <input name="fastqFile" required="true"/>
+    </inputs>
+
+    <outputs>
+        <output name="alignmentFiles" plurality="multiple" safeNaming="false" description="Bowtie alignment output files."/>
+    </outputs>
+
+</task:task>

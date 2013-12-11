@@ -1,0 +1,213 @@
+Multi-Genome Alignment Contaminant Screen
+-----------------------------------------
+
+Matt Eldridge
+matthew.eldridge@cruk.cam.ac.uk
+Cancer Research UK Cambridge Institute
+University of Cambridge
+
+
+MGA (multi-genome alignment) is a quality control tool for high-throughput sequence
+data. It screens for contaminants by aligning sequence reads in FASTQ format against
+a series of reference genomes using Bowtie and against a set of adapter sequences
+using exonerate.
+
+MGA samples a subset of the reads, by default 100000, prior to alignment against
+reference genome sequences and adapters. This reduces considerably the overall run
+time. In addition, the reads are trimmed to 36 bases by default, prior to alignment
+by Bowtie. This is to ensure consistency of the output mapping and error rates across
+runs of differing lengths. Exonerate alignment against adapters uses the full-length
+sequences.
+
+
+Installation
+------------
+
+1. Pre-requisites
+
+The following software needs to be installed (versions currently in use at CRUK-CI
+are shown in parentheses):
+- Java SE 6
+- Bowtie 1 (1.0.0)
+- Exonerate (2.2.0)
+- bash shell
+
+The MGA is an analysis pipeline that is executed using the workflow system
+developed at CRUK-CI and included within the distribution. The workflow engine
+creates bash shell scripts for each task in the pipeline so availability of a
+bash shell is also required. This is usually present on Linux and Mac computers;
+it may be possible to run the workflow system using Cygwin on Windows.
+
+MGA is a Java application and as such requires that a suitable Java Runtime
+Environment. You can test the availability of Java on your system using the
+following command:
+
+java -version
+
+Using the default settings, MGA expects the bowtie and exonerate executables
+to be present on your path (PATH environment variable). Typing 'bowtie' or
+'exonerate' at the command line should bring up usage details for both tools.
+However, it is also possible to configure the paths to the bowtie and exonerate
+executables in the config XML file (see below).
+
+
+2. Install the MGA distribution
+
+Unpack the tarball:
+
+$ tar zxf mga-1.2-distribution.tar.gz
+
+Optionally add the mga-1.2/bin directory to your path. This is not strictly
+necessary but the instructions for running the pipeline and utility scripts
+given below assume that these are on the path; they can be run by providing
+the full or relative path to the program instead.
+
+
+3. Download and index reference genome sequences
+
+Use the bowtie-build tool to index as many reference genomes as you wish to
+align to. It accepts a comma-separated list of FASTA files and is run as
+follows:
+$ bowtie-build chr1.fa,chr2.fa,chr3.fa Hsa.GRCh37
+
+The second argument is the basename of the index files to write. There is a
+dictionary in the MGA resources subdirectory that maps the basename you give to
+a more user-friendly name for use in the report (see below for more details).
+
+Six index files get created for each reference genome with the suffixes
+1.ebwt, 2.ebwt, 3.ebwt, 4.ebwt, rev.1.ebwt and rev.2.ebwt.
+
+MGA looks for the bowtie indexes in a single directory. By default, MGA expects
+this to be called bowtie_indexes, a subdirectory within the resources directory
+in the unpacked distribution. However this can be configured in the config XML
+file (see below). Instead of copying or moving bowtie index files into the
+resources/bowtie_indexes directory, it is possible to create symbolic links to
+these files.
+
+
+4. Update the reference genome mapping file
+
+Edit the reference genome mapping file in resources/reference_genome_mappings.txt
+adding entries for each reference genome for which a bowtie index was created.
+The header of this file contains more detail on the format.
+
+
+Running MGA
+-----------
+
+The following steps show how to run the multi-genome alignment tool.
+
+1. Create a sample sheet
+
+This is a tab-delimited file that contains details about the samples that have
+been sequenced in each dataset. An example sample sheet is provided in the examples
+directory in the distribution and displayed below.
+
+Run ID	443
+Run name	100902_HWUSI-EAS582_443_706PVAAXX
+Cycles	36
+End type	Single End
+DatasetId	File	Sample ID	Sample name	Institute	Sequence type	End type	Experiment type	Species	Control
+1	s_1_sequence.txt.gz	SLX-2609	LUDO05	LMC	DNA	Single End	Whole Genome	homo_sapiens	No
+2	s_2_sequence.txt.gz	SLX-2631	GI-DM-174	Girton	RNA	Single End	sRNA	mus_musculus	No
+3	s_3_sequence.txt.gz	SLX-2632	IUD ChIP 2	CRUK-CI	DNA	Single End	ChIP-Seq	homo_sapiens	No
+4	s_4_sequence.txt.gz	SLX-2633	IUD WCX 2	CRUK-CI	DNA	Single End	ChIP-Seq	homo_sapiens	No
+5	s_5_sequence.txt.gz	SLX-2645	MDE379	CRUK-CI	DNA	Single End	ChIP-Seq	homo_sapiens	No
+6	s_6_sequence.txt.gz	SLX-2398	MDE380	CRUK-CI	RNA	Single End	RNA-Seq	homo_sapiens	No
+7	s_7_sequence.txt.gz	SLX-2576	MDE381	CRUK-CI	DNA	Single End	ChIP-Seq	homo_sapiens	No
+8	s_8_sequence.txt.gz	SLX-2577	MDE382	CRUK-CI	DNA	Single End	ChIP-Seq	homo_sapiens	No
+8	s_8_sequence.txt.gz	4950265_2-Ctrl	4950265_2	CRUK-CI	DNA	N/A	N/A	phix	Yes
+
+The first section of the file contains information about the collection of datasets,
+typically a flow cell or run on a sequencing instrument. This information is given in two
+columns as key value pairs or properties. The 'Run ID' property is required; other fields are
+optional, can take any values, and are only used in the report generated. The 'Run name' property,
+if it exists, will be used in the report title.
+
+The second section of the file begins with a line that has 'DatasetId' and 'File' in the first
+two columns. This section is tabular, the first line of which represent headers and the subsequent
+lines correspond to samples. The DatasetId and File headers are mandatory and must be the first
+and second columns respectively as these signify the start of the sample metadata table. Other
+columns are optional, can take any values and are displayed in the report.
+
+The Species column is optional but recommended as values given are used to highlight correct and
+incorrect genomes matched in the report generated. Species values should correspond to values or
+synonyms provided in the reference genome mapping file (resources/reference_genome_mappings.txt).
+
+Note that there can be multiple rows for a single dataset or FASTQ file as in the example above.
+This is the case where multiple samples are run on a single lane for example.
+
+The report displays spike-in or control samples a little differently. Samples can be marked as
+controls using the optional Control column with a value of Y or Yes (not case sensitive).
+
+
+2. Generate a config XML file for the MGA pipeline
+
+This config XML file for the MGA pipeline can be generated from the sample sheet as
+follows:
+
+$ create-config-from-samplesheet samplesheet.xml -o config.xml
+
+It is possible to override the default settings for the working directory and also for the
+following directories:
+
+ resources directory   contains the adapter sequences, bowtie indexes and reference genome mappings
+ temp directory        where the bash scripts and intermediate outputs for each task are created
+ data directory        where MGA looks to find the FASTQ files
+ output directory      where the MGA report(s) is created
+
+For details, run the create-config-from-samplesheet without any arguments.
+
+
+3. Configure the config XML file
+
+The config XML file should be edited to make changes to the default configuration of
+the pipeline if required.
+
+The pipeline can be run in two modes: either using the Platform LSF scheduler on a cluster
+or using multiple processors on a single server. The mode element should be configured as
+'lsf' or 'local', and further execution configuration options for each of these modes are
+available in the executionConfiguration section.
+
+Other configuration options include the number of sequence reads to sample from each dataset
+and the length to trim to prior to alignment using bowtie against reference genomes.
+
+
+4. Perform a multi-genome alignment
+
+Run the MGA pipeline as follows:
+
+$ run-pipeline config.xml
+
+This will generate a summary report, results.xml, with an accompanying stylesheet, results.xsl,
+and summary plot image, results.png, for display in a web browser. Separate reports for each
+dataset are also produced.
+
+The pipeline creates a number of intermediate files in a subdirectory called temp. These can be
+deleted automatically after successful completion of the pipeline by using the --remove-temp
+option:
+
+$ run-pipeline --remove-temp config.xml
+
+
+Notes
+-----
+
+1. Quality scores
+
+The MGA pipeline assumes that the FASTQ file contains base quality scores corresponding to
+the Sanger format, i.e. Phred quality + 33.
+
+
+Acknowledgements
+----------------
+
+The adapter sequences used by MGA are taken from the contaminants file in FastQC v0.10.1.
+http://www.bioinformatics.babraham.ac.uk/projects/fastqc/
+
+The short-read aligner used in MGA is Bowtie.
+http://bowtie-bio.sourceforge.net/index.shtml
+
+Exonerate is used to search for adapter sequence contamination.
+http://www.ebi.ac.uk/~guy/exonerate
+

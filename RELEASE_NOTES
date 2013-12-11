@@ -1,0 +1,32 @@
+
+Version 1.2 (4 February 2013)
+-----------
+
+* Fix for failing validation of XML schema definitions.
+
+* New utility for creating the run metadata file by retrieving information
+  from the Solexa LIMS via the SOAP API.
+
+
+Version 1.1 (26 September 2012)
+-----------
+
+* Summary report contains new graphical representation of the alignment results
+  and different highlighting for spike-in/control samples.
+
+* Fixed bug in which MGA fails if any of the FASTQ sequence data files have no
+  sequences.
+
+* Bowtie indexes no longer need to have '.bowtie' preceding the usual suffixes
+  (1.ebwt, 2.ebwt, 3.ebwt, 4,ebwt, rev.1.ebwt, rev.2.ebwt)
+
+* Base qualities in the FASTQ sequence data files are now expected to be on the
+  Sanger scale, i.e. Phred+33.
+
+
+Version 1.0 (13 July 2011)
+-----------
+
+* First release using workflow system also developed at the CRI and deployed as
+  a Java application, replacing the initial prototype developed in ruby.
+

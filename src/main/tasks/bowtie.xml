@@ -1,0 +1,28 @@
+<?xml version="1.1" encoding="ISO-8859-1" ?>
+<task:task xmlns:task="http://cancerresearchuk.org/workflow/task"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://cancerresearchuk.org/workflow/task http://uk-cri-lbio01/schema/workflow/task-1.4.xsd">
+
+    <name>bowtie</name>
+    <description>Task for aligning sequences against a reference genome using Bowtie (version 1).</description>
+
+    <program type="commandLine">
+        <executable>${bowtieExecutable} --time --best --chunkmbs 256 ${bowtieArguments} ${indexDir}/${indexName} ${fastqFile} ${alignmentFile}</executable>
+    </program>
+
+    <inputs>
+        <input name="fastqFile" required="true" quoted="true"/>
+        <input name="indexDir" required="true" quoted="true"/>
+    </inputs>
+
+    <outputs>
+        <output name="alignmentFile" quoted="true"/>
+    </outputs>
+
+    <arguments>
+        <arg name="bowtieArguments" required="false" description="Optional additional bowtie arguments."/>
+        <arg name="indexName" required="true" description="Name of the reference index for Bowtie to align against." quoted="true"/>
+        <arg name="bowtieExecutable" required="false" description="Path to the bowtie executable" default="bowtie" quoted="true"/>
+    </arguments>
+
+</task:task>

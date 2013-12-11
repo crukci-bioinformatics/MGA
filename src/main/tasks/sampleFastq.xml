@@ -1,0 +1,35 @@
+<?xml version="1.1" encoding="ISO-8859-1" ?>
+<task:task xmlns:task="http://cancerresearchuk.org/workflow/task"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://cancerresearchuk.org/workflow/task http://uk-cri-lbio01/schema/workflow/task-1.4.xsd">
+
+    <name>sampleFastq</name>
+    <description>Task for sampling a FASTQ file to produce a subset of entries of a specified size</description>
+
+    <program type="commandLine">
+        <executable>@{java.home}/bin/java ${jvmargs} ${classpath} org.cruk.seq.SampleFastq ${datasetId} ${numberOfRecordsToSample} ${maxNumberOfRecordsToSampleFrom} ${sequenceIdPrefix} ${fastqFile} ${outputFastqFile} ${sampleSummaryFile}</executable>
+    </program>
+
+    <inputs>
+        <input name="fastqFile" required="true" quoted="true"/>
+    </inputs>
+
+    <outputs>
+        <output name="outputFastqFile" flag="-o" quoted="true"/>
+        <output name="sampleSummaryFile" flag="-x" quoted="true"/>
+    </outputs>
+
+    <arguments>
+        <arg name="datasetId" flag="-i" required="false"
+            description="The dataset identifier to use in the summary output file."/>
+        <arg name="sequenceIdPrefix" flag="-p" required="false"
+            description="The prefix to use if renaming sequence identifiers."/>
+        <arg name="numberOfRecordsToSample" flag="-s" type="integer" required="false"
+            description="Number of records to sample from the FASTQ file."/>
+        <arg name="maxNumberOfRecordsToSampleFrom" flag="-m" type="integer" required="false"
+            description="Maximum number of records to sample from."/>
+        <arg name="classpath" flag="-classpath" required="false" quoted="true" default="@{java.class.path}" />
+        <arg name="jvmargs" required="false" description="Java Virtual Machine arguments."/>
+    </arguments>
+
+</task:task>

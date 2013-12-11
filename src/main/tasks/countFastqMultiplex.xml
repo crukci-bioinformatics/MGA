@@ -1,0 +1,15 @@
+<?xml version="1.1" encoding="ISO-8859-1" ?>
+<task:task xmlns:task="http://cancerresearchuk.org/workflow/task"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://cancerresearchuk.org/workflow/task http://uk-cri-lbio01/schema/workflow/task-1.4.xsd">
+
+    <name>countFastqMultiplex</name>
+    <description>Task for looping over multiple FASTQ files and counting the records for each.</description>
+
+    <program type="inbuilt"/>
+
+    <outputs>
+        <output name="countSummaryFiles" required="true" plurality="multiple"/>
+    </outputs>
+
+</task:task>

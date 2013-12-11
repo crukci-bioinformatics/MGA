@@ -1,0 +1,338 @@
+<?xml version="1.1" encoding="ISO-8859-1" ?>
+<pipe:pipeline xmlns:pipe="http://cancerresearchuk.org/workflow/pipeline"
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xsi:schemaLocation="http://cancerresearchuk.org/workflow/pipeline http://uk-cri-lbio01/schema/workflow/pipeline-1.4.xsd">
+
+    <name>Multi-Genome Alignment Pipeline</name>
+    <description>Contaminant screen for high-throughput sequencing data that aligns to multiple reference genomes and adapter sequences.</description>
+
+    <namingService>org.cruk.mga.workflow.JobNamingService</namingService>
+    <metaDataValidator>org.cruk.mga.workflow.MetaDataValidator</metaDataValidator>
+
+    <defaultResources>
+        <memory>512M</memory>
+    </defaultResources>
+
+    <variables>
+        <work>@{user.dir}</work>
+        <dataDir>${work}</dataDir>
+        <outputDir>${work}</outputDir>
+        <resourcesDir>${install}/resources</resourcesDir>
+        <bowtieIndexDir>${resourcesDir}/bowtie_indexes</bowtieIndexDir>
+        <adapterFastaFile>${resourcesDir}/adapters.fa</adapterFastaFile>
+        <referenceGenomeMappingFile>${resourcesDir}/reference_genome_mappings.txt</referenceGenomeMappingFile>
+        <xslStyleSheetFile>${install}/resources/results.xsl</xslStyleSheetFile>
+        <bowtieExecutable>bowtie</bowtieExecutable>
+        <exonerateExecutable>exonerate</exonerateExecutable>
+        <sampleSheetFile></sampleSheetFile>
+        <sampleSize>100000</sampleSize>
+        <maxNumberOfRecordsToSampleFrom>5000000</maxNumberOfRecordsToSampleFrom>
+        <chunkSize>5000000</chunkSize>
+        <trimLength>36</trimLength>
+        <plotWidth>800</plotWidth>
+        <minimumSequenceCount>10</minimumSequenceCount>
+        <separateDatasetReports>true</separateDatasetReports>
+    </variables>
+
+    <tasks>
+
+        <!--
+            Counts records for each of the input FASTQ files
+        -->
+        <specialisationSet name="countFastqMultiplex" type="countFastqMultiplex" variable="datasetId">
+
+            <outputs>
+                <output name="countSummaryFiles" patternType="wildcard" deleteOnFailure="false">${temp}/${runId}.*.count.xml</output>
+            </outputs>
+
+            <subtasks>
+                <!--
+                    Counts records in the FASTQ file.
+                -->
+                <task name="countFastq" type="countFastq">
+                    <inputs>
+                        <input name="fastqFile">${fastqFile}</input>
+                    </inputs>
+
+                    <outputs>
+                        <output name="outputFile">${temp}/${runId}.${datasetId}.count.xml</output>
+                    </outputs>
+
+                    <arguments>
+                        <arg name="datasetId">${datasetId}</arg>
+                        <arg name="classpath">@{java.class.path}</arg>
+                        <arg name="jvmargs">-Xmx512m</arg>
+                    </arguments>
+                </task>
+            </subtasks>
+
+        </specialisationSet>
+
+        <!--
+            Samples records from each of the input FASTQ files
+        -->
+        <specialisationSet name="sampleFastqMultiplex" type="sampleFastqMultiplex" variable="datasetId">
+
+            <outputs>
+                <output name="sampleFastqFiles" patternType="wildcard" deleteOnFailure="false">${temp}/${runId}.*.sampled.fq</output>
+                <output name="sampleSummaryFiles" patternType="wildcard" deleteOnFailure="false">${temp}/${runId}.*.sampled.xml</output>
+            </outputs>
+
+            <subtasks>
+
+                <!--
+                    Samples subset of original FASTQ file.
+                -->
+                <task name="sampleFastq" type="sampleFastq">
+                    <resources>
+                        <memory>2G</memory>
+                    </resources>
+
+                    <inputs>
+                        <input name="fastqFile">${fastqFile}</input>
+                    </inputs>
+
+                    <outputs>
+                        <output name="outputFastqFile">${temp}/${runId}.${datasetId}.sampled.fq</output>
+                        <output name="sampleSummaryFile">${temp}/${runId}.${datasetId}.sampled.xml</output>
+                    </outputs>
+
+                    <arguments>
+                        <arg name="datasetId">${datasetId}</arg>
+                        <arg name="sequenceIdPrefix">${datasetId}_</arg>
+                        <arg name="numberOfRecordsToSample">${sampleSize}</arg>
+                        <arg name="maxNumberOfRecordsToSampleFrom">${maxNumberOfRecordsToSampleFrom}</arg>
+                        <arg name="classpath">@{java.class.path}</arg>
+                        <arg name="jvmargs">-Xms512m -Xmx2g</arg>
+                    </arguments>
+                </task>
+
+            </subtasks>
+
+        </specialisationSet>
+
+        <task name="mergeAndSplitFastq" type="mergeAndSplitFastq">
+            <depends>
+                <task>sampleFastqMultiplex</task>
+            </depends>
+
+            <inputs>
+                <input name="fastqFiles" origin="dependency" dependency="sampleFastqMultiplex" ref="sampleFastqFiles"
+                       ordered="true"/>
+            </inputs>
+
+            <outputs>
+                <output name="outputFastqFiles" patternType="regex">${temp}/${runId}.\d+\.fq</output>
+            </outputs>
+
+            <arguments>
+                <arg name="outputFilePrefix">${temp}/${runId}</arg>
+                <arg name="recordsPerFile">${chunkSize}</arg>
+                <arg name="classpath">@{java.class.path}</arg>
+                <arg name="jvmargs">-Xmx512m</arg>
+            </arguments>
+        </task>
+
+        <foreach name="sequenceChunkIterator" type="fileIterator" loopInput="inputFile">
+            <depends>
+                <task>mergeAndSplitFastq</task>
+            </depends>
+
+            <inputs>
+                <input name="inputFile">${temp}/${runId}.${chunkNumber}.fq</input>
+            </inputs>
+
+            <variables>
+                <var name="chunkNumber" pattern="\d+"/>
+            </variables>
+
+            <outputs>
+                <output name="outputFiles" patternType="regex" deleteOnFailure="false">${temp}/${runId}\.\d+\..+\.alignment</output>
+            </outputs>
+
+            <subtasks>
+
+                <!--
+                    Converts full-length sequences in FASTQ format to FASTA for subsequent
+                    alignment to adapter sequences using exonerate.
+                -->
+                <task name="fastqToFasta" type="fastqToFasta">
+                    <inputs>
+                        <input name="fastqFile" origin="inherited" ref="inputFile"/>
+                    </inputs>
+
+                    <outputs>
+                        <output name="outputFastaFile">${temp}/${runId}.${chunkNumber}.fa</output>
+                    </outputs>
+
+                    <arguments>
+                        <arg name="classpath">@{java.class.path}</arg>
+                        <arg name="jvmargs">-Xmx512m</arg>
+                    </arguments>
+                </task>
+
+                <!--
+                    Aligns sampled sequences against known adapter sequences using exonerate.
+                -->
+                <task name="alignAdaptersWrapper" type="alignmentWrapper">
+                    <depends>
+                        <task>fastqToFasta</task>
+                    </depends>
+
+                    <inputs>
+                        <input name="queryFile" origin="dependency" dependency="fastqToFasta" ref="outputFastaFile"/>
+                    </inputs>
+
+                    <outputs>
+                        <output name="alignmentFile">${temp}/${runId}.${chunkNumber}.adapter.exonerate.alignment</output>
+                    </outputs>
+
+                    <subtasks>
+                        <task name="alignAdapters" type="exonerate">
+                            <inputs>
+                                <input name="queryFastaFile" origin="inherited" ref="queryFile"/>
+                                <input name="targetFastaFile">${adapterFastaFile}</input>
+                            </inputs>
+
+                            <outputs>
+                                <output name="alignmentFile" origin="inherited" ref="alignmentFile"/>
+                            </outputs>
+
+                            <arguments>
+                                <arg name="model">ungapped</arg>
+                                <arg name="exonerateExecutable">${exonerateExecutable}</arg>
+                            </arguments>
+                        </task>
+                    </subtasks>
+                </task>
+
+                <!--
+                    Trims sequences prior to alignment to reference genomes to give results
+                    that are comparable between runs of differing lengths.
+                -->
+                <task name="trimFastq" type="trimFastq">
+                    <inputs>
+                        <input name="fastqFile" origin="inherited" ref="inputFile"/>
+                    </inputs>
+
+                    <outputs>
+                        <output name="outputFastqFile">${temp}/${runId}.${chunkNumber}.trimmed.fq</output>
+                    </outputs>
+
+                    <arguments>
+                        <arg name="length">${trimLength}</arg>
+                        <arg name="classpath">@{java.class.path}</arg>
+                        <arg name="jvmargs">-Xmx512m</arg>
+                    </arguments>
+                </task>
+
+                <!--
+                    Aligns sequences against multiple reference genomes using Bowtie.
+                -->
+                <foreach name="alignReferenceGenomes" type="alignReferenceGenomeIterator" loopInput="referenceGenome">
+                    <depends>
+                        <task>trimFastq</task>
+                    </depends>
+
+                    <inputs>
+                        <input name="referenceGenome">${bowtieIndexDir}/${referenceGenomeId}\.rev\.1\.ebwt</input>
+                        <input name="fastqFile" origin="dependency" dependency="trimFastq" ref="outputFastqFile"/>
+                    </inputs>
+
+                    <variables>
+                        <var name="referenceGenomeId" pattern=".+"/>
+                    </variables>
+
+                    <outputs>
+                        <output name="alignmentFiles" patternType="wildcard">${temp}/${runId}.${chunkNumber}.*.bowtie.alignment</output>
+                    </outputs>
+
+                    <subtasks>
+                        <!--
+                            Aligns sequences against a specific reference genome using Bowtie.
+
+                            The alignReferenceGenomeIterator parent foreach task introduces the following
+                            custom parameter the bowtie task:
+
+                            ${referenceGenomeId} - the reference genome identifier
+                        -->
+                        <task name="alignAdaptersWrapper" type="alignmentWrapper">
+                            <inputs>
+                                <input name="queryFile" origin="inherited" ref="fastqFile"/>
+                            </inputs>
+
+                            <outputs>
+                                <output name="alignmentFile">${temp}/${runId}.${chunkNumber}.${referenceGenomeId}.bowtie.alignment</output>
+                            </outputs>
+
+                            <subtasks>
+                                <task name="bowtie" type="bowtie">
+                                    <resources>
+                                        <memory>4G</memory>
+                                    </resources>
+
+                                    <inputs>
+                                        <input name="fastqFile" origin="inherited" ref="queryFile"/>
+                                        <input name="indexDir">${bowtieIndexDir}</input>
+                                    </inputs>
+
+                                    <outputs>
+                                        <output name="alignmentFile" origin="inherited" ref="alignmentFile"/>
+                                    </outputs>
+
+                                    <arguments>
+                                        <arg name="indexName">${referenceGenomeId}</arg>
+                                        <arg name="bowtieExecutable">${bowtieExecutable}</arg>
+                                    </arguments>
+                                </task>
+                            </subtasks>
+                        </task>
+                    </subtasks>
+                </foreach>
+            </subtasks>
+        </foreach>
+
+        <!--
+                Compiles report from FASTQ record count and sampling summaries and alignment results files.
+        -->
+        <task name="createReport" type="createReport">
+            <depends>
+                <task>countFastqMultiplex</task>
+                <task>sampleFastqMultiplex</task>
+                <task>sequenceChunkIterator</task>
+            </depends>
+
+            <resources>
+                <memory>2G</memory>
+            </resources>
+
+            <inputs>
+                <input name="countSummaryFiles" origin="dependency" dependency="countFastqMultiplex" ref="countSummaryFiles"/>
+                <input name="sampleSummaryFiles" origin="dependency" dependency="sampleFastqMultiplex" ref="sampleSummaryFiles"/>
+                <input name="alignmentFiles" origin="dependency" dependency="sequenceChunkIterator" ref="outputFiles"/>
+            </inputs>
+
+            <outputs>
+                <output name="outputReportFile">${outputDir}/results.xml</output>
+            </outputs>
+
+            <arguments>
+                <arg name="runId">${runId}</arg>
+                <arg name="sampleSheetFile">${sampleSheetFile}</arg>
+                <arg name="referenceGenomeMappingFile">${referenceGenomeMappingFile}</arg>
+                <arg name="xslStyleSheetFile">${xslStyleSheetFile}</arg>
+                <arg name="separateDatasetReports">${separateDatasetReports}</arg>
+                <arg name="datasetReportFilePrefix">${outputDir}/results_</arg>
+                <arg name="trimLength">${trimLength}</arg>
+                <arg name="plotWidth">${plotWidth}</arg>
+                <arg name="minimumSequenceCount">${minimumSequenceCount}</arg>
+                <arg name="classpath">@{java.class.path}</arg>
+                <arg name="jvmargs">-Xms512m -Xmx2g</arg>
+            </arguments>
+        </task>
+
+    </tasks>
+
+</pipe:pipeline>
+
+

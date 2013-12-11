@@ -1,0 +1,17 @@
+<?xml version="1.1" encoding="ISO-8859-1" ?>
+<task:task xmlns:task="http://cancerresearchuk.org/workflow/task"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://cancerresearchuk.org/workflow/task http://uk-cri-lbio01/schema/workflow/task-1.4.xsd">
+
+    <name>sampleFastqMultiplex</name>
+    <description>Task for looping over multiple FASTQ files and sampling records from each.</description>
+
+
+    <program type="inbuilt"/>
+
+    <outputs>
+        <output name="sampleFastqFiles" required="true" plurality="multiple"/>
+        <output name="sampleSummaryFiles" required="true" plurality="multiple"/>
+    </outputs>
+
+</task:task>

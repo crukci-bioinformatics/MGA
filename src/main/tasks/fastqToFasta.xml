@@ -1,0 +1,26 @@
+<?xml version="1.1" encoding="ISO-8859-1" ?>
+<task:task xmlns:task="http://cancerresearchuk.org/workflow/task"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://cancerresearchuk.org/workflow/task http://uk-cri-lbio01/schema/workflow/task-1.4.xsd">
+
+    <name>fastqToFasta</name>
+    <description>Task for converting sequences in FASTQ format to FASTA.</description>
+
+    <program type="commandLine">
+        <executable>@{java.home}/bin/java ${jvmargs} ${classpath} org.cruk.seq.FastqToFasta ${fastqFile} ${outputFastaFile}</executable>
+    </program>
+
+    <inputs>
+        <input name="fastqFile" required="true" quoted="true"/>
+    </inputs>
+
+    <outputs>
+        <output name="outputFastaFile" flag="-o" quoted="true"/>
+    </outputs>
+
+    <arguments>
+        <arg name="classpath" flag="-classpath" required="false" quoted="true" default="@{java.class.path}" />
+        <arg name="jvmargs" required="false" description="Java Virtual Machine arguments."/>
+    </arguments>
+
+</task:task>

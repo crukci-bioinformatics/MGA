@@ -1,0 +1,40 @@
+# This file contains mappings reference genome IDs and species for alignments
+# where the former are used as prefixes in Bowtie index file names.
+# 
+# Each entry in this file corresponds to a mapping of species for a given
+# reference genome identifier in the following format
+#   key = value
+# where the key is the reference genome ID and the value is a list of species
+# and synonyms separated by the '|' character. The first value in the species
+# list will be used as the primary display name for the aligned reference
+# genome.
+#
+# Note that multiple species may map to a single reference genome, for example
+# closely-related species. 
+#
+Ath.TAIR7 = Arabidopsis thaliana (thale cress) | arabidopsis_thaliana | arabidopsis thaliana | a thaliana | thale cress
+bacteria.NCBI = Bacteria (~2000 genomes)
+Cel.WS200 = Caenorhabditis elegans (nematode worm) | caenorhabditis_elegans | caenorhabditis elegans | c elegans | nematode worm | worm
+Cfa.BROADD2 = Canis familiaris (dog) | canis_familiaris | canis familiaris | dog
+Cja.calJac1 = Callithrix jacchus (marmoset) | callithrix_jacchus | callithrix jacchus | marmoset
+Cpo.CavPor3 = Cavia porcellus (guinea pig) | cavia_porcellus | cavia porcellus | guinea pig
+Ddi.090731 = Dictyostelium discoideum | dictyostelium_discoideum
+Eco.W3110 = Escherichia coli | e_coli | e coli
+fungi.RefSeq = Fungi
+Gga.WASHUC2 = Gallus gallus (chicken) | gallus_gallus | gallus gallus | chicken
+Ggo.gorGor3 = Gorilla gorilla | gorilla_gorilla | gorilla gorilla | gorilla
+Hsa.GRCh37 = Homo sapiens (human) | homo_sapiens | homo sapiens | human
+Mdo.BROADO5 = Monodelphis domestica (opossum) | monodelphis_domestica | monodelphis domestica | opossum
+Mml.MMUL1 = Macaca mulatta (macaque) | macaca_mulatta | macaca mulatta | macaque
+Mmu.NCBIM37 = Mus musculus (mouse) | mus_musculus | mus musculus | mouse | Mus musculus tc1 (trisomy Hsa21 mouse) | mus_musculus_tc1 | Mus musculus (Algerian mouse) | mus_spretus | mus spretus
+Ocu.OryCun2 = Oryctolagus cuniculus (rabbit) | oryctolagus_cuniculus | oryctolagus cuniculus | rabbit
+Pha.BCM_v1 = Papio hamadryas (baboon) | papio_hamadryas | paio hamadryas | baboon
+phix174 = Phi X 174 | phix
+Ppy.WU_202 = Pongo pygmaeus (orangutan) | pongo_pygmaeus | orangutan
+Ptr.CHIMP2 = Pan troglodytes (chimpanzee) | pan_troglodytes | pan troglodytes | chimpanzee
+Rno.RNOR3_4 = Rattus norvegicus (rat) | rattus_norvegicus | rattus norvegicus | rat
+Sce.SGD1.01 = Saccharomyces cerevisiae (yeast) | saccharomyces_cerevisiae | saccharomyces cerevisiae | yeast
+Tni.TETRAODON8 = Tetraodon nigroviridis (puffer fish) | tetraodon_nigroviridis | tetraodon nigroviridis | puffer fish
+viruses.NCBI = Viruses (~1700 genomes)
+Xtr.JGI4_1 = Xenopus tropicalis (frog) | xenopus_tropicalis | xenopus tropicalis | Xenopus laevis (frog) | xenopus_laevis | xenopus laevis | frog
+Nle.Nleu1 = Nomascus leucogenys (northern white cheeked gibbon) | nomascus_leucogenys | nomascus leucogenys | northern white cheeked gibbon | gibbon
