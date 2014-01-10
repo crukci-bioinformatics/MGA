@@ -198,6 +198,8 @@ public class CreateMetadataFromSampleSheet extends CommandLineUtility
         meta.setVariable("bowtieExecutable", "bowtie");
         meta.setVariable("exonerateExecutable", "exonerate");
         meta.setVariable("separateDatasetReports", "true");
+        meta.setVariable("plotWidth", "800");
+        meta.setVariable("minimumSequenceCount", "10");
 
         meta.getSpecialisationSets().add(new SpecialisationSet());
         SpecialisationSet specialisationSet = meta.getSpecialisationSet(0);
