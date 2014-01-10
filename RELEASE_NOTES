@@ -1,4 +1,28 @@
 
+Version 1.3 (10 January 2014)
+-----------
+
+* Major reworking of pipeline to combine FASTQ records from multiple datasets
+  and splitting the sequence data into chunks with a specified number of
+  records, corresponding changes to report generation code.
+
+* FASTQ sampling rewritten to use modified version of reservoir sampling method.
+
+* Added option for setting the maximum number of FASTQ records to sample from.
+
+* Added option to create separate reports for each dataset in addition to the
+  report for all.
+
+* Added option to specify the minimum number of sequences to display on the
+  x-axis of the stacked bar plot in the report.
+
+* Improved scaling for larger image sizes for the stacked bar plot and added
+  anti-aliasing for text.
+
+* Removed utility for creating a configuration file from the Solexa LIMS (no
+  longer in use).
+
+
 Version 1.2 (4 February 2013)
 -----------
 
