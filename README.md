@@ -19,10 +19,8 @@ a pre-packaged release.
 
 ####Building MGA from source
 
-MGA is built using [Apache Maven](http://maven.apache.org), a software project
-management and build automation tool.
-
-Details on how to install and run Maven can be found
+MGA is built using Apache Maven, a software project management and build
+automation tool. Details on how to install and run Maven can be found
 [here](http://maven.apache.org).
 
 Maven will automatically download dependencies from a central Maven repository. 
@@ -34,21 +32,21 @@ MGA.
 
 1. Clone the MGA project
 
-    git clone https://github.com/crukci-bioinformatics/MGA.git
+        git clone https://github.com/crukci-bioinformatics/MGA.git
 
 2. Install workflow system jar files into the local maven repository
 
-    cd workflow
-    ./install_workflow_jars.sh
-    cd ..
+        cd workflow
+        ./install_workflow_jars.sh
+        cd ..
 
 3. Build and package MGA
 
-    mvn package
+        mvn package
 
-4. Unpack MGA to installation directory
+4. Unpack MGA to installation directory (substituting for the version number as appropriate)
 
-    tar zxf target/mga-1.x-distribution.tar.gz
+        tar zxf target/mga-1.x-distribution.tar.gz
 
 This will create a directory named mga-1.x which can be moved to the desired
 installation directory.
