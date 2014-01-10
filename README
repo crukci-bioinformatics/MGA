@@ -53,11 +53,11 @@ executables in the config XML file (see below).
 
 2. Install the MGA distribution
 
-Unpack the tarball:
+Unpack the tarball, substituting for the version number as appropriate:
 
-$ tar zxf mga-1.2-distribution.tar.gz
+$ tar zxf mga-1.x-distribution.tar.gz
 
-Optionally add the mga-1.2/bin directory to your path. This is not strictly
+Optionally add the mga-1.x/bin directory to your path. This is not strictly
 necessary but the instructions for running the pipeline and utility scripts
 given below assume that these are on the path; they can be run by providing
 the full or relative path to the program instead.
