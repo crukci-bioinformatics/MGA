@@ -172,6 +172,10 @@ available in the executionConfiguration section.
 Other configuration options include the number of sequence reads to sample from each dataset
 and the length to trim to prior to alignment using bowtie against reference genomes.
 
+The paths to the bowtie and exonerate executables can be explicitly defined in the
+configuration by setting the bowtieExecutable and exonerateExecutable variables and the
+directory containing bowtie indexes for the reference genomes can also be specified.
+
 
 4. Perform a multi-genome alignment
 
