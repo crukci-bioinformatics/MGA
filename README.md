@@ -15,7 +15,7 @@ sequences.
 ####Installing and running MGA
 
 Please see [README](README) file for details of how to install and run MGA from
-a pre-packaged release.
+a [pre-packaged release](https://github.com/crukci-bioinformatics/MGA/releases).
 
 ####Building MGA from source
 
