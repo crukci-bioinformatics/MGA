@@ -130,6 +130,11 @@ lines correspond to samples. The DatasetId and File headers are mandatory and mu
 and second columns respectively as these signify the start of the sample metadata table. Other
 columns are optional, can take any values and are displayed in the report.
 
+FASTQ file paths are treated as relative to the working directory or a data directory specified
+when running the create-config-from-samplesheet utility (see below), unless the file name starts
+with "/" or "./" in which case it is assumed to be an absolute path or a path relative to the
+working directory.
+
 The Species column is optional but recommended as values given are used to highlight correct and
 incorrect genomes matched in the report generated. Species values should correspond to values or
 synonyms provided in the reference genome mapping file (resources/reference_genome_mappings.txt).
