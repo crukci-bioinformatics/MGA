@@ -7,7 +7,7 @@
     <groupId>org.cruk.workflow.pipelines</groupId>
     <artifactId>mga</artifactId>
     <packaging>jar</packaging>
-    <version>1.3</version>
+    <version>1.4-SNAPSHOT</version>
 
     <name>Multi-Genome Alignment Pipeline</name>
 
@@ -70,10 +70,9 @@
                 <enabled>false</enabled>
             </snapshots>
         </repository>
-<!--
         <repository>
             <id>uk-cri-lbio01</id>
-            <url>http://uk-cri-lbio01/maven</url>
+            <url>http://uk-cri-lbio01.crnet.org/maven</url>
             <releases>
                 <enabled>true</enabled>
                 <updatePolicy>daily</updatePolicy>
@@ -83,21 +82,18 @@
                 <updatePolicy>daily</updatePolicy>
             </snapshots>
         </repository>
--->
     </repositories>
 
-<!--
     <distributionManagement>
         <repository>
             <id>uk-cri-lbio01</id>
-            <url>sftp://uk-cri-lbio01/var/www/html/maven</url>
+            <url>sftp://uk-cri-lbio01.crnet.org/var/www/html/maven</url>
         </repository>
         <snapshotRepository>
             <id>uk-cri-lbio01</id>
-            <url>sftp://uk-cri-lbio01/var/www/html/maven</url>
+            <url>sftp://uk-cri-lbio01.crnet.org/var/www/html/maven</url>
         </snapshotRepository>
     </distributionManagement>
--->
     
     <build>
         <pluginManagement>
