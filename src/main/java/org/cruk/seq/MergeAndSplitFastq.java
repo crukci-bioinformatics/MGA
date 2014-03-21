@@ -119,7 +119,7 @@ public class MergeAndSplitFastq extends CommandLineUtility
     }
 
     /**
-     * Runs the FASTQ trimming utility.
+     * Merges and splits FASTQ files into chunks of the specified size.
      *
      * @throws Exception 
      */
