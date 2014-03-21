@@ -207,7 +207,9 @@ public class CreateMetadataFromSampleSheet extends CommandLineUtility
         {
             Specialisation specialisation = new Specialisation(dataset);
             specialisation.setActive(true);
-            specialisation.setVariable("fastqFile", "${dataDir}/" + filenameMappings.get(dataset));
+            String filename = filenameMappings.get(dataset);
+            if (!filename.startsWith("./") && !filename.startsWith("/")) filename = "${dataDir}/" + filename;
+            specialisation.setVariable("fastqFile", filename);
             specialisationSet.add(specialisation);
         }
     }
