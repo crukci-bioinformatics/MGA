@@ -244,7 +244,7 @@
                     </variables>
 
                     <outputs>
-                        <output name="alignmentFiles" patternType="wildcard">${temp}/${runId}.${chunkNumber}.*.bowtie.alignment</output>
+                        <output name="alignmentFiles" patternType="wildcard" deleteOnFailure="false">${temp}/${runId}.${chunkNumber}.*.bowtie.alignment</output>
                     </outputs>
 
                     <subtasks>
