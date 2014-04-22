@@ -23,10 +23,6 @@
 
 package org.cruk.mga;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-
 /**
  * Class used to represent the summary of an alignment of a sequence
  * dataset against a specific reference genome.
@@ -40,7 +36,6 @@ public class AlignmentSummary
     private int totalMismatchCount = 0;
     private int alignedCount = 0;
     private int assignedCount = 0;
-    private Set<Integer> sequenceIds = new HashSet<Integer>();
 
     /**
      * @return the referenceGenomeId
@@ -136,58 +131,5 @@ public class AlignmentSummary
     public void setAssignedCount(int assignedCount)
     {
         this.assignedCount = assignedCount;
-    }
-
-    /**
-     * @return the sequence identifiers associated with alignment to the
-     *         reference genome.
-     */
-    public Set<Integer> getSequenceIds()
-    {
-        return sequenceIds;
-    }
-
-    /**
-     * Returns the number of sequences associated with alignment to the
-     * reference genome.
-     *
-     * @return the sequence count.
-     */
-    public int getSequenceCount()
-    {
-        return sequenceIds.size();
-    }
-
-    /**
-     * Adds the given sequence identifier to the set of sequences associated
-     * with alignment to the reference genome.
-     *
-     * @param id the sequence identifier.
-     */
-    public void addSequenceId(int id)
-    {
-        sequenceIds.add(id);
-    }
-
-    /**
-     * Adds the given sequence identifiers to the set of sequences associated
-     * with alignment to the reference genome.
-     *
-     * @param ids the sequence identifiers.
-     */
-    public void addSequenceIds(Collection<Integer> ids)
-    {
-        sequenceIds.addAll(ids);
-    }
-
-    /**
-     * Removes the following sequence identifiers from the set of sequences
-     * associated with alignment to the reference genome.
-     *
-     * @param ids
-     */
-    public void removeSequenceIds(Collection<Integer> ids)
-    {
-        sequenceIds.removeAll(ids);
     }
 }
