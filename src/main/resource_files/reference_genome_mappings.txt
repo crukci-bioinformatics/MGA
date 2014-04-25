@@ -19,7 +19,6 @@ Cfa.BROADD2 = Canis familiaris (dog) | canis_familiaris | canis familiaris | dog
 Cja.calJac1 = Callithrix jacchus (marmoset) | callithrix_jacchus | callithrix jacchus | marmoset
 Cpo.CavPor3 = Cavia porcellus (guinea pig) | cavia_porcellus | cavia porcellus | guinea pig
 Ddi.090731 = Dictyostelium discoideum | dictyostelium_discoideum
-Dmg.dm3 = Drosophila melanogaster (fruit fly) | drosophila_melanogaster | drosophila melanogaster | fruit fly
 Eco.W3110 = Escherichia coli | e_coli | e coli
 fungi.RefSeq = Fungi
 Gga.WASHUC2 = Gallus gallus (chicken) | gallus_gallus | gallus gallus | chicken
