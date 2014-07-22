@@ -32,7 +32,7 @@
 
 <xsl:variable name="yieldMultiplier">
 	<xsl:choose>
-		<xsl:when test="MultiGenomeAlignmentSummaries/EndType = 'Paired End'">2</xsl:when>
+		<xsl:when test="MultiGenomeAlignmentSummaries/Properties/Property[@name='End type']/@value = 'Paired End'">2</xsl:when>
 		<xsl:otherwise>1</xsl:otherwise>
 	</xsl:choose>
 </xsl:variable>
