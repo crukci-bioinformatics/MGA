@@ -1,0 +1,21 @@
+<?xml version="1.1" encoding="ISO-8859-1" ?>
+<task:task xmlns:task="http://cancerresearchuk.org/workflow/task"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://cancerresearchuk.org/workflow/task http://internal-bioinformatics.cruk.cam.ac.uk/schema/workflow/task-1.5.xsd">
+
+    <name>datasetIterator</name>
+    <description>Reads the sample sheet and iterates over each dataset.</description>
+
+    <program type="class">
+        <executable>org.cruk.mga.workflow.DatasetIteratorTask</executable>
+    </program>
+
+    <inputs>
+        <input name="sampleSheetFile"/>
+    </inputs>
+
+    <outputs>
+        <output name="outputFiles" required="true" plurality="multiple" safeNaming="false"/>
+    </outputs>
+
+</task:task>
