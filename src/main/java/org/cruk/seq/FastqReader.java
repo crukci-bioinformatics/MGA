@@ -29,25 +29,65 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipInputStream;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+/**
+ * Class for reading records from a FASTQ file or from a set of FASTQ files in 
+ * which case records are read from each file in turn in a round-robin fashion.
+ *
+ * @author eldrid01
+ */
 public class FastqReader
 {
     protected Log logger = LogFactory.getLog(FastqReader.class);
-    private BufferedReader reader;
+    private boolean roundRobin = false;
+    private List<BufferedReader> readers = new ArrayList<BufferedReader>();
+    private int currentReaderIndex = 0;
 
+    /**
+     * Creates a new instance of FastqReader for reading from the given FASTQ file.
+     *
+     * @param fastqFilename the name of the FASTQ file.
+     * @throws IOException
+     */
     public FastqReader(String fastqFilename) throws IOException
     {
         this (new File(fastqFilename));
     }
 
+    /**
+     * Creates a new instance of FastqReader for reading from the given FASTQ file.
+     *
+     * @param fastqFile the FASTQ file.
+     * @throws IOException
+     */
     public FastqReader(File fastqFile) throws IOException
     {
-        reader = getBufferedReader(fastqFile);
+        readers.add(getBufferedReader(fastqFile));
+    }
+
+    /**
+     * Creates a new instance of FastqReader for reading from the given files,
+     * optionally in a round-robin fashion.
+     *
+     * @param fastqFilenames the names of the FASTQ files.
+     * @param roundRobin whether to read records from each file in turn or all records from one file before proceeding to the next.
+     * @throws IOException
+     */
+    public FastqReader(String[] fastqFilenames, boolean roundRobin) throws IOException
+    {
+        this.roundRobin = roundRobin;
+        for (String fastqFilename : fastqFilenames)
+        {
+            readers.add(getBufferedReader(new File(fastqFilename)));
+        }
     }
 
     /**
@@ -92,8 +132,58 @@ public class FastqReader
 
     public void close() throws IOException
     {
-        reader.close();
-        reader = null;
+        for (Reader reader : readers)
+        {
+            reader.close();
+        }
+        readers.clear();
+    }
+
+    /**
+     * Reads the next FASTQ entry from the current reader and moves the
+     * index of the current reader forward if in round-robin mode.
+     *
+     * @return a Fastq object or null if there are no more files containing records.
+     * @throws FastqFormatException
+     * @throws IOException
+     */
+    public Fastq readFastq() throws FastqFormatException, IOException
+    {
+        while (!readers.isEmpty())
+        {
+            if (roundRobin && currentReaderIndex >= readers.size()) currentReaderIndex = 0;
+            BufferedReader reader = readers.get(currentReaderIndex);
+            Fastq fastq = readFastq(reader);
+            if (fastq == null)
+            {
+                reader.close();
+                readers.remove(currentReaderIndex);
+            }
+            else
+            {
+                if (roundRobin) currentReaderIndex++;
+                return fastq;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Reads the next FASTQ entry from the given reader.
+     *
+     * @param reader the FASTQ file reader.
+     * @return a Fastq object or null if there are no more files containing records.
+     * @throws FastqFormatException
+     * @throws IOException
+     */
+    private Fastq readFastq(BufferedReader reader) throws FastqFormatException, IOException
+    {
+        String[] lines = new String[4];
+        for (int i = 0; i < 4; i++)
+        {
+            lines[i] = reader.readLine();
+        }
+        return createFastq(lines);
     }
 
     /**
@@ -193,97 +283,5 @@ public class FastqReader
         }
 
         return new Fastq(description, sequence, quality);
-    }
-
-    /**
-     * Reads the next FASTQ entry from the given reader.
-     *
-     * @return a Fastq object or null if at the end of the file.
-     * @throws FastqFormatException
-     * @throws IOException
-     */
-    public Fastq readFastq() throws FastqFormatException, IOException
-    {
-        if (reader == null)
-        {
-            String message = "Error reading from FASTQ file; possible cause is that the file has been closed.";
-            logger.error(message);
-            throw new FastqFormatException(message);
-
-        }
-
-        String[] lines = new String[4];
-        for (int i = 0; i < 4; i++)
-        {
-            lines[i] = reader.readLine();
-        }
-
-        return createFastq(lines);
-    }
-
-    /**
-     * Reads next FASTQ entry from the given reader.
-     *
-     * This method is used in sampling and does not assume that the current
-     * position within the file reader is at the beginning of a line. The
-     * first line read which could be part of a line is discarded, so it is
-     * possible that the next FASTQ entry returned is the one after the one
-     * starting at the current position.
-     *
-     * @return a Fastq object or null if at the end of the file.
-     * @throws FastqFormatException
-     * @throws IOException
-     */
-    public Fastq readNextFastq() throws FastqFormatException, IOException
-    {
-        if (reader == null)
-        {
-            String message = "Error reading from FASTQ file; possible cause is that the file has been closed.";
-            logger.error(message);
-            throw new FastqFormatException(message);
-
-        }
-
-        // ensure at beginning of current line or move to start of next line
-        reader.readLine();
-
-        // read subsequent lines until one that starts with @
-        String line = null;
-        for (int i = 0; i < 4; i++)
-        {
-            line = reader.readLine();
-            if (line == null) return null;
-            if (line.startsWith("@")) break;
-        }
-        if (!line.startsWith("@"))
-        {
-            String message = "Invalid FASTQ format: header not found (assumes entries are 4 lines long, i.e. no wrapping)";
-            logger.error(message);
-            throw new FastqFormatException(message);
-        }
-
-        String[] lines = new String[4];
-        lines[0] = line;
-        int linesRead = 1;
-
-        // check for quality string starting with @ by reading next line
-        // assumes sequences cannot contain @ character
-        line = reader.readLine();
-        if (line == null) return null;
-        if (line.startsWith("@"))
-        {
-            // two consecutive lines starting with a @
-            // must be quality followed by header
-            linesRead = 0;
-        }
-
-        lines[linesRead] = line;
-        for (int i = linesRead + 1; i < 4; i++)
-        {
-            lines[i] = reader.readLine();
-            if (lines[i] == null) return null;
-        }
-
-        return createFastq(lines);
     }
 }
