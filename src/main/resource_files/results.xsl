@@ -59,13 +59,12 @@
 
 <p/>
 
-<xsl:if test="MultiGenomeAlignmentSummaries/Image">
+<xsl:param name="image"/>
+
+<xsl:if test="$image">
 	<img>
-		<xsl:attribute name="src">
-				<xsl:value-of select="MultiGenomeAlignmentSummaries/Image"/>
-		</xsl:attribute>
+		<xsl:attribute name="src">data:image/png;base64,<xsl:value-of select="$image"/></xsl:attribute>
 	</img>
-	<br/>
 </xsl:if>
 
 Sequences were sampled<xsl:if test="$trimLength != ''">,
