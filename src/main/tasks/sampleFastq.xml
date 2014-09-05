@@ -7,11 +7,11 @@
     <description>Task for sampling a FASTQ file to produce a subset of entries of a specified size</description>
 
     <program type="commandLine">
-        <executable>@{java.home}/bin/java ${jvmargs} ${classpath} org.cruk.seq.SampleFastq ${datasetId} ${numberOfRecordsToSample} ${maxNumberOfRecordsToSampleFrom} ${sequenceIdPrefix} ${fastqFile} ${outputFastqFile} ${sampleSummaryFile}</executable>
+        <executable>@{java.home}/bin/java ${jvmargs} ${classpath} org.cruk.seq.SampleFastq ${datasetId} ${numberOfRecordsToSample} ${maxNumberOfRecordsToSampleFrom} ${sequenceIdPrefix} ${fastqFiles} ${outputFastqFile} ${sampleSummaryFile}</executable>
     </program>
 
     <inputs>
-        <input name="fastqFile" required="true" plurality="multiple" quoted="true"/>
+        <input name="fastqFiles" required="true" plurality="multiple" quoted="true"/>
     </inputs>
 
     <outputs>
