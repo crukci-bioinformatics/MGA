@@ -51,7 +51,7 @@ public class SampleFastq extends CommandLineUtility
     public static int DEFAULT_MAX_SAMPLE_FROM = 5000000;
 
     private String datasetId;
-    private String fastqFilename;
+    private String[] fastqFilenames;
     private String summaryFilename;
     private String prefix;
     private int sampleSize;
@@ -75,7 +75,7 @@ public class SampleFastq extends CommandLineUtility
      */
     private SampleFastq(String[] args)
     {
-        super("fastq_filename", args);
+        super("fastq_file(s)", args);
     }
 
     /**
@@ -171,12 +171,8 @@ public class SampleFastq extends CommandLineUtility
             {
                 error("Error parsing command line: missing FASTQ filename.", true);
             }
-            if (args.length > 1)
-            {
-                error("Error parsing command line: additional arguments and/or unrecognized options.");
-            }
 
-            fastqFilename = args[0];
+            fastqFilenames = args;
         }
         catch (ParseException e)
         {
@@ -193,7 +189,7 @@ public class SampleFastq extends CommandLineUtility
     {
         try
         {
-            Fastq[] records = reservoirSampling(fastqFilename, sampleSize, maxSampleFrom, prefix != null);
+            Fastq[] records = reservoirSampling(fastqFilenames, sampleSize, maxSampleFrom, prefix != null);
 
             for (int i = 0; i < records.length; i++)
             {
@@ -216,7 +212,7 @@ public class SampleFastq extends CommandLineUtility
     /**
      * Samples records from a FASTQ file using reservoir sampling.
      *
-     * @param fastqFilename the FASTQ file.
+     * @param fastqFilenames the FASTQ file(s).
      * @param sampleSize the number of records to sample.
      * @param maxRecordsToSample the maximum number of records to sample from.
      * @param removeDescriptions to remove sequence identifiers/descriptions to save on space.
@@ -224,10 +220,10 @@ public class SampleFastq extends CommandLineUtility
      * @throws IOException
      * @throws FastqFormatException
      */
-    private Fastq[] reservoirSampling(String fastqFilename, int sampleSize, int maxSampleFrom, boolean removeDescriptions)
+    private Fastq[] reservoirSampling(String[] fastqFilenames, int sampleSize, int maxSampleFrom, boolean removeDescriptions)
             throws IOException, FastqFormatException
     {
-        FastqReader reader = new FastqReader(fastqFilename);
+        FastqReader reader = new FastqReader(fastqFilenames, true);
 
         Fastq[] records = new Fastq[sampleSize];
 
