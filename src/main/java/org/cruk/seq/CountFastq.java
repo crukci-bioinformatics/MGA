@@ -35,14 +35,14 @@ import org.cruk.util.CommandLineUtility;
 import org.cruk.util.LineCounter;
 
 /**
- * Utility for counting records in a FASTQ file.
+ * Utility for counting records in FASTQ file(s).
  *
  * @author eldrid01
  */
 public class CountFastq extends CommandLineUtility
 {
     private String datasetId;
-    private String fastqFilename;
+    private String[] fastqFilenames;
 
     /**
      * Runs the CountFastq utility with the given command-line arguments.
@@ -62,7 +62,7 @@ public class CountFastq extends CommandLineUtility
      */
     private CountFastq(String[] args)
     {
-        super("fastq_filename", args);
+        super("fastq_file(s)", args);
     }
 
     /**
@@ -97,12 +97,8 @@ public class CountFastq extends CommandLineUtility
             {
                 error("Error parsing command line: missing FASTQ filename.", true);
             }
-            if (args.length > 1)
-            {
-                error("Error parsing command line: additional arguments and/or unrecognized options.");
-            }
 
-            fastqFilename = args[0];
+            fastqFilenames = args;
         }
         catch (ParseException e)
         {
@@ -117,9 +113,13 @@ public class CountFastq extends CommandLineUtility
      */
     protected void run() throws Exception
     {
-        LineCounter lineCounter = new LineCounter();
-        long lineCount = lineCounter.getLineCount(fastqFilename);
-        long recordCount = lineCount / 4;
+        long recordCount = 0;
+        for (String fastqFilename : fastqFilenames)
+        {
+            LineCounter lineCounter = new LineCounter();
+            long lineCount = lineCounter.getLineCount(fastqFilename);
+            recordCount += lineCount / 4;
+        }
 
         Element root = new Element("SequenceCountSummary");
 
