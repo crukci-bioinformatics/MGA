@@ -69,7 +69,7 @@ public class TrimFastq extends CommandLineUtility
      */
     private TrimFastq(String[] args)
     {
-        super("fastq_filename", args);
+        super("fastq_file", args);
     }
 
     /**
