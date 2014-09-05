@@ -27,8 +27,8 @@ Installation
 
 The following software needs to be installed (versions currently in use at CRUK-CI
 are shown in parentheses):
-- Java SE 6
-- Bowtie 1 (1.0.0)
+- Java SE 7
+- Bowtie 1 (1.1.0)
 - Exonerate (2.2.0)
 - bash shell
 
@@ -130,10 +130,13 @@ lines correspond to samples. The DatasetId and File headers are mandatory and mu
 and second columns respectively as these signify the start of the sample metadata table. Other
 columns are optional, can take any values and are displayed in the report.
 
-FASTQ file paths are treated as relative to the working directory or a data directory specified
-when running the create-config-from-samplesheet utility (see below), unless the file name starts
-with "/" or "./" in which case it is assumed to be an absolute path or a path relative to the
-working directory.
+FASTQ file paths are treated as relative to the working directory when running the prepare-pipeline
+utility (see below), unless the file name starts with "/" or "./" in which case it is assumed to
+be an absolute path or a path relative to the working directory. It is also possible to use
+wildcards to specify multiple files and to use the "|" character as a delimiter for multiple file
+paths or wildcard expressions. If a data directory is specified when running the prepare-pipeline
+utility, file paths can also contain "${dataDir}" which will be substituted with the specified
+data directory, e.g. ${dataDir}/myseq.fasta.gz.
 
 The Species column is optional but recommended as values given are used to highlight correct and
 incorrect genomes matched in the report generated. Species values should correspond to values or
@@ -151,22 +154,27 @@ controls using the optional Control column with a value of Y or Yes (not case se
 This config XML file for the MGA pipeline can be generated from the sample sheet as
 follows:
 
-$ create-config-from-samplesheet samplesheet.xml -o config.xml
+$ prepare-pipeline samplesheet.txt -o config.xml
 
 It is possible to override the default settings for the working directory and also for the
 following directories:
 
  resources directory   contains the adapter sequences, bowtie indexes and reference genome mappings
  temp directory        where the bash scripts and intermediate outputs for each task are created
- data directory        where MGA looks to find the FASTQ files
+ data directory        where MGA looks to find FASTQ data files if using ${dataDir} in file names
  output directory      where the MGA report(s) is created
 
-For details, run the create-config-from-samplesheet without any arguments.
+Paths for bowtie and exonerate executables can also be supplied to prepare-pipeline and various
+other options including the sample size for each dataset, the length to trim sequences, etc. can
+be configured.
+
+For further details on the options that can be configured, run the prepare-pipeline without any
+arguments.
 
 
 3. Configure the config XML file
 
-The config XML file should be edited to make changes to the default configuration of
+The config XML file can be edited to make changes to the default configuration of
 the pipeline if required.
 
 The pipeline can be run in two modes: either using the Platform LSF scheduler on a cluster
