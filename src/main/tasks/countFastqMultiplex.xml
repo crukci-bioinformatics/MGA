@@ -4,9 +4,15 @@
            xsi:schemaLocation="http://cancerresearchuk.org/workflow/task http://internal-bioinformatics.cruk.cam.ac.uk/schema/workflow/task-1.5.xsd">
 
     <name>countFastqMultiplex</name>
-    <description>Task for looping over multiple FASTQ files and counting the records for each.</description>
+    <description>Task for looping over multiple data sets and counting the records in FASTQ files for each.</description>
 
-    <program type="inbuilt"/>
+    <program type="class">
+        <executable>org.cruk.mga.workflow.DatasetIteratorTask</executable>
+    </program>
+
+    <inputs>
+        <input name="sampleSheetFile"/>
+    </inputs>
 
     <outputs>
         <output name="countSummaryFiles" required="true" plurality="multiple"/>

@@ -4,10 +4,15 @@
            xsi:schemaLocation="http://cancerresearchuk.org/workflow/task http://internal-bioinformatics.cruk.cam.ac.uk/schema/workflow/task-1.5.xsd">
 
     <name>sampleFastqMultiplex</name>
-    <description>Task for looping over multiple FASTQ files and sampling records from each.</description>
+    <description>Task for looping over multiple data sets and sampling FASTQ records from each.</description>
 
+    <program type="class">
+        <executable>org.cruk.mga.workflow.DatasetIteratorTask</executable>
+    </program>
 
-    <program type="inbuilt"/>
+    <inputs>
+        <input name="sampleSheetFile"/>
+    </inputs>
 
     <outputs>
         <output name="sampleFastqFiles" required="true" plurality="multiple"/>
