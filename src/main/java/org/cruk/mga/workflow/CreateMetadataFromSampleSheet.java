@@ -192,22 +192,19 @@ public class CreateMetadataFromSampleSheet extends CommandLineUtility
         meta.setTempDirectory(temporaryDirectory);
         meta.setPipeline("${install}/pipelines/mga.xml");
 
+        local = new ModeConfiguration("local");
+        local.setVar("maxCpuResources", "1");
+        local.setVar("outputDirectory", "${work}/localOutput");
+        meta.getModeConfigurations().add(local);
+
         lsf = new ModeConfiguration("lsf");
         lsf.setVar("outputDirectory", "${work}/lsfOutput");
         lsf.setVar("queue", DEFAULT_LSF_QUEUE);
         lsf.setVar("maximumSubmittedJobs", "50");
         meta.getModeConfigurations().add(lsf);
 
-        local = new ModeConfiguration("local");
-        local.setVar("maxCpuResources", "1");
-        meta.getModeConfigurations().add(local);
-
         meta.setVariable("runId", runId);
         meta.setVariable("sampleSheetFile", sampleSheetFilename);
-        meta.setVariable("sampleSize", "100000");
-        meta.setVariable("maxNumberOfRecordsToSampleFrom", "5000000");
-        meta.setVariable("chunkSize", "5000000");
-        meta.setVariable("trimLength", "36");
         meta.setVariable("work", workingDirectory);
         meta.setVariable("dataDir", dataDirectory);
         meta.setVariable("outputDir", outputDirectory);
@@ -217,6 +214,10 @@ public class CreateMetadataFromSampleSheet extends CommandLineUtility
         meta.setVariable("referenceGenomeMappingFile", "${resourcesDir}/reference_genome_mappings.txt");
         meta.setVariable("bowtieExecutable", bowtieExecutable);
         meta.setVariable("exonerateExecutable", exonerateExecutable);
+        meta.setVariable("sampleSize", "100000");
+        meta.setVariable("maxNumberOfRecordsToSampleFrom", "5000000");
+        meta.setVariable("chunkSize", "5000000");
+        meta.setVariable("trimLength", "36");
         meta.setVariable("separateDatasetReports", Boolean.toString(separateDatasetReports));
         meta.setVariable("plotWidth", "800");
         meta.setVariable("minimumSequenceCount", "10");
