@@ -1,7 +1,7 @@
 <?xml version="1.1" encoding="ISO-8859-1" ?>
 <task:task xmlns:task="http://cancerresearchuk.org/workflow/task"
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-           xsi:schemaLocation="http://cancerresearchuk.org/workflow/task http://uk-cri-lbio01/schema/workflow/task-1.4.xsd">
+           xsi:schemaLocation="http://cancerresearchuk.org/workflow/task http://internal-bioinformatics.cruk.cam.ac.uk/schema/workflow/task-1.5.xsd">
 
     <name>createReport</name>
     <description>Task for creating a report from a set of alignment results files.</description>
@@ -13,7 +13,7 @@
   ${sampleSheetFile} \
   ${referenceGenomeMappingFile} \
   ${xslStyleSheetFile} \
-  ${outputReportFile} \
+  ${outputFilePrefix} \
   ${separateDatasetReports} \
   ${datasetReportFilePrefix} \
   ${trimLength} \
@@ -32,7 +32,7 @@
     </inputs>
 
     <outputs>
-        <output name="outputReportFile" flag="-o" safeNaming="false" quoted="true"/>
+        <output name="outputReportFile" safeNaming="false" quoted="true"/>
     </outputs>
 
     <arguments>
@@ -44,6 +44,8 @@
             description="File containing mappings between reference genome IDs (bowtie prefixes) and species names/synonyms." quoted="true"/>
         <arg name="xslStyleSheetFile" flag="-x" required="false"
             description="XSL stylesheet file to be copied to the output directory." quoted="true"/>
+        <arg name="outputFilePrefix" flag="-o" required="false" quoted="true"
+            description="File name prefix for output report, image and XML files."/>
         <arg name="separateDatasetReports" type="boolean" flag="-d" novalue="true" required="false"
             description="To create individual reports for each dataset."/>
         <arg name="datasetReportFilePrefix" flag="-p" required="false" quoted="true"
