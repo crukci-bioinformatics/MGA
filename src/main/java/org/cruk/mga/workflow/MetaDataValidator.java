@@ -23,15 +23,24 @@
 
 package org.cruk.mga.workflow;
 
-import static org.cruk.mga.workflow.Variables.*;
+import static org.cruk.mga.workflow.Variables.ADAPTER_FASTA_FILE;
+import static org.cruk.mga.workflow.Variables.BOWTIE_EXECUTABLE;
+import static org.cruk.mga.workflow.Variables.BOWTIE_INDEX_DIR;
+import static org.cruk.mga.workflow.Variables.DATA_DIR;
+import static org.cruk.mga.workflow.Variables.EXONERATE_EXECUTABLE;
+import static org.cruk.mga.workflow.Variables.OUTPUT_DIR;
+import static org.cruk.mga.workflow.Variables.REFERENCE_GENOME_MAPPING_FILE;
+import static org.cruk.mga.workflow.Variables.RUN_ID;
+import static org.cruk.mga.workflow.Variables.SAMPLE_SHEET_FILE;
+import static org.cruk.mga.workflow.Variables.SAMPLE_SIZE;
+import static org.cruk.mga.workflow.Variables.TRIM_LENGTH;
+import static org.cruk.mga.workflow.Variables.XSL_STYLE_SHEET_FILE;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.cruk.workflow.PipelineConfig;
 import org.cruk.workflow.assembly.MetaDataException;
 import org.cruk.workflow.xml2.metadata.MetaData;
-import org.cruk.workflow.xml2.metadata.Specialisation;
-import org.cruk.workflow.xml2.metadata.SpecialisationSet;
 import org.cruk.workflow.xml2.pipeline.Pipeline;
 
 public class MetaDataValidator implements org.cruk.workflow.assembly.MetaDataValidator
@@ -46,8 +55,7 @@ public class MetaDataValidator implements org.cruk.workflow.assembly.MetaDataVal
         MetaDataException metadataException = new MetaDataException("Problems with metadata ");
 
         getVariable(RUN_ID, pipeline, metadata, "run id.", metadataException);
-        // sample sheet now optional
-//        getVariable(SAMPLE_SHEET_FILE, pipeline, metadata, "sample sheet file", metadataException);
+        getVariable(SAMPLE_SHEET_FILE, pipeline, metadata, "sample sheet file", metadataException);
         getIntegerVariable(SAMPLE_SIZE, pipeline, metadata, "sample size", metadataException);
         getIntegerVariable(TRIM_LENGTH, pipeline, metadata, "trim length", metadataException);
         getVariable(DATA_DIR, pipeline, metadata, "data directory", metadataException);
@@ -58,28 +66,6 @@ public class MetaDataValidator implements org.cruk.workflow.assembly.MetaDataVal
         getVariable(BOWTIE_EXECUTABLE, pipeline, metadata, "bowtie executable", metadataException);
         getVariable(EXONERATE_EXECUTABLE, pipeline, metadata, "exonerate executable", metadataException);
         getVariable(XSL_STYLE_SHEET_FILE, pipeline, metadata, "XSL style sheet file", metadataException);
-
-        SpecialisationSet specSet = metadata.getSpecialisationSet(0);
-        for (Specialisation s : specSet)
-        {
-            String identifier = s.getIdentifier();
-            if (identifier == null)
-            {
-                metadataException.addVariable(s.getIdentifier(), "The specialisation identifier is required.");
-            }
-            String fastqFile = s.getVariable(FASTQ_FILE);
-            if (fastqFile == null)
-            {
-                if (s.isActive())
-                {
-                    metadataException.addVariable(s.getIdentifier(), "The fastq file is required.");
-                }
-                else
-                {
-                    logger.warn("Inactive specialisation " + identifier + " has no fastq file set.");
-                }
-            }
-        }
 
         if (metadataException.hasErrors())
         {
