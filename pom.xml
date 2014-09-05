@@ -13,7 +13,7 @@
 
     <properties>
         <application.name>mga-pipeline</application.name>
-        <workflow.version>1.4.0</workflow.version>
+        <workflow.version>1.5.0</workflow.version>
         <spring.version>3.2.1.RELEASE</spring.version>
         <xlint.options>-Xlint:all</xlint.options>
     </properties>
@@ -71,8 +71,8 @@
             </snapshots>
         </repository>
         <repository>
-            <id>uk-cri-lbio01</id>
-            <url>http://uk-cri-lbio01.crnet.org/maven</url>
+            <id>bioinformatics</id>
+            <url>http://internal-bioinformatics.cruk.cam.ac.uk/maven</url>
             <releases>
                 <enabled>true</enabled>
                 <updatePolicy>daily</updatePolicy>
@@ -86,15 +86,15 @@
 
     <distributionManagement>
         <repository>
-            <id>uk-cri-lbio01</id>
-            <url>sftp://uk-cri-lbio01.crnet.org/var/www/html/maven</url>
+            <id>bioinformatics</id>
+            <url>scpexe://internal-bioinformatics.cruk.cam.ac.uk/var/www/html/maven</url>
         </repository>
         <snapshotRepository>
-            <id>uk-cri-lbio01</id>
-            <url>sftp://uk-cri-lbio01.crnet.org/var/www/html/maven</url>
+            <id>bioinformatics</id>
+            <url>scpexe://internal-bioinformatics.cruk.cam.ac.uk/var/www/html/maven</url>
         </snapshotRepository>
     </distributionManagement>
-    
+
     <build>
         <pluginManagement>
             <plugins>
@@ -183,7 +183,7 @@
                         </program>
                         <program>
                             <mainClass>org.cruk.mga.workflow.CreateMetadataFromSampleSheet</mainClass>
-                            <name>create-config-from-samplesheet</name>
+                            <name>prepare-pipeline</name>
                         </program>
                         <program>
                             <mainClass>org.cruk.seq.SampleFastq</mainClass>
@@ -340,7 +340,7 @@
         </dependency>
         <dependency>
             <groupId>org.cruk.workflow</groupId>
-            <artifactId>workflow-lsf</artifactId>
+            <artifactId>workflow-cluster</artifactId>
             <version>${workflow.version}</version>
             <scope>runtime</scope>
         </dependency>
@@ -363,6 +363,18 @@
                     <artifactId>xalan</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>1.9</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20140107</version>
         </dependency>
     </dependencies>
 </project>

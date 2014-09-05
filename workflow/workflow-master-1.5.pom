@@ -8,13 +8,13 @@
     <groupId>org.cruk.workflow</groupId>
     <artifactId>workflow-master</artifactId>
     <packaging>pom</packaging>
-    <version>1.4</version>
+    <version>1.5</version>
 
     <name>Workflow master POM</name>
 
     <properties>
         <xlint.options>-Xlint:all</xlint.options>
-        <schema.version>1.4</schema.version>
+        <schema.version>1.5</schema.version>
         <spring.version>3.2.1.RELEASE</spring.version>
         <gmaven.version>1.4</gmaven.version>
         <groovy.version>2.1.1</groovy.version>
@@ -84,8 +84,8 @@
             </snapshots>
         </repository>
         <repository>
-            <id>uk-cri-lbio01</id>
-            <url>http://uk-cri-lbio01.crnet.org/maven</url>
+            <id>bioinformatics</id>
+            <url>http://internal-bioinformatics.cruk.cam.ac.uk/maven</url>
             <releases>
                 <enabled>true</enabled>
                 <updatePolicy>daily</updatePolicy>
@@ -99,16 +99,29 @@
 
     <distributionManagement>
         <repository>
-            <id>uk-cri-lbio01</id>
-            <url>sftp://uk-cri-lbio01.crnet.org/var/www/html/maven</url>
+            <id>bioinformatics</id>
+            <url>scpexe://internal-bioinformatics.cruk.cam.ac.uk/var/www/html/maven</url>
         </repository>
         <snapshotRepository>
-            <id>uk-cri-lbio01</id>
-            <url>sftp://uk-cri-lbio01.crnet.org/var/www/html/maven</url>
+            <id>bioinformatics</id>
+            <url>scpexe://internal-bioinformatics.cruk.cam.ac.uk/var/www/html/maven</url>
         </snapshotRepository>
     </distributionManagement>
 
     <build>
+        <extensions>
+            <extension>
+                <groupId>org.apache.maven.wagon</groupId>
+                <artifactId>wagon-ssh</artifactId>
+                <version>2.6</version>
+            </extension>
+            <extension>
+                <groupId>org.apache.maven.wagon</groupId>
+                <artifactId>wagon-ssh-external</artifactId>
+                <version>2.6</version>
+            </extension>
+        </extensions>
+
         <pluginManagement>
             <plugins>
                 <plugin>
@@ -169,11 +182,46 @@
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>jaxb2-maven-plugin</artifactId>
                     <version>1.5</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>axistools-maven-plugin</artifactId>
-                    <version>1.4</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>javax.xml.bind</groupId>
+                            <artifactId>jaxb-api</artifactId>
+                            <version>${jaxb.version}</version>
+                            <exclusions>
+                                <exclusion>
+                                    <groupId>javax.xml.stream</groupId>
+                                    <artifactId>stax-api</artifactId>
+                                </exclusion>
+                            </exclusions>
+                        </dependency>
+                        <dependency>
+                            <groupId>com.sun.xml.bind</groupId>
+                            <artifactId>jaxb-impl</artifactId>
+                            <version>${jaxb.version}</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>xml-apis</groupId>
+                            <artifactId>xml-apis</artifactId>
+                            <version>1.4.01</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>xerces</groupId>
+                            <artifactId>xercesImpl</artifactId>
+                            <version>2.11.0-xml-schema-1.1-beta</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>org.eclipse.wst</groupId>
+                            <artifactId>org.eclipse.wst.xml.xpath2.processor</artifactId>
+                            <version>1.1.4</version>
+                            <scope>runtime</scope>
+                            <exclusions>
+                                <exclusion>
+                                    <groupId>org.apache.xerces</groupId>
+                                    <artifactId>org.apache.xerces</artifactId>
+                                </exclusion>
+                            </exclusions>
+                        </dependency>
+                    </dependencies>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.gmaven</groupId>
@@ -241,7 +289,7 @@
                         <link>http://docs.oracle.com/javase/6/docs/api</link>
                         <link>http://docs.oracle.com/javaee/5/api/</link>
                         <link>http://commons.apache.org/logging/commons-logging-1.1/apidocs/</link>
-                        <link>http://static.springsource.org/spring/docs/3.0.x/javadoc-api/</link>
+                        <link>http://docs.spring.io/spring/docs/3.2.x/javadoc-api/</link>
                     </links>
                 </configuration>
                 <reportSets>
@@ -266,8 +314,7 @@
         <module>core</module>
         <module>groovy</module>
         <module>notifiers</module>
-        <module>lsf</module>
-        <module>torque</module>
+        <module>cluster</module>
         <module>uberjar</module>
     </modules>
 
@@ -290,12 +337,7 @@
             </dependency>
             <dependency>
                 <groupId>org.cruk.workflow</groupId>
-                <artifactId>workflow-lsf</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.cruk.workflow</groupId>
-                <artifactId>workflow-torque</artifactId>
+                <artifactId>workflow-cluster</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -374,13 +416,13 @@
         <dependency>
             <groupId>org.easymock</groupId>
             <artifactId>easymock</artifactId>
-            <version>3.1</version>
+            <version>3.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>xmlunit</groupId>
             <artifactId>xmlunit</artifactId>
-            <version>1.4</version>
+            <version>1.5</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

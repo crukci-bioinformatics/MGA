@@ -7,12 +7,12 @@
     <parent>
         <groupId>org.cruk.workflow</groupId>
         <artifactId>workflow-master</artifactId>
-        <version>1.4</version>
+        <version>1.5</version>
     </parent>
     
     <artifactId>workflow-notifiers</artifactId>
     <packaging>jar</packaging>
-    <version>1.4.0</version>
+    <version>1.5.0</version>
 
     <name>Workflow notification implementations.</name>
 

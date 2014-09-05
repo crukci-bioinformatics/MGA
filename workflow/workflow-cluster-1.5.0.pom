@@ -7,14 +7,14 @@
     <parent>
         <groupId>org.cruk.workflow</groupId>
         <artifactId>workflow-master</artifactId>
-        <version>1.4</version>
+        <version>1.5</version>
     </parent>
     
-    <artifactId>workflow-lsf</artifactId>
+    <artifactId>workflow-cluster</artifactId>
     <packaging>jar</packaging>
-    <version>1.4.0</version>
+    <version>1.5.0</version>
 
-    <name>Workflow LSF cluster execution library</name>
+    <name>Workflow cluster integration</name>
 
 <!--
     <reporting>

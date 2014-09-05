@@ -1,6 +1,7 @@
 #!/bin/sh
-version=1.4.0
-for module in core groovy notifiers lsf
+
+version=1.5.0
+for module in core groovy notifiers cluster
 do
 	mvn install:install-file \
 		-DgroupId=org.cruk.workflow \
@@ -11,7 +12,7 @@ do
 		-DpomFile=workflow-${module}-${version}.pom
 done
 
-version=1.4
+version=1.5
 mvn install:install-file \
 	-DgroupId=org.cruk.workflow \
 	-DartifactId=workflow-master \
