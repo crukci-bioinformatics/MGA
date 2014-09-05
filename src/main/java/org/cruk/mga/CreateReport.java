@@ -34,6 +34,7 @@ import java.awt.image.BufferedImage;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -52,13 +53,18 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import javax.imageio.ImageIO;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 
 import nu.xom.Attribute;
 import nu.xom.Builder;
 import nu.xom.Document;
 import nu.xom.Element;
 import nu.xom.ParsingException;
-import nu.xom.ProcessingInstruction;
 import nu.xom.Serializer;
 import nu.xom.ValidityException;
 
@@ -67,8 +73,7 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.codec.binary.Base64;
 import org.cruk.util.CommandLineUtility;
 import org.cruk.util.OrderedProperties;
 
@@ -94,7 +99,7 @@ public class CreateReport extends CommandLineUtility
 
     private String runId;
     private Integer trimLength;
-    private String outputImageFilename;
+    private String outputPrefix = "results";
     private String sampleSheetFilename;
     private String referenceGenomeMappingFilename;
     private String xslStyleSheetFilename;
@@ -149,7 +154,7 @@ public class CreateReport extends CommandLineUtility
         Option option = new Option("i", "run-id", true, "The run identifier");
         option.setRequired(true);
         options.addOption(option);
-        options.addOption("o", "output-xml-file", true, "Output alignment report XML file");
+        options.addOption("o", "output-filename-prefix", true, "File name prefix for output report, image and xml file");
         options.addOption("s", "sample-sheet-file", true, "Sample sheet file");
         options.addOption("r", "reference-genome-mapping-file", true, "Reference genome to species mapping file");
         options.addOption("x", "xsl-stylesheet-file", true, "XSL stylesheet file");
@@ -168,11 +173,11 @@ public class CreateReport extends CommandLineUtility
 
             runId = commandLine.getOptionValue("run-id");
 
-            if (commandLine.hasOption("output-xml-file"))
+            if (commandLine.hasOption("output-filename-prefix"))
             {
-                outputFilename = commandLine.getOptionValue("output-xml-file");
-                outputImageFilename = FilenameUtils.removeExtension(outputFilename) + ".png";
+                outputPrefix = commandLine.getOptionValue("output-filename-prefix");
             }
+            outputFilename = outputPrefix + ".xml";
 
             if (commandLine.hasOption("sample-sheet-file"))
             {
@@ -256,7 +261,7 @@ public class CreateReport extends CommandLineUtility
     }
 
     @Override
-    protected void run() throws IOException, ValidityException, ParsingException
+    protected void run() throws IOException, ValidityException, ParsingException, TransformerException
     {
         readReferenceGenomeMapping();
         readCountSummaryFiles();
@@ -265,8 +270,10 @@ public class CreateReport extends CommandLineUtility
         readAlignmentFiles();
         assignAlignedSequences();
         OrderedProperties runProperties = readSampleSheet(multiGenomeAlignmentSummaries);
-        createSummaryPlot(multiGenomeAlignmentSummaries.values(), outputImageFilename);
-        writeSummary(multiGenomeAlignmentSummaries.values(), runProperties, out, outputFilename, outputImageFilename);
+        String imageFilename = outputPrefix + ".png";
+        String htmlFilename = outputPrefix + ".html";
+        createSummaryPlot(multiGenomeAlignmentSummaries.values(), imageFilename);
+        writeReport(multiGenomeAlignmentSummaries.values(), runProperties, out, imageFilename, htmlFilename);
 
         if (separateDatasetReports)
         {
@@ -277,11 +284,11 @@ public class CreateReport extends CommandLineUtility
                 summaries.add(multiGenomeAlignmentSummary);
                 String datasetId = multiGenomeAlignmentSummary.getDatasetId();
                 String prefix = datasetReportFilenamePrefix + datasetId;
-                String outputFilename = prefix + ".xml";
-                String imageFilename = prefix + ".png";
+                htmlFilename = prefix + ".html";
+                imageFilename = prefix + ".png";
                 createSummaryPlot(summaries, imageFilename);
                 PrintStream printStream = new PrintStream(new BufferedOutputStream(new FileOutputStream(outputFilename)));
-                writeSummary(summaries, runProperties, printStream, outputFilename, imageFilename);
+                writeReport(summaries, runProperties, printStream, imageFilename, htmlFilename);
                 printStream.close();
             }
         }
@@ -913,9 +920,10 @@ public class CreateReport extends CommandLineUtility
      * @param outputFilename
      * @param imageFilename
      * @throws IOException
+     * @throws TransformerException 
      */
-    private void writeSummary(Collection<MultiGenomeAlignmentSummary> multiGenomeAlignmentSummaries, OrderedProperties runProperties, PrintStream out, String outputFilename, String imageFilename)
-            throws IOException
+    private void writeReport(Collection<MultiGenomeAlignmentSummary> multiGenomeAlignmentSummaries, OrderedProperties runProperties, PrintStream out, String imageFilename, String htmlFilename)
+            throws IOException, TransformerException
     {
         Element root = new Element("MultiGenomeAlignmentSummaries");
 
@@ -927,8 +935,6 @@ public class CreateReport extends CommandLineUtility
         {
             addElement(root, "TrimLength", trimLength);
         }
-
-        if (imageFilename != null) addElement(root, "Image", FilenameUtils.getName(imageFilename));
 
         Set<String> referenceGenomeIds = new HashSet<String>();
 
@@ -986,24 +992,28 @@ public class CreateReport extends CommandLineUtility
 
         Document document = new Document(root);
 
-        if (outputFilename != null && xslStyleSheetFilename != null)
-        {
-            File outputFile = new File(outputFilename);
-            File xslFile = new File(xslStyleSheetFilename);
-            File destDir = outputFile.getParentFile();
-            if (destDir == null)
-            {
-                destDir = new File(".");
-            }
-            FileUtils.copyFileToDirectory(xslFile, destDir);
-            ProcessingInstruction stylesheet = new ProcessingInstruction("xml-stylesheet", "type=\"text/xsl\" href=\"" + xslFile.getName() + "\"");
-            document.insertChild(stylesheet, 0);
-        }
-
         Serializer serializer = new Serializer(out, "ISO-8859-1");
         serializer.setIndent(2);
         serializer.setLineSeparator("\n");
-        serializer.write(document);  
+        serializer.write(document);
+        out.close();
+
+        if (xslStyleSheetFilename != null)
+        {
+            File imageFile = new File(imageFilename);
+            FileInputStream imageInputStream = new FileInputStream(imageFile);
+            byte imageByteArray[] = new byte[(int)imageFile.length()];
+            imageInputStream.read(imageByteArray);
+            imageInputStream.close();
+
+            String imageBase64String = Base64.encodeBase64String(imageByteArray);
+            TransformerFactory factory = TransformerFactory.newInstance();
+            Source xslt = new StreamSource(new File(xslStyleSheetFilename));
+            Transformer transformer = factory.newTransformer(xslt);
+            transformer.setParameter("image", imageBase64String);
+            Source xmlSource = new StreamSource(new File(outputFilename));
+            transformer.transform(xmlSource, new StreamResult(new File(htmlFilename)));
+        }
     }
 
     private void addElement(Element parent, String name, String value)
