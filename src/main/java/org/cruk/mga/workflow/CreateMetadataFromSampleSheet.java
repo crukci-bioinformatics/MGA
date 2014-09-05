@@ -193,12 +193,12 @@ public class CreateMetadataFromSampleSheet extends CommandLineUtility
         meta.setPipeline("${install}/pipelines/mga.xml");
 
         local = new ModeConfiguration("local");
+        local.setVar("outputDirectory", "${work}/logs");
         local.setVar("maxCpuResources", "1");
-        local.setVar("outputDirectory", "${work}/localOutput");
         meta.getModeConfigurations().add(local);
 
         lsf = new ModeConfiguration("lsf");
-        lsf.setVar("outputDirectory", "${work}/lsfOutput");
+        lsf.setVar("outputDirectory", "${work}/logs");
         lsf.setVar("queue", DEFAULT_LSF_QUEUE);
         lsf.setVar("maximumSubmittedJobs", "50");
         meta.getModeConfigurations().add(lsf);
