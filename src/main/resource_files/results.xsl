@@ -67,6 +67,7 @@
 	</img>
 </xsl:if>
 
+<br/>
 Sequences were sampled<xsl:if test="$trimLength != ''">,
 trimmed to <xsl:value-of select="$trimLength"/> bases</xsl:if>
 and mapped to <xsl:value-of select="$referenceGenomeCount"/>
