@@ -1,7 +1,7 @@
 <?xml version="1.1" encoding="ISO-8859-1" ?>
 <pipe:pipeline xmlns:pipe="http://cancerresearchuk.org/workflow/pipeline"
                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-               xsi:schemaLocation="http://cancerresearchuk.org/workflow/pipeline http://uk-cri-lbio01/schema/workflow/pipeline-1.4.xsd">
+               xsi:schemaLocation="http://cancerresearchuk.org/workflow/pipeline http://internal-bioinformatics.cruk.cam.ac.uk/schema/workflow/pipeline-1.5.xsd">
 
     <name>Multi-Genome Alignment Pipeline</name>
     <description>Contaminant screen for high-throughput sequencing data that aligns to multiple reference genomes and adapter sequences.</description>
@@ -37,9 +37,13 @@
     <tasks>
 
         <!--
-            Counts records for each of the input FASTQ files
+            Counts records for each of the input FASTQ data sets
         -->
-        <specialisationSet name="countFastqMultiplex" type="countFastqMultiplex" variable="datasetId">
+        <task name="countFastqMultiplex" type="countFastqMultiplex">
+
+            <inputs>
+                <input name="sampleSheetFile">${sampleSheetFile}</input>
+            </inputs>
 
             <outputs>
                 <output name="countSummaryFiles" patternType="wildcard" deleteOnFailure="false">${temp}/${runId}.*.count.xml</output>
@@ -51,7 +55,7 @@
                 -->
                 <task name="countFastq" type="countFastq">
                     <inputs>
-                        <input name="fastqFile">${fastqFile}</input>
+                        <input name="fastqFiles" patternType="wildcard" multipleDelimiter="|">${datasetFiles}</input>
                     </inputs>
 
                     <outputs>
@@ -66,12 +70,16 @@
                 </task>
             </subtasks>
 
-        </specialisationSet>
+        </task>
 
         <!--
-            Samples records from each of the input FASTQ files
+            Samples records from each of the input FASTQ data sets
         -->
-        <specialisationSet name="sampleFastqMultiplex" type="sampleFastqMultiplex" variable="datasetId">
+        <task name="sampleFastqMultiplex" type="sampleFastqMultiplex">
+
+            <inputs>
+                <input name="sampleSheetFile">${sampleSheetFile}</input>
+            </inputs>
 
             <outputs>
                 <output name="sampleFastqFiles" patternType="wildcard" deleteOnFailure="false">${temp}/${runId}.*.sampled.fq</output>
@@ -89,7 +97,7 @@
                     </resources>
 
                     <inputs>
-                        <input name="fastqFile">${fastqFile}</input>
+                        <input name="fastqFiles" patternType="wildcard">${datasetFiles}</input>
                     </inputs>
 
                     <outputs>
@@ -109,7 +117,7 @@
 
             </subtasks>
 
-        </specialisationSet>
+        </task>
 
         <task name="mergeAndSplitFastq" type="mergeAndSplitFastq">
             <depends>
@@ -117,8 +125,7 @@
             </depends>
 
             <inputs>
-                <input name="fastqFiles" origin="dependency" dependency="sampleFastqMultiplex" ref="sampleFastqFiles"
-                       ordered="true"/>
+                <input name="fastqFiles" origin="dependency" dependency="sampleFastqMultiplex" ref="sampleFastqFiles" ordered="true"/>
             </inputs>
 
             <outputs>
@@ -313,7 +320,7 @@
             </inputs>
 
             <outputs>
-                <output name="outputReportFile">${outputDir}/results.xml</output>
+                <output name="outputReportFile">${outputDir}/results.html</output>
             </outputs>
 
             <arguments>
@@ -321,6 +328,7 @@
                 <arg name="sampleSheetFile">${sampleSheetFile}</arg>
                 <arg name="referenceGenomeMappingFile">${referenceGenomeMappingFile}</arg>
                 <arg name="xslStyleSheetFile">${xslStyleSheetFile}</arg>
+                <arg name="outputFilePrefix">${outputDir}/results</arg>
                 <arg name="separateDatasetReports">${separateDatasetReports}</arg>
                 <arg name="datasetReportFilePrefix">${outputDir}/results_</arg>
                 <arg name="trimLength">${trimLength}</arg>
