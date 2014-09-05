@@ -70,10 +70,9 @@ public class LineCounter
             }
             else if (filename.toLowerCase().endsWith(".zip"))
             {
-                ZipInputStream zipInputStream = new ZipInputStream(inputStream);
                 // assumes single entry in the zip archive
-                zipInputStream.getNextEntry();
-                inputStream = zipInputStream;
+                inputStream = new ZipInputStream(inputStream);
+                ((ZipInputStream)inputStream).getNextEntry();
             }
             LineNumberReader reader = new LineNumberReader(new InputStreamReader(inputStream));
 //            while (reader.readLine() != null) {}

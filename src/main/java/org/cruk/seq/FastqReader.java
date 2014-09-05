@@ -108,10 +108,9 @@ public class FastqReader
         }
         else if (filename.toLowerCase().endsWith(".zip"))
         {
-            ZipInputStream zipInputStream = new ZipInputStream(inputStream);
             // assumes single entry in the zip archive
-            zipInputStream.getNextEntry();
-            inputStream = zipInputStream;
+            inputStream = new ZipInputStream(inputStream);
+            ((ZipInputStream)inputStream).getNextEntry();
         }
         return inputStream;
     }
