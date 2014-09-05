@@ -56,7 +56,7 @@ public class FastqToFasta extends CommandLineUtility
      */
     private FastqToFasta(String[] args)
     {
-        super("fastq_filename", args);
+        super("fastq_file", args);
     }
 
     /**
