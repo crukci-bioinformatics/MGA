@@ -99,7 +99,7 @@ public class CreateReport extends CommandLineUtility
 
     private String runId;
     private Integer trimLength;
-    private String outputPrefix = "results";
+    private String outputPrefix;
     private String sampleSheetFilename;
     private String referenceGenomeMappingFilename;
     private String xslStyleSheetFilename;
@@ -164,6 +164,7 @@ public class CreateReport extends CommandLineUtility
         options.addOption("m", "minimum-sequence-count", true, "The minimum number of sequences to display on the x-axis.");
         options.addOption("l", "trim-length", true, "Trim length of sequences following trimming from 3' end");
 
+        outputPrefix = "results";
         separateDatasetReports = false;
         datasetReportFilenamePrefix = "results_";
 
@@ -700,6 +701,21 @@ public class CreateReport extends CommandLineUtility
             }
         }
 
+        // initialize alignment summary for each reference genome and dataset
+        for (String referenceGenomeId : fileReferenceGenomeMapping.values())
+        {
+            for (MultiGenomeAlignmentSummary multiGenomeAlignmentSummary : multiGenomeAlignmentSummaries.values())
+            {
+                AlignmentSummary alignmentSummary = multiGenomeAlignmentSummary.getAlignmentSummary(referenceGenomeId);
+                if (alignmentSummary == null)
+                {
+                    alignmentSummary = new AlignmentSummary();
+                    alignmentSummary.setReferenceGenomeId(referenceGenomeId);
+                    multiGenomeAlignmentSummary.addAlignmentSummary(alignmentSummary);
+                }
+            }
+        }
+
         // Calculate how many bytes required to hold binary alignment matrix for each
         // dataset, sampled sequence and reference genome.
         bytesPerSequence = referenceGenomeCount / Byte.SIZE;
@@ -783,12 +799,6 @@ public class CreateReport extends CommandLineUtility
             }
 
             AlignmentSummary alignmentSummary = multiGenomeAlignmentSummary.getAlignmentSummary(referenceGenomeId);
-            if (alignmentSummary == null)
-            {
-                alignmentSummary = new AlignmentSummary();
-                alignmentSummary.setReferenceGenomeId(referenceGenomeId);
-                multiGenomeAlignmentSummary.addAlignmentSummary(alignmentSummary);
-            }
 
             int alignedLength = fields[4].length();
             alignmentSummary.addAlignedSequenceLength(alignedLength);
