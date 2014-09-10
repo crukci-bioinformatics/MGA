@@ -51,28 +51,28 @@ import org.springframework.context.ApplicationContext;
  */
 public class CreateMetadataFromSampleSheet extends CommandLineUtility
 {
-	private static final String DEFAULT_MODE = "local";
-    private static final int DEFAULT_MAX_CPU_RESOURCES = 1;
-    private static final String DEFAULT_QUEUE = "bioinformatics";
-    private static final int DEFAULT_MAX_SUBMITTED_JOBS = 50;
+    public static final String DEFAULT_MODE = "local";
+    public static final int DEFAULT_MAX_CPU_RESOURCES = 1;
+    public static final String DEFAULT_QUEUE = "bioinformatics";
+    public static final int DEFAULT_MAX_SUBMITTED_JOBS = 50;
 
-    private static final String DEFAULT_WORKING_DIR = "@{user.dir}";
-    private static final String DEFAULT_TEMP_DIR = "${work}/temp";
-    private static final String DEFAULT_RESOURCES_DIR = "${install}/resources";
-    private static final String DEFAULT_DATA_DIR = "${work}";
-    private static final String DEFAULT_OUTPUT_DIR = "${work}";
+    public static final String DEFAULT_WORKING_DIR = "@{user.dir}";
+    public static final String DEFAULT_TEMP_DIR = "${work}/temp";
+    public static final String DEFAULT_RESOURCES_DIR = "${install}/resources";
+    public static final String DEFAULT_DATA_DIR = "${work}";
+    public static final String DEFAULT_OUTPUT_DIR = "${work}";
     
-    private static final String DEFAULT_BOWTIE_EXECUTABLE = "bowtie";
-    private static final String DEFAULT_EXONERATE_EXECUTABLE = "exonerate";
+    public static final String DEFAULT_BOWTIE_EXECUTABLE = "bowtie";
+    public static final String DEFAULT_EXONERATE_EXECUTABLE = "exonerate";
 
-    private static final int DEFAULT_SAMPLE_SIZE = 100000;
-    private static final int DEFAULT_MAX_RECORDS_TO_SAMPLE_FROM = 5000000;
-    private static final int DEFAULT_CHUNK_SIZE = 5000000;
-    private static final int DEFAULT_TRIM_LENGTH = 36;
+    public static final int DEFAULT_SAMPLE_SIZE = 100000;
+    public static final int DEFAULT_MAX_RECORDS_TO_SAMPLE_FROM = 5000000;
+    public static final int DEFAULT_CHUNK_SIZE = 5000000;
+    public static final int DEFAULT_TRIM_LENGTH = 36;
 
-    private static final int DEFAULT_PLOT_WIDTH = 800;
-    private static final int DEFAULT_MIN_SEQUENCE_COUNT = 10;
-    private static final boolean DEFAULT_SEPARATE_DATASET_REPORTS = false;
+    public static final int DEFAULT_PLOT_WIDTH = 800;
+    public static final int DEFAULT_MIN_SEQUENCE_COUNT = 10;
+    public static final boolean DEFAULT_SEPARATE_DATASET_REPORTS = false;
 
     private FileFinder fileFinder = new FileFinder();
 
@@ -108,7 +108,7 @@ public class CreateMetadataFromSampleSheet extends CommandLineUtility
         createMetadataFromSampleSheet.execute();
     }
 
-    CreateMetadataFromSampleSheet(String[] args)
+    public CreateMetadataFromSampleSheet(String[] args)
     {
         super("sample_sheet_file", args);
         meta = new MetaData();
@@ -177,7 +177,7 @@ public class CreateMetadataFromSampleSheet extends CommandLineUtility
                 mode = commandLine.getOptionValue("mode").toLowerCase();
                 if (!mode.equals("local") && !mode.equals("lsf"))
                 {
-                	error("Error: unrecognized execution mode: " + commandLine.getOptionValue("mode") + " (can be either local or lsf)");
+                    error("Error: unrecognized execution mode: " + commandLine.getOptionValue("mode") + " (can be either local or lsf)");
                 }
             }
 
@@ -185,7 +185,7 @@ public class CreateMetadataFromSampleSheet extends CommandLineUtility
             {
                 try
                 {
-                	maxCpuResources = Integer.parseInt(commandLine.getOptionValue("max-cpu-resources"));
+                    maxCpuResources = Integer.parseInt(commandLine.getOptionValue("max-cpu-resources"));
                 }
                 catch (NumberFormatException e)
                 {
@@ -202,7 +202,7 @@ public class CreateMetadataFromSampleSheet extends CommandLineUtility
             {
                 try
                 {
-                	maxSubmittedJobs = Integer.parseInt(commandLine.getOptionValue("max-submitted-jobs"));
+                    maxSubmittedJobs = Integer.parseInt(commandLine.getOptionValue("max-submitted-jobs"));
                 }
                 catch (NumberFormatException e)
                 {
@@ -237,19 +237,19 @@ public class CreateMetadataFromSampleSheet extends CommandLineUtility
 
             if (commandLine.hasOption("bowtie-executable"))
             {
-            	bowtieExecutable = commandLine.getOptionValue("bowtie-executable");
+                bowtieExecutable = commandLine.getOptionValue("bowtie-executable");
             }
 
             if (commandLine.hasOption("exonerate-executable"))
             {
-            	exonerateExecutable = commandLine.getOptionValue("exonerate-executable");
+                exonerateExecutable = commandLine.getOptionValue("exonerate-executable");
             }
 
             if (commandLine.hasOption("sample-size"))
             {
                 try
                 {
-                	sampleSize = Integer.parseInt(commandLine.getOptionValue("sample-size"));
+                    sampleSize = Integer.parseInt(commandLine.getOptionValue("sample-size"));
                 }
                 catch (NumberFormatException e)
                 {
@@ -261,7 +261,7 @@ public class CreateMetadataFromSampleSheet extends CommandLineUtility
             {
                 try
                 {
-                	maxNumberOfRecordsToSampleFrom = Integer.parseInt(commandLine.getOptionValue("max-records-to-sample-from"));
+                    maxNumberOfRecordsToSampleFrom = Integer.parseInt(commandLine.getOptionValue("max-records-to-sample-from"));
                 }
                 catch (NumberFormatException e)
                 {
@@ -273,7 +273,7 @@ public class CreateMetadataFromSampleSheet extends CommandLineUtility
             {
                 try
                 {
-                	chunkSize = Integer.parseInt(commandLine.getOptionValue("chunk-size"));
+                    chunkSize = Integer.parseInt(commandLine.getOptionValue("chunk-size"));
                 }
                 catch (NumberFormatException e)
                 {
@@ -285,7 +285,7 @@ public class CreateMetadataFromSampleSheet extends CommandLineUtility
             {
                 try
                 {
-                	trimLength = Integer.parseInt(commandLine.getOptionValue("trim-length"));
+                    trimLength = Integer.parseInt(commandLine.getOptionValue("trim-length"));
                 }
                 catch (NumberFormatException e)
                 {
@@ -297,7 +297,7 @@ public class CreateMetadataFromSampleSheet extends CommandLineUtility
             {
                 try
                 {
-                	plotWidth = Integer.parseInt(commandLine.getOptionValue("plot-width"));
+                    plotWidth = Integer.parseInt(commandLine.getOptionValue("plot-width"));
                 }
                 catch (NumberFormatException e)
                 {
@@ -309,7 +309,7 @@ public class CreateMetadataFromSampleSheet extends CommandLineUtility
             {
                 try
                 {
-                	minimumSequenceCount = Integer.parseInt(commandLine.getOptionValue("min-sequence-count"));
+                    minimumSequenceCount = Integer.parseInt(commandLine.getOptionValue("min-sequence-count"));
                 }
                 catch (NumberFormatException e)
                 {
@@ -319,7 +319,7 @@ public class CreateMetadataFromSampleSheet extends CommandLineUtility
 
             if (commandLine.hasOption("separate-dataset-reports"))
             {
-            	separateDatasetReports = commandLine.hasOption("separate-dataset-reports");
+                separateDatasetReports = commandLine.hasOption("separate-dataset-reports");
             }
 
             args = commandLine.getArgs();
@@ -410,12 +410,12 @@ public class CreateMetadataFromSampleSheet extends CommandLineUtility
 
         try
         {
-        	boolean inDatasetSection = false;
+            boolean inDatasetSection = false;
 
             int lineNumber = 0;
-        	String line = null;
+            String line = null;
 
-        	while ((line = reader.readLine()) != null)
+            while ((line = reader.readLine()) != null)
             {
                 lineNumber++;
                 String[] fields = line.split("\\t");
@@ -423,32 +423,32 @@ public class CreateMetadataFromSampleSheet extends CommandLineUtility
                 {
                     if (fields.length < 2)
                     {
-                    	error("Error: dataset section in sample sheet contains line with less than two columns at line " + lineNumber + " of sample sheet file " + sampleSheetFilename);
+                        error("Error: dataset section in sample sheet contains line with less than two columns at line " + lineNumber + " of sample sheet file " + sampleSheetFilename);
                     }
 
                     String id = fields[0].trim();
                     if (id.length() == 0)
                     {
-                    	error("Error: missing dataset identifier in first column at line " + lineNumber + " of sample sheet file " + sampleSheetFilename);
+                        error("Error: missing dataset identifier in first column at line " + lineNumber + " of sample sheet file " + sampleSheetFilename);
                     }
 
                     String filename = fields[1].trim();
                     if (filename.length() != 0)
                     {
-                    	if (!dataDirectory.equals(DEFAULT_DATA_DIR))
-                    	{
-                    		filename = filename.replaceAll("\\$\\{dataDir\\}", dataDirectory);
-                    	}
-                    	String[] filenames = filename.split("\\|");
-                    	for (int i = 0; i < filenames.length; i++)
-                    	{
-                    		File file = new File(filenames[i]);
-                    		List<File> files = fileFinder.findFiles(file.getAbsolutePath(), FilenamePattern.WILDCARD, TaskVariableSet.INPUT);
-                    		if (files.isEmpty())
-                    		{
-                    			logger.warn("Could not find any files matching pattern " + fields[1].trim() + " at line " + lineNumber + " of sample sheet file " + sampleSheetFilename);
-                    		}
-                    	}
+                        if (!dataDirectory.equals(DEFAULT_DATA_DIR))
+                        {
+                            filename = filename.replaceAll("\\$\\{dataDir\\}", dataDirectory);
+                        }
+                        String[] filenames = filename.split("\\|");
+                        for (int i = 0; i < filenames.length; i++)
+                        {
+                            File file = new File(filenames[i]);
+                            List<File> files = fileFinder.findFiles(file.getAbsolutePath(), FilenamePattern.WILDCARD, TaskVariableSet.INPUT);
+                            if (files.isEmpty())
+                            {
+                                logger.warn("Could not find any files matching pattern " + fields[1].trim() + " at line " + lineNumber + " of sample sheet file " + sampleSheetFilename);
+                            }
+                        }
                     }
                 }
                 else
@@ -467,15 +467,15 @@ public class CreateMetadataFromSampleSheet extends CommandLineUtility
                 }
             }
 
-        	if (runId == null)
-        	{
-        		error("Error: Run ID must be specified in header section in sample sheet file " + sampleSheetFilename);
-        	}
+            if (runId == null)
+            {
+                error("Error: Run ID must be specified in header section in sample sheet file " + sampleSheetFilename);
+            }
 
-        	if (!inDatasetSection)
-        	{
-        		error("Error: missing dataset section in sample sheet file " + sampleSheetFilename);
-        	}
+            if (!inDatasetSection)
+            {
+                error("Error: missing dataset section in sample sheet file " + sampleSheetFilename);
+            }
         }
         catch (IOException e)
         {
@@ -494,11 +494,194 @@ public class CreateMetadataFromSampleSheet extends CommandLineUtility
         }
     }
 
-    public MetaData getMeta() {
+    public MetaData getMeta()
+    {
         return meta;
     }
 
-    public ModeConfiguration getLsf() {
+    public ModeConfiguration getLsf()
+    {
         return lsf;
     }
+
+    public String getMode()
+    {
+        return mode;
+    }
+
+    public void setMode(String mode)
+    {
+        this.mode = mode;
+    }
+
+    public int getMaxCpuResources()
+    {
+        return maxCpuResources;
+    }
+
+    public void setMaxCpuResources(int maxCpuResources)
+    {
+        this.maxCpuResources = maxCpuResources;
+    }
+
+    public String getQueue()
+    {
+        return queue;
+    }
+
+    public void setQueue(String queue)
+    {
+        this.queue = queue;
+    }
+
+    public int getMaxSubmittedJobs()
+    {
+        return maxSubmittedJobs;
+    }
+
+    public void setMaxSubmittedJobs(int maxSubmittedJobs)
+    {
+        this.maxSubmittedJobs = maxSubmittedJobs;
+    }
+
+    public String getWorkingDirectory()
+    {
+        return workingDirectory;
+    }
+
+    public void setWorkingDirectory(String workingDirectory)
+    {
+        this.workingDirectory = workingDirectory;
+    }
+
+    public String getTemporaryDirectory()
+    {
+        return temporaryDirectory;
+    }
+
+    public void setTemporaryDirectory(String temporaryDirectory)
+    {
+        this.temporaryDirectory = temporaryDirectory;
+    }
+
+    public String getResourcesDirectory()
+    {
+        return resourcesDirectory;
+    }
+
+    public void setResourcesDirectory(String resourcesDirectory)
+    {
+        this.resourcesDirectory = resourcesDirectory;
+    }
+
+    public String getDataDirectory()
+    {
+        return dataDirectory;
+    }
+
+    public void setDataDirectory(String dataDirectory)
+    {
+        this.dataDirectory = dataDirectory;
+    }
+
+    public String getOutputDirectory()
+    {
+        return outputDirectory;
+    }
+
+    public void setOutputDirectory(String outputDirectory)
+    {
+        this.outputDirectory = outputDirectory;
+    }
+
+    public String getBowtieExecutable()
+    {
+        return bowtieExecutable;
+    }
+
+    public void setBowtieExecutable(String bowtieExecutable)
+    {
+        this.bowtieExecutable = bowtieExecutable;
+    }
+
+    public String getExonerateExecutable()
+    {
+        return exonerateExecutable;
+    }
+
+    public void setExonerateExecutable(String exonerateExecutable)
+    {
+        this.exonerateExecutable = exonerateExecutable;
+    }
+
+    public int getSampleSize()
+    {
+        return sampleSize;
+    }
+
+    public void setSampleSize(int sampleSize)
+    {
+        this.sampleSize = sampleSize;
+    }
+
+    public int getMaxNumberOfRecordsToSampleFrom()
+    {
+        return maxNumberOfRecordsToSampleFrom;
+    }
+
+    public void setMaxNumberOfRecordsToSampleFrom(int maxNumberOfRecordsToSampleFrom)
+    {
+        this.maxNumberOfRecordsToSampleFrom = maxNumberOfRecordsToSampleFrom;
+    }
+
+    public int getChunkSize()
+    {
+        return chunkSize;
+    }
+
+    public void setChunkSize(int chunkSize)
+    {
+        this.chunkSize = chunkSize;
+    }
+
+    public int getTrimLength()
+    {
+        return trimLength;
+    }
+
+    public void setTrimLength(int trimLength)
+    {
+        this.trimLength = trimLength;
+    }
+
+    public int getPlotWidth()
+    {
+        return plotWidth;
+    }
+
+    public void setPlotWidth(int plotWidth)
+    {
+        this.plotWidth = plotWidth;
+    }
+
+    public int getMinimumSequenceCount()
+    {
+        return minimumSequenceCount;
+    }
+
+    public void setMinimumSequenceCount(int minimumSequenceCount)
+    {
+        this.minimumSequenceCount = minimumSequenceCount;
+    }
+
+    public boolean isSeparateDatasetReports()
+    {
+        return separateDatasetReports;
+    }
+
+    public void setSeparateDatasetReports(boolean separateDatasetReports)
+    {
+        this.separateDatasetReports = separateDatasetReports;
+    }
+
 }
