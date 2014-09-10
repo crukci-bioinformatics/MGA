@@ -97,7 +97,7 @@
                     </resources>
 
                     <inputs>
-                        <input name="fastqFiles" patternType="wildcard">${datasetFiles}</input>
+                        <input name="fastqFiles" patternType="wildcard" multipleDelimiter="|">${datasetFiles}</input>
                     </inputs>
 
                     <outputs>
