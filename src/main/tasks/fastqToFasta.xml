@@ -6,7 +6,7 @@
     <name>fastqToFasta</name>
     <description>Task for converting sequences in FASTQ format to FASTA.</description>
 
-    <program type="commandLine">
+    <program type="externalJava">
         <executable>@{java.home}/bin/java ${jvmargs} ${classpath} org.cruk.seq.FastqToFasta ${fastqFile} ${outputFastaFile}</executable>
     </program>
 
@@ -20,7 +20,7 @@
 
     <arguments>
         <arg name="classpath" flag="-classpath" required="false" quoted="true" default="@{java.class.path}" />
-        <arg name="jvmargs" required="false" description="Java Virtual Machine arguments."/>
+        <arg name="jvmargs" required="false" default="${jvmMemoryArguments}" description="Java Virtual Machine arguments."/>
     </arguments>
 
 </task:task>

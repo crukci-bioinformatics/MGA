@@ -6,7 +6,7 @@
     <name>countFastq</name>
     <description>Task for counting records in a FASTQ file.</description>
 
-    <program type="commandLine">
+    <program type="externalJava">
         <executable>@{java.home}/bin/java ${jvmargs} ${classpath} org.cruk.seq.CountFastq ${datasetId} ${outputFile} ${fastqFiles}</executable>
     </program>
 
@@ -22,7 +22,7 @@
         <arg name="datasetId" flag="-i" required="false"
             description="The dataset identifier to use in the summary output file."/>
         <arg name="classpath" flag="-classpath" required="false" quoted="true" default="@{java.class.path}" />
-        <arg name="jvmargs" required="false" description="Java Virtual Machine arguments."/>
+        <arg name="jvmargs" required="false" default="${jvmMemoryArguments}" description="Java Virtual Machine arguments."/>
     </arguments>
 
 </task:task>

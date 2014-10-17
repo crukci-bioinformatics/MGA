@@ -64,8 +64,6 @@
 
                     <arguments>
                         <arg name="datasetId">${datasetId}</arg>
-                        <arg name="classpath">@{java.class.path}</arg>
-                        <arg name="jvmargs">-Xmx512m</arg>
                     </arguments>
                 </task>
             </subtasks>
@@ -110,8 +108,6 @@
                         <arg name="sequenceIdPrefix">${datasetId}_</arg>
                         <arg name="numberOfRecordsToSample">${sampleSize}</arg>
                         <arg name="maxNumberOfRecordsToSampleFrom">${maxNumberOfRecordsToSampleFrom}</arg>
-                        <arg name="classpath">@{java.class.path}</arg>
-                        <arg name="jvmargs">-Xms512m -Xmx2g</arg>
                     </arguments>
                 </task>
 
@@ -135,8 +131,6 @@
             <arguments>
                 <arg name="outputFilePrefix">${temp}/${runId}</arg>
                 <arg name="recordsPerFile">${chunkSize}</arg>
-                <arg name="classpath">@{java.class.path}</arg>
-                <arg name="jvmargs">-Xmx512m</arg>
             </arguments>
         </task>
 
@@ -171,11 +165,6 @@
                     <outputs>
                         <output name="outputFastaFile">${temp}/${runId}.${chunkNumber}.fa</output>
                     </outputs>
-
-                    <arguments>
-                        <arg name="classpath">@{java.class.path}</arg>
-                        <arg name="jvmargs">-Xmx512m</arg>
-                    </arguments>
                 </task>
 
                 <!--
@@ -228,8 +217,6 @@
 
                     <arguments>
                         <arg name="length">${trimLength}</arg>
-                        <arg name="classpath">@{java.class.path}</arg>
-                        <arg name="jvmargs">-Xmx512m</arg>
                     </arguments>
                 </task>
 
@@ -334,8 +321,6 @@
                 <arg name="trimLength">${trimLength}</arg>
                 <arg name="plotWidth">${plotWidth}</arg>
                 <arg name="minimumSequenceCount">${minimumSequenceCount}</arg>
-                <arg name="classpath">@{java.class.path}</arg>
-                <arg name="jvmargs">-Xms512m -Xmx2g</arg>
             </arguments>
         </task>
 
