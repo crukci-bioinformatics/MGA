@@ -183,7 +183,7 @@ public class SampleFastq extends CommandLineUtility
     /**
      * Runs the FASTQ sampling utility.
      *
-     * @throws Exception 
+     * @throws Exception
      */
     protected void run() throws Exception
     {
@@ -191,12 +191,19 @@ public class SampleFastq extends CommandLineUtility
         {
             Fastq[] records = reservoirSampling(fastqFilenames, sampleSize, maxSampleFrom, prefix != null);
 
+            // Later code requires that the prefix ends with an underscore.
+            String safePrefix = prefix;
+            if (prefix != null && !prefix.endsWith("_"))
+            {
+                safePrefix = prefix + "_";
+            }
+
             for (int i = 0; i < records.length; i++)
             {
                 Fastq record = records[i];
                 if (prefix != null)
                 {
-                    record.setDescription(prefix + (i + 1));
+                    record.setDescription(safePrefix + (i + 1));
                 }
                 out.print(record);
             }
