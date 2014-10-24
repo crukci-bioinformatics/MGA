@@ -287,8 +287,9 @@ public class CreateReport extends CommandLineUtility
                 String prefix = datasetReportFilenamePrefix + datasetId;
                 htmlFilename = prefix + ".html";
                 imageFilename = prefix + ".png";
+                String xmlFilename = prefix + ".xml";
                 createSummaryPlot(summaries, imageFilename);
-                PrintStream printStream = new PrintStream(new BufferedOutputStream(new FileOutputStream(outputFilename)));
+                PrintStream printStream = new PrintStream(new BufferedOutputStream(new FileOutputStream(xmlFilename)));
                 writeReport(summaries, runProperties, printStream, imageFilename, htmlFilename);
                 printStream.close();
             }
@@ -298,8 +299,8 @@ public class CreateReport extends CommandLineUtility
     /**
      * Read reference genome mapping file.
      *
-     * @throws IOException 
-     * @throws FileNotFoundException 
+     * @throws IOException
+     * @throws FileNotFoundException
      */
     private void readReferenceGenomeMapping() throws FileNotFoundException, IOException
     {
@@ -832,7 +833,7 @@ public class CreateReport extends CommandLineUtility
     /**
      * Iterative process for assignment of aligned sequences to reference genomes
      * based on which genome has the most hits.
-     * 
+     *
      * @param multiGenomeAlignmentSummary
      */
     private void assignAlignedSequences(MultiGenomeAlignmentSummary multiGenomeAlignmentSummary)
@@ -930,7 +931,7 @@ public class CreateReport extends CommandLineUtility
      * @param outputFilename
      * @param imageFilename
      * @throws IOException
-     * @throws TransformerException 
+     * @throws TransformerException
      */
     private void writeReport(Collection<MultiGenomeAlignmentSummary> multiGenomeAlignmentSummaries, OrderedProperties runProperties, PrintStream out, String imageFilename, String htmlFilename)
             throws IOException, TransformerException
@@ -1043,7 +1044,7 @@ public class CreateReport extends CommandLineUtility
         Element propertiesElement = new Element("Properties");
         parent.appendChild(propertiesElement);
 
-        
+
         for (String name : properties.getPropertyNames())
         {
             String value = properties.getProperty(name);
@@ -1062,7 +1063,7 @@ public class CreateReport extends CommandLineUtility
      *
      * @param multiGenomeAlignmentSummaries
      * @param the name of the image file
-     * @throws IOException 
+     * @throws IOException
      */
     private void createSummaryPlot(Collection<MultiGenomeAlignmentSummary> multiGenomeAlignmentSummaries, String imageFilename) throws IOException
     {
