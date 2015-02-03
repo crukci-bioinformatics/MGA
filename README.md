@@ -27,24 +27,20 @@ Maven will automatically download dependencies from a central Maven repository.
 MGA is dependent on a workflow system also developed at CRUK-CI. We are in the
 process of releasing the workflow system and making the workflow dependencies
 available on a publicly-accessible Maven repository. In the interim, however,
-the workflow libraries contained within the MGA project can be used to build
-MGA.
+the workflow libraries and two other dependencies not available in the public
+Maven repository (Apache Xerces XML Schema and PsychoPath Path 2.0 Processor)
+are included in a local Maven repository under the maven subdirectory and are
+used in building MGA.
 
 1. Clone the MGA project
 
         git clone https://github.com/crukci-bioinformatics/MGA.git
 
-2. Install workflow system jar files into the local maven repository
-
-        cd workflow
-        ./install_workflow_jars.sh
-        cd ..
-
-3. Build and package MGA
+2. Build and package MGA
 
         mvn package
 
-4. Unpack MGA to installation directory (substituting for the version number as appropriate)
+3. Unpack MGA to installation directory (substituting for the version number as appropriate)
 
         tar zxf target/mga-1.x-distribution.tar.gz
 
