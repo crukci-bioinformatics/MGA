@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>xerces</groupId>
+    <artifactId>xercesImpl</artifactId>
+    <packaging>jar</packaging>
+    <version>2.11.0-xml-schema-1.1-beta</version>
+
+    <name>Xerces2 Java Parser for XSD 1.1</name>
+
+    <licenses>
+        <license>
+            <name>Apache License</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
+        </license>
+    </licenses>
+    
+    <dependencies>
+        <dependency>
+            <groupId>xml-apis</groupId>
+            <artifactId>xml-apis</artifactId>
+            <version>1.4.01</version>
+        </dependency>
+        <dependency>
+            <groupId>xml-resolver</groupId>
+            <artifactId>xml-resolver</artifactId>
+            <version>1.2</version>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.wst</groupId>
+            <artifactId>org.eclipse.wst.xml.xpath2.processor</artifactId>
+            <version>1.1.0</version>
+        </dependency>
+    </dependencies>
+</project>
