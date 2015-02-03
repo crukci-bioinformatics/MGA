@@ -42,29 +42,17 @@
             </snapshots>
         </repository>
         <repository>
-            <id>bioinformatics</id>
-            <url>http://internal-bioinformatics.cruk.cam.ac.uk/maven</url>
+            <id>local</id>
+            <url>file://${project.basedir}/maven</url>
             <releases>
                 <enabled>true</enabled>
-                <updatePolicy>daily</updatePolicy>
+                <updatePolicy>never</updatePolicy>
             </releases>
             <snapshots>
-                <enabled>true</enabled>
-                <updatePolicy>daily</updatePolicy>
+                <enabled>false</enabled>
             </snapshots>
         </repository>
     </repositories>
-
-    <distributionManagement>
-        <repository>
-            <id>bioinformatics</id>
-            <url>scpexe://internal-bioinformatics.cruk.cam.ac.uk/var/www/html/maven</url>
-        </repository>
-        <snapshotRepository>
-            <id>bioinformatics</id>
-            <url>scpexe://internal-bioinformatics.cruk.cam.ac.uk/var/www/html/maven</url>
-        </snapshotRepository>
-    </distributionManagement>
 
     <build>
         <resources>
