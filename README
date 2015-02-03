@@ -228,3 +228,23 @@ http://bowtie-bio.sourceforge.net/index.shtml
 Exonerate is used to search for adapter sequence contamination.
 http://www.ebi.ac.uk/~guy/exonerate
 
+
+License
+-------
+
+MGA is made available under the MIT License (see separate LICENSE file).
+
+
+Notices
+-------
+
+MGA is packaged with the following software covered under separate licenses:
+
+Apache XML Schema package (xercesImpl-2.11.0-xml-schema-1.1-beta)
+developed at The Apache Software Foundation (http://www.apache.org/)
+and made available under the Apache License v2.0.
+
+PsychoPath XPath 2.0 Processor (org.eclipse.wst.xml.xpath2.processor_1.0.0.jar)
+developed at The Eclipse Foundation (http://www.eclipse.org)
+and made available under the Eclipse Public License v1.0.
+
