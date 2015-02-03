@@ -38,6 +38,7 @@ used in building MGA.
 
 2. Build and package MGA
 
+        cd MGA
         mvn package
 
 3. Unpack MGA to installation directory (substituting for the version number as appropriate)
