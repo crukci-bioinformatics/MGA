@@ -7,7 +7,14 @@
     <description>Task for aligning sequences against a reference genome using Bowtie (version 1).</description>
 
     <program type="commandLine">
-        <executable>${bowtieExecutable} --time --best --chunkmbs 256 ${bowtieArguments} ${indexDir}/${indexName} ${fastqFile} ${alignmentFile}</executable>
+        <executable>
+            ${bowtieExecutable} \
+                --time --best --chunkmbs 256 \
+                ${bowtieArguments} \
+                ${indexDir}/${indexName} \
+                ${fastqFile} \
+                ${alignmentFile}
+        </executable>
     </program>
 
     <inputs>

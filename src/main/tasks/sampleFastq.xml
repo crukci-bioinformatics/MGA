@@ -7,7 +7,17 @@
     <description>Task for sampling a FASTQ file to produce a subset of entries of a specified size</description>
 
     <program type="externalJava">
-        <executable>@{java.home}/bin/java ${jvmargs} ${classpath} org.cruk.seq.SampleFastq ${datasetId} ${numberOfRecordsToSample} ${maxNumberOfRecordsToSampleFrom} ${sequenceIdPrefix} ${fastqFiles} ${outputFastqFile} ${sampleSummaryFile}</executable>
+        <executable>
+            @{java.home}/bin/java \
+                ${jvmargs} \
+                ${classpath} \
+                org.cruk.seq.SampleFastq \ 
+                ${datasetId} ${numberOfRecordsToSample} ${maxNumberOfRecordsToSampleFrom} \
+                ${sequenceIdPrefix} \
+                ${fastqFiles} \
+                ${outputFastqFile} \
+                ${sampleSummaryFile}
+        </executable>
     </program>
 
     <inputs>
@@ -29,7 +39,7 @@
         <arg name="maxNumberOfRecordsToSampleFrom" flag="-m" type="integer" required="false"
             description="Maximum number of records to sample from."/>
         <arg name="classpath" flag="-classpath" required="false" quoted="true" default="@{java.class.path}" />
-        <arg name="jvmargs" required="false" default="${jvmMemoryArguments}" description="Java Virtual Machine arguments."/>
+        <arg name="jvmargs" required="false" quoted="false" default="${jvmMemoryArguments}" description="Java Virtual Machine arguments."/>
     </arguments>
 
 </task:task>

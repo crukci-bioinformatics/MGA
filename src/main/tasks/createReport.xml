@@ -8,20 +8,23 @@
 
     <program type="externalJava">
         <executable>
-@{java.home}/bin/java ${jvmargs} ${classpath} org.cruk.mga.CreateReport \
-  ${runId} \
-  ${sampleSheetFile} \
-  ${referenceGenomeMappingFile} \
-  ${xslStyleSheetFile} \
-  ${outputFilePrefix} \
-  ${separateDatasetReports} \
-  ${datasetReportFilePrefix} \
-  ${trimLength} \
-  ${plotWidth} \
-  ${minimumSequenceCount} \
-  ${countSummaryFiles} \
-  ${sampleSummaryFiles} \
-  ${alignmentFiles}
+@{java.home}/bin/java \
+    ${jvmargs} \
+    ${classpath} \
+    org.cruk.mga.CreateReport \
+    ${runId} \
+    ${sampleSheetFile} \
+    ${referenceGenomeMappingFile} \
+    ${xslStyleSheetFile} \
+    ${outputFilePrefix} \
+    ${separateDatasetReports} \
+    ${datasetReportFilePrefix} \
+    ${trimLength} \
+    ${plotWidth} \
+    ${minimumSequenceCount} \
+    ${countSummaryFiles} \
+    ${sampleSummaryFiles} \
+    ${alignmentFiles}
          </executable>
     </program>
 
@@ -57,7 +60,7 @@
         <arg name="minimumSequenceCount" flag="-m" type="integer" required="false"
             description="The minimum number of sequences to display on the x-axis."/>
         <arg name="classpath" flag="-classpath" required="false" quoted="true" default="@{java.class.path}" />
-        <arg name="jvmargs" required="false" default="${jvmMemoryArguments}" description="Java Virtual Machine arguments."/>
+        <arg name="jvmargs" required="false" quoted="false" default="${jvmMemoryArguments}" description="Java Virtual Machine arguments."/>
     </arguments>
 
 </task:task>

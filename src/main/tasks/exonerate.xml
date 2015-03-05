@@ -7,7 +7,15 @@
     <description>Task for aligning two sets of sequences using exonerate.</description>
 
     <program type="commandLine">
-        <executable>${exonerateExecutable} ${model} ${bestn} ${score} --showalignment no --showvulgar no --verbose 0 --ryo "%qi\t%qab\t%qae\t%qS\t%ti\t%tab\t%tae\t%tS\t%pi\t%s\n" ${queryFastaFile} ${targetFastaFile} > ${alignmentFile}</executable>
+        <executable>
+            ${exonerateExecutable} \
+                ${model} \
+                ${bestn} ${score} --showalignment no --showvulgar no --verbose 0 \
+                --ryo "%qi\t%qab\t%qae\t%qS\t%ti\t%tab\t%tae\t%tS\t%pi\t%s\n" \
+                ${queryFastaFile} \
+                ${targetFastaFile} \
+                > ${alignmentFile}
+        </executable>
     </program>
 
     <inputs>

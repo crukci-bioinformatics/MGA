@@ -7,7 +7,15 @@
     <description>Task for combining FASTQ files and splitting into files with a specified number of records in each.</description>
 
     <program type="externalJava">
-        <executable>@{java.home}/bin/java ${jvmargs} ${classpath} org.cruk.seq.MergeAndSplitFastq ${outputFilePrefix} ${recordsPerFile} ${fastqFiles}</executable>
+        <executable>
+            @{java.home}/bin/java \
+                ${jvmargs} \
+                ${classpath} \
+                org.cruk.seq.MergeAndSplitFastq \
+                ${outputFilePrefix} \
+                ${recordsPerFile} \
+                ${fastqFiles}
+        </executable>
     </program>
 
     <inputs>
@@ -26,7 +34,7 @@
         <arg name="recordsPerFile" flag="-n" type="integer" required="false"
             description="The maximum number of records per FASTQ output file."/>
         <arg name="classpath" flag="-classpath" required="false" quoted="true" default="@{java.class.path}" />
-        <arg name="jvmargs" required="false" default="${jvmMemoryArguments}" description="Java Virtual Machine arguments."/>
+        <arg name="jvmargs" required="false" quoted="false" default="${jvmMemoryArguments}" description="Java Virtual Machine arguments."/>
     </arguments>
 
 </task:task>

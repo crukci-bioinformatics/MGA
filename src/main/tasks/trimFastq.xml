@@ -7,7 +7,16 @@
     <description>Task for trimming sequences in a FASTQ file from the 3' end to the specified length</description>
 
     <program type="externalJava">
-        <executable>@{java.home}/bin/java ${jvmargs} ${classpath} org.cruk.seq.TrimFastq ${length} ${fastqFile} ${outputFastqFile} ${trimmingSummaryFile}</executable>
+        <executable>
+            @{java.home}/bin/java \
+                ${jvmargs} \
+                ${classpath} \
+                org.cruk.seq.TrimFastq \
+                ${length} \
+                ${fastqFile} \
+                ${outputFastqFile} \
+                ${trimmingSummaryFile}
+        </executable>
     </program>
 
     <inputs>
@@ -22,7 +31,7 @@
     <arguments>
         <arg name="length" flag="-l" type="integer" required="false" description="Length of sequences following trimming from the 3' end."/>
         <arg name="classpath" flag="-classpath" required="false" quoted="true" default="@{java.class.path}" />
-        <arg name="jvmargs" required="false" default="${jvmMemoryArguments}" description="Java Virtual Machine arguments."/>
+        <arg name="jvmargs" required="false" quoted="false" default="${jvmMemoryArguments}" description="Java Virtual Machine arguments."/>
     </arguments>
 
 </task:task>
