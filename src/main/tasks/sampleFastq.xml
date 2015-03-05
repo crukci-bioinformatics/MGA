@@ -11,7 +11,7 @@
             @{java.home}/bin/java \
                 ${jvmargs} \
                 ${classpath} \
-                org.cruk.seq.SampleFastq \ 
+                org.cruk.seq.SampleFastq \
                 ${datasetId} ${numberOfRecordsToSample} ${maxNumberOfRecordsToSampleFrom} \
                 ${sequenceIdPrefix} \
                 ${fastqFiles} \
