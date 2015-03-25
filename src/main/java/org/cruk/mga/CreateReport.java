@@ -274,7 +274,7 @@ public class CreateReport extends CommandLineUtility
         String imageFilename = outputPrefix + ".png";
         String htmlFilename = outputPrefix + ".html";
         createSummaryPlot(multiGenomeAlignmentSummaries.values(), imageFilename);
-        writeReport(multiGenomeAlignmentSummaries.values(), runProperties, out, imageFilename, htmlFilename);
+        writeReport(multiGenomeAlignmentSummaries.values(), runProperties, out, imageFilename, outputFilename, htmlFilename);
 
         if (separateDatasetReports)
         {
@@ -290,7 +290,7 @@ public class CreateReport extends CommandLineUtility
                 String xmlFilename = prefix + ".xml";
                 createSummaryPlot(summaries, imageFilename);
                 PrintStream printStream = new PrintStream(new BufferedOutputStream(new FileOutputStream(xmlFilename)));
-                writeReport(summaries, runProperties, printStream, imageFilename, htmlFilename);
+                writeReport(summaries, runProperties, printStream, imageFilename, xmlFilename, htmlFilename);
                 printStream.close();
             }
         }
@@ -928,12 +928,13 @@ public class CreateReport extends CommandLineUtility
      * @param multiGenomeAlignmentSummaries
      * @param runProperties
      * @param out
-     * @param outputFilename
      * @param imageFilename
+     * @param xmlFilename
+     * @param htmlFilename
      * @throws IOException
      * @throws TransformerException
      */
-    private void writeReport(Collection<MultiGenomeAlignmentSummary> multiGenomeAlignmentSummaries, OrderedProperties runProperties, PrintStream out, String imageFilename, String htmlFilename)
+    private void writeReport(Collection<MultiGenomeAlignmentSummary> multiGenomeAlignmentSummaries, OrderedProperties runProperties, PrintStream out, String imageFilename, String xmlFilename, String htmlFilename)
             throws IOException, TransformerException
     {
         Element root = new Element("MultiGenomeAlignmentSummaries");
@@ -1022,7 +1023,7 @@ public class CreateReport extends CommandLineUtility
             Source xslt = new StreamSource(new File(xslStyleSheetFilename));
             Transformer transformer = factory.newTransformer(xslt);
             transformer.setParameter("image", imageBase64String);
-            Source xmlSource = new StreamSource(new File(outputFilename));
+            Source xmlSource = new StreamSource(new File(xmlFilename));
             transformer.transform(xmlSource, new StreamResult(new File(htmlFilename)));
         }
     }
