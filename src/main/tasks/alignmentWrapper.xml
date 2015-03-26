@@ -1,7 +1,7 @@
 <?xml version="1.1" encoding="ISO-8859-1" ?>
 <task:task xmlns:task="http://cancerresearchuk.org/workflow/task"
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-           xsi:schemaLocation="http://cancerresearchuk.org/workflow/task http://internal-bioinformatics.cruk.cam.ac.uk/schema/workflow/task-1.5.xsd">
+           xsi:schemaLocation="http://cancerresearchuk.org/workflow/task http://content.cruk.cam.ac.uk/bioinformatics/schema/workflow/task-1.5.xsd">
 
     <name>alignmentWrapper</name>
     <description>Wrapper for alignment tasks that handles the special case of having no query sequences.</description>
