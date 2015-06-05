@@ -1,7 +1,9 @@
 <?xml version="1.0"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
 <xsl:output method="html" indent="yes"/>
-<xsl:variable name="alignedFractionThreshold">0.025</xsl:variable>
+<xsl:variable name="assignedFractionThreshold">0.02</xsl:variable>
+<xsl:variable name="alignedFractionThreshold">0.01</xsl:variable>
+<xsl:variable name="errorRateThreshold">0.008</xsl:variable>
 <xsl:template match="/">
 <html>
 <head>
@@ -128,8 +130,8 @@ Datasets:
 
 	<xsl:if test="SampledCount &gt; 0">
 
-		<xsl:variable name="otherCount"><xsl:value-of select="sum(AlignmentSummaries/AlignmentSummary[not(ReferenceGenome/@name = ../../Samples/Sample/Properties/Property[@name='Species']/@value) and AlignedCount div ../../SampledCount &lt; $alignedFractionThreshold]/AssignedCount)"/></xsl:variable>
-		<xsl:variable name="otherNumber"><xsl:value-of select="count(AlignmentSummaries/AlignmentSummary[not(ReferenceGenome/@name = ../../Samples/Sample/Properties/Property[@name='Species']/@value) and AlignedCount div ../../SampledCount &lt; $alignedFractionThreshold]/AssignedCount)"/></xsl:variable>
+		<xsl:variable name="otherCount"><xsl:value-of select="sum(AlignmentSummaries/AlignmentSummary[not(ReferenceGenome/@name = ../../Samples/Sample/Properties/Property[@name='Species']/@value) and AssignedCount div ../../SampledCount &lt; $assignedFractionThreshold and (AlignedCount div ../../SampledCount &lt; $alignedFractionThreshold or ErrorRate &gt; $errorRateThreshold)]/AssignedCount)"/></xsl:variable>
+		<xsl:variable name="otherNumber"><xsl:value-of select="count(AlignmentSummaries/AlignmentSummary[not(ReferenceGenome/@name = ../../Samples/Sample/Properties/Property[@name='Species']/@value) and AssignedCount div ../../SampledCount &lt; $assignedFractionThreshold and (AlignedCount div ../../SampledCount &lt; $alignedFractionThreshold or ErrorRate &gt; $errorRateThreshold)]/AssignedCount)"/></xsl:variable>
 
 		<table border="2" cellpadding="5" style="border-collapse: collapse">
 
@@ -149,7 +151,7 @@ Datasets:
 				<xsl:variable name="alignedFraction"><xsl:value-of select="AlignedCount div ../../SampledCount"/></xsl:variable>
 				<xsl:variable name="assignedFraction"><xsl:value-of select="AssignedCount div ../../SampledCount"/></xsl:variable>
 
-				<xsl:if test="$otherNumber &lt; 2 or $alignedFraction &gt; $alignedFractionThreshold or ReferenceGenome/@name = ../../Samples/Sample/Properties/Property[@name='Species']/@value">
+				<xsl:if test="$otherNumber &lt; 2 or not($assignedFraction &lt; $assignedFractionThreshold) or (not($alignedFraction &lt; $alignedFractionThreshold) and not(ErrorRate &gt; $errorRateThreshold)) or ReferenceGenome/@name = ../../Samples/Sample/Properties/Property[@name='Species']/@value">
 
 				<tr>
 					<xsl:choose>
@@ -262,11 +264,11 @@ Datasets:
 				</xsl:choose>
 				<td>Unmapped</td>
 				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
 				<td align="right"><xsl:value-of select="UnmappedCount"/></td>
 				<td align="right"><xsl:value-of select="format-number($unmappedFraction, '0.0%')"/></td>
-				<td></td>
-				<td></td>
-				<td></td>
 			</tr>
 
 			<tr>
