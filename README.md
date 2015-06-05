@@ -23,14 +23,10 @@ MGA is built using Apache Maven, a software project management and build
 automation tool. Details on how to install and run Maven can be found
 [here](http://maven.apache.org).
 
-Maven will automatically download dependencies from a central Maven repository. 
-MGA is dependent on a workflow system also developed at CRUK-CI. We are in the
-process of releasing the workflow system and making the workflow dependencies
-available on a publicly-accessible Maven repository. In the interim, however,
-the workflow libraries and two other dependencies not available in the public
-Maven repository (Apache Xerces XML Schema and PsychoPath Path 2.0 Processor)
-are included in a local Maven repository under the maven subdirectory and are
-used in building MGA.
+Maven will automatically download dependencies from the central Maven repository
+and a repository hosted by Cancer Research UK Cambridge Institute (CRUK-CI). The
+latter contains the Java libraries and source code for the workflow system that
+MGA depends on, which is also developed at CRUK-CI.
 
 1. Clone the MGA project
 
