@@ -35,8 +35,7 @@ are shown in parentheses):
 The MGA is an analysis pipeline that is executed using the workflow system
 developed at CRUK-CI and included within the distribution. The workflow engine
 creates bash shell scripts for each task in the pipeline so availability of a
-bash shell is also required. This is usually present on Linux and Mac computers;
-it may be possible to run the workflow system using Cygwin on Windows.
+bash shell is also required. This is usually present on Linux and Mac computers.
 
 MGA is a Java application and as such requires that a suitable Java Runtime
 Environment. You can test the availability of Java on your system using the
