@@ -12,6 +12,7 @@
 # Note that multiple species may map to a single reference genome, for example
 # closely-related species. 
 #
+acs.AnoCar2 = Anolis carolinensis (anole lizard) | anolis_carolinensis | anolis carolinensis | anole lizard
 ath.TAIR10 = Arabidopsis thaliana (thale cress) | arabidopsis_thaliana | arabidopsis thaliana | thale cress
 bacteria.NCBI = Bacteria
 cel.WBcel235 = Caenorhabditis elegans (roundworm) | caenorhabditis_elegans | caenorhabditis elegans | c elegans
@@ -25,10 +26,10 @@ eco.ASM1024v1 = Escherichia coli | escherichia_coli | e coli
 fungi.NCBI = Fungi
 gga.Galgal4 = Gallus gallus (chicken) | gallus_gallus | gallus gallus | chicken
 ggo.gorGor3.1 = Gorilla gorilla | gorilla_gorilla | gorilla gorilla | gorilla
-hsa.hs37d5 = Homo sapiens (human) | homo_sapiens | homo sapiens | human
+hsa.GRCh37 = Homo sapiens (human) | homo_sapiens | homo sapiens | human
 mcc.MMUL1 = Macaca mulatta (Rhesus macaque) | macaca_mulatta | macaca mulatta | rhesus macaque | macaque
 mdo.monDom5 = Monodelphis domestica (opossum) | monodelphis_domestica | monodelphis domestica | opossum
-mmu.NCBIM37 = Mus musculus (mouse) | mus_musculus | mus musculus | mouse | mus_spretus | mus spretus
+mmu.GRCm38 = Mus musculus (mouse) | mus_musculus | mus musculus | mouse | mus_spretus | mus spretus
 nle.Nleu1 = Nomascus leucogenys (northern white-cheeked gibbon) | nomascus_leucogenys | nomascus leucogenys | gibbon
 ocu.OryCun2 = Oryctolagus cuniculus (rabbit) | oryctolagus_cuniculus | oryctolagus cuniculus | rabbit
 pan.PapAnu2 = Papio anubis (olive baboon) | papio_anubis | papio anubis | olive baboon | baboon
