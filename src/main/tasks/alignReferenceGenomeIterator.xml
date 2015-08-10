@@ -14,7 +14,7 @@
     </inputs>
 
     <outputs>
-        <output name="alignmentFiles" plurality="multiple" safeNaming="false" description="Bowtie alignment output files."/>
+        <output name="alignmentFiles" plurality="multiple" safeNaming="false" required="nice" description="Bowtie alignment output files."/>
     </outputs>
 
 </task:task>
