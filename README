@@ -229,8 +229,8 @@ supports small indexes at the present time.
 Acknowledgements
 ----------------
 
-The adapter sequences used by MGA are taken from the contaminants file in FastQC v0.10.1.
-http://www.bioinformatics.babraham.ac.uk/projects/fastqc/
+The adapter sequences used by MGA are taken from the contaminants file in FastQC v0.11.3.
+http://www.bioinformatics.babraham.ac.uk/projects/fastqc
 
 The short-read aligner used in MGA is Bowtie.
 http://bowtie-bio.sourceforge.net/index.shtml
