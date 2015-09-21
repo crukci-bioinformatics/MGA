@@ -229,7 +229,7 @@
                     </depends>
 
                     <inputs>
-                        <input name="referenceGenome">${bowtieIndexDir}/${referenceGenomeId}\.rev\.1\.ebwt</input>
+                        <input name="referenceGenome">${bowtieIndexDir}/${referenceGenomeId}\.rev\.1\.ebwtl?</input>
                         <input name="fastqFile" origin="dependency" dependency="trimFastq" ref="outputFastqFile"/>
                     </inputs>
 
