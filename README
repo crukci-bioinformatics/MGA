@@ -83,8 +83,7 @@ file (see below). Instead of copying or moving bowtie index files into the
 resources/bowtie_indexes directory, it is possible to create symbolic links to
 these files.
 
-Large 64-bit bowtie indexes are not supported currently in MGA - see the note
-below.
+Large 64-bit bowtie indexes are now supported in MGA - see the note below.
 
 
 4. Update the reference genome mapping file
@@ -220,10 +219,12 @@ the Sanger format, i.e. Phred quality + 33.
 2. Bowtie 64-bit indexes
 
 Since release 1.1.0 bowtie can support genomes with over 4 billion nucleotides by building
-indexes using 64-bit numbers. There is however a bug in the bowtie wrapper script that causes
-bowtie small-index alignment tool to run to run even when presented with a large index. See
-https://github.com/BenLangmead/bowtie/issues/12 for more details. As a result, MGA only
-supports small indexes at the present time.
+indexes using 64-bit numbers. Previous releases of MGA did not support large indexes because 
+of a bug in the bowtie wrapper script that caused the bowtie small-index alignment tool to
+run even when presented with a large index. MGA now detects if there is a large index for
+a reference genome and ensures that bowtie uses this through the --large-index command-line
+argument. The bowtie indexes directory should not contain both small and large indexes for
+a reference genome as this could lead to two bowtie jobs writing to the same output file.
 
 
 Acknowledgements
