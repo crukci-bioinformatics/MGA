@@ -8,12 +8,17 @@
 
     <program type="commandLine">
         <executable>
-            ${bowtieExecutable} \
-                --time --best --chunkmbs 256 \
-                ${bowtieArguments} \
-                ${indexDir}/${indexName} \
-                ${fastqFile} \
-                ${alignmentFile}
+largeIndex=
+if [[ -e ${indexDir}/${indexName}.rev.1.ebwtl ]]
+then
+  largeIndex="--large-index"
+fi
+${bowtieExecutable} \
+  --time --best --chunkmbs 256 \
+  ${bowtieArguments} $largeIndex \
+  ${indexDir}/${indexName} \
+  ${fastqFile} \
+  ${alignmentFile}
         </executable>
     </program>
 
