@@ -1,3 +1,21 @@
+Version 1.4 (TBD)
+-----------
+
+* Added support for large reference genomes requiring use of large bowtie
+  indexes.
+
+* Fixed problem with report generation not able to run on hosts without an X11
+  environment.
+
+* Improvements to the report including change of criteria for including a
+  species as separate entry in the table of potential contaminants (only the
+  species most likely to be contaminants now included)
+
+* Added prototype MGA wrapper for Illumina BaseSpace.
+
+* Fixed problem with separate report per dataset containing tables for all
+  datasets.
+
 
 Version 1.3 (10 January 2014)
 -----------
