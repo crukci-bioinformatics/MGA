@@ -9,7 +9,7 @@
     <program type="externalJava">
         <executable>
 @{java.home}/bin/java \
-    ${jvmargs} \
+    -Djava.awt.headless=true ${jvmargs} \
     ${classpath} \
     org.cruk.mga.CreateReport \
     ${runId} \
