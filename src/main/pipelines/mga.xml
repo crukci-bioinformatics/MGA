@@ -137,7 +137,7 @@
             </arguments>
         </task>
 
-        <foreach name="sequenceChunkIterator" type="fileIterator" loopInput="inputFile">
+        <foreach name="sequenceChunkIterator" loopInput="inputFile">
             <depends>
                 <task>mergeAndSplitFastq</task>
             </depends>
@@ -151,7 +151,7 @@
             </variables>
 
             <outputs>
-                <output name="outputFiles" patternType="regex" deleteOnFailure="false">${temp}/${runId}\.\d+\..+\.alignment</output>
+                <output name="outputFiles" required="true" patternType="regex" deleteOnFailure="false">${temp}/${runId}\.\d+\..+\.alignment</output>
             </outputs>
 
             <subtasks>
@@ -226,7 +226,7 @@
                 <!--
                     Aligns sequences against multiple reference genomes using Bowtie.
                 -->
-                <foreach name="alignReferenceGenomes" type="alignReferenceGenomeIterator" loopInput="referenceGenome">
+                <foreach name="alignReferenceGenomes" loopInput="referenceGenome">
                     <depends>
                         <task>trimFastq</task>
                     </depends>
@@ -241,14 +241,14 @@
                     </variables>
 
                     <outputs>
-                        <output name="alignmentFiles" patternType="wildcard" deleteOnFailure="false">${temp}/${runId}.${chunkNumber}.*.bowtie.alignment</output>
+                        <output name="alignmentFiles" required="nice" patternType="wildcard" deleteOnFailure="false">${temp}/${runId}.${chunkNumber}.*.bowtie.alignment</output>
                     </outputs>
 
                     <subtasks>
                         <!--
                             Aligns sequences against a specific reference genome using Bowtie.
 
-                            The alignReferenceGenomeIterator parent foreach task introduces the following
+                            The alignReferenceGenomes parent foreach task introduces the following
                             custom parameter the bowtie task:
 
                             ${referenceGenomeId} - the reference genome identifier
