@@ -1,16 +1,18 @@
-<?xml version="1.1" encoding="ISO-8859-1" ?>
+<?xml version="1.1" encoding="ISO-8859-1"?>
 <pipe:pipeline xmlns:pipe="http://cancerresearchuk.org/workflow/pipeline"
                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-               xsi:schemaLocation="http://cancerresearchuk.org/workflow/pipeline http://content.cruk.cam.ac.uk/bioinformatics/schema/workflow/pipeline-1.5.xsd">
+               xsi:schemaLocation="http://cancerresearchuk.org/workflow/pipeline http://content.cruk.cam.ac.uk/bioinformatics/schema/workflow/pipeline-1.6.xsd">
 
     <name>Multi-Genome Alignment Pipeline</name>
     <description>Contaminant screen for high-throughput sequencing data that aligns to multiple reference genomes and adapter sequences.</description>
 
-    <namingService>org.cruk.mga.workflow.JobNamingService</namingService>
+    <defaultJobName>mga.${runId}${datasetId|.%}${chunkNumber|.%}${referenceGenomeId|.%}.${task}</defaultJobName>
+
     <metaDataValidator>org.cruk.mga.workflow.MetaDataValidator</metaDataValidator>
 
     <defaultResources>
         <memory>512M</memory>
+        <jvmOverhead>128M</jvmOverhead>
     </defaultResources>
 
     <variables>
@@ -91,7 +93,8 @@
                 -->
                 <task name="sampleFastq" type="sampleFastq">
                     <resources>
-                        <memory>2G</memory>
+                        <memory>1G</memory>
+                        <maxMemory>6G</maxMemory>
                     </resources>
 
                     <inputs>
@@ -263,6 +266,7 @@
                                 <task name="bowtie" type="bowtie">
                                     <resources>
                                         <memory>4G</memory>
+                                        <maxMemory>16G</maxMemory>
                                     </resources>
 
                                     <inputs>
@@ -297,7 +301,8 @@
             </depends>
 
             <resources>
-                <memory>2G</memory>
+                <memory>1G</memory>
+                <maxMemory>6G</maxMemory>
             </resources>
 
             <inputs>
