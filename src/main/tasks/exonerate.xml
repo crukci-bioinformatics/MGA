@@ -1,7 +1,7 @@
-<?xml version="1.1" encoding="ISO-8859-1" ?>
+<?xml version="1.1" encoding="ISO-8859-1"?>
 <task:task xmlns:task="http://cancerresearchuk.org/workflow/task"
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-           xsi:schemaLocation="http://cancerresearchuk.org/workflow/task http://content.cruk.cam.ac.uk/bioinformatics/schema/workflow/task-1.5.xsd">
+           xsi:schemaLocation="http://cancerresearchuk.org/workflow/task http://content.cruk.cam.ac.uk/bioinformatics/schema/workflow/task-1.6.xsd">
 
     <name>exonerate</name>
     <description>Task for aligning two sets of sequences using exonerate.</description>
@@ -19,19 +19,23 @@
     </program>
 
     <inputs>
-        <input name="queryFastaFile" required="true" quoted="true"/>
-        <input name="targetFastaFile" required="true" quoted="true"/>
+        <input name="queryFastaFile" required="true"/>
+        <input name="targetFastaFile" required="true"/>
     </inputs>
 
     <outputs>
-        <output name="alignmentFile" quoted="true"/>
+        <output name="alignmentFile"/>
     </outputs>
 
     <arguments>
-        <arg name="model" flag="--model" type="string" required="false" description="The alignment model to use."/>
-        <arg name="bestn" flag="--bestn" type="integer" required="false" description="Report the best N results for each query."/>
-        <arg name="score" flag="--score" type="integer" required="false" description="The overall score threshold for reporting alignment hits."/>
-        <arg name="exonerateExecutable" required="false" description="Path to the exonerate executable" default="exonerate" quoted="true"/>
+        <arg name="model" flag="--model" type="string" required="false"
+            description="The alignment model to use."/>
+        <arg name="bestn" flag="--bestn" type="integer" required="false"
+            description="Report the best N results for each query."/>
+        <arg name="score" flag="--score" type="integer" required="false"
+            description="The overall score threshold for reporting alignment hits."/>
+        <arg name="exonerateExecutable" required="false" default="exonerate"
+            description="Path to the exonerate executable"/>
     </arguments>
 
 </task:task>

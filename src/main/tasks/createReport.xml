@@ -1,7 +1,7 @@
-<?xml version="1.1" encoding="ISO-8859-1" ?>
+<?xml version="1.1" encoding="ISO-8859-1"?>
 <task:task xmlns:task="http://cancerresearchuk.org/workflow/task"
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-           xsi:schemaLocation="http://cancerresearchuk.org/workflow/task http://content.cruk.cam.ac.uk/bioinformatics/schema/workflow/task-1.5.xsd">
+           xsi:schemaLocation="http://cancerresearchuk.org/workflow/task http://content.cruk.cam.ac.uk/bioinformatics/schema/workflow/task-1.6.xsd">
 
     <name>createReport</name>
     <description>Task for creating a report from a set of alignment results files.</description>
@@ -29,29 +29,29 @@
     </program>
 
     <inputs>
-        <input name="countSummaryFiles" required="true" plurality="multiple" quoted="true"/>
-        <input name="sampleSummaryFiles" required="true" plurality="multiple" quoted="true"/>
-        <input name="alignmentFiles" required="true" plurality="multiple" quoted="true"/>
+        <input name="countSummaryFiles" required="true" plurality="multiple"/>
+        <input name="sampleSummaryFiles" required="true" plurality="multiple"/>
+        <input name="alignmentFiles" required="true" plurality="multiple"/>
     </inputs>
 
     <outputs>
-        <output name="outputReportFile" safeNaming="false" quoted="true"/>
+        <output name="outputReportFile" safeNaming="false"/>
     </outputs>
 
     <arguments>
         <arg name="runId" flag="-i" required="true"
-            description="The run identifier." quoted="true"/>
+            description="The run identifier."/>
         <arg name="sampleSheetFile" flag="-s" required="false"
-            description="File containing details about samples." quoted="true"/>
+            description="File containing details about samples."/>
         <arg name="referenceGenomeMappingFile" flag="-r" required="true"
-            description="File containing mappings between reference genome IDs (bowtie prefixes) and species names/synonyms." quoted="true"/>
+            description="File containing mappings between reference genome IDs (bowtie prefixes) and species names/synonyms."/>
         <arg name="xslStyleSheetFile" flag="-x" required="false"
-            description="XSL stylesheet file to be copied to the output directory." quoted="true"/>
-        <arg name="outputFilePrefix" flag="-o" required="false" quoted="true"
+            description="XSL stylesheet file to be copied to the output directory."/>
+        <arg name="outputFilePrefix" flag="-o" required="false"
             description="File name prefix for output report, image and XML files."/>
         <arg name="separateDatasetReports" type="boolean" flag="-d" novalue="true" required="false"
             description="To create individual reports for each dataset."/>
-        <arg name="datasetReportFilePrefix" flag="-p" required="false" quoted="true"
+        <arg name="datasetReportFilePrefix" flag="-p" required="false"
             description="File name prefix for creating separate report for each dataset."/>
         <arg name="trimLength" flag="-l" type="integer" required="false"
             description="Length of sequences following trimming from the 3' end."/>
@@ -59,8 +59,10 @@
             description="The width of the plot in pixels."/>
         <arg name="minimumSequenceCount" flag="-m" type="integer" required="false"
             description="The minimum number of sequences to display on the x-axis."/>
-        <arg name="classpath" flag="-classpath" required="false" quoted="true" default="@{java.class.path}" />
-        <arg name="jvmargs" required="false" quoted="false" default="${jvmMemoryArguments}" description="Java Virtual Machine arguments."/>
+        <arg name="classpath" flag="-classpath" required="false" default="@{java.class.path}"
+            description="The Java class path."/>
+        <arg name="jvmargs" required="false" quoted="false" default="${jvmMemoryArguments}"
+            description="Java Virtual Machine arguments."/>
     </arguments>
 
 </task:task>

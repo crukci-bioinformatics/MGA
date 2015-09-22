@@ -1,7 +1,7 @@
-<?xml version="1.1" encoding="ISO-8859-1" ?>
+<?xml version="1.1" encoding="ISO-8859-1"?>
 <task:task xmlns:task="http://cancerresearchuk.org/workflow/task"
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-           xsi:schemaLocation="http://cancerresearchuk.org/workflow/task http://content.cruk.cam.ac.uk/bioinformatics/schema/workflow/task-1.5.xsd">
+           xsi:schemaLocation="http://cancerresearchuk.org/workflow/task http://content.cruk.cam.ac.uk/bioinformatics/schema/workflow/task-1.6.xsd">
 
     <name>sampleFastq</name>
     <description>Task for sampling a FASTQ file to produce a subset of entries of a specified size</description>
@@ -21,12 +21,12 @@
     </program>
 
     <inputs>
-        <input name="fastqFiles" required="true" plurality="multiple" quoted="true"/>
+        <input name="fastqFiles" required="true" plurality="multiple"/>
     </inputs>
 
     <outputs>
-        <output name="outputFastqFile" flag="-o" quoted="true"/>
-        <output name="sampleSummaryFile" flag="-x" quoted="true"/>
+        <output name="outputFastqFile" flag="-o"/>
+        <output name="sampleSummaryFile" flag="-x"/>
     </outputs>
 
     <arguments>
@@ -38,8 +38,10 @@
             description="Number of records to sample from the FASTQ file."/>
         <arg name="maxNumberOfRecordsToSampleFrom" flag="-m" type="integer" required="false"
             description="Maximum number of records to sample from."/>
-        <arg name="classpath" flag="-classpath" required="false" quoted="true" default="@{java.class.path}" />
-        <arg name="jvmargs" required="false" quoted="false" default="${jvmMemoryArguments}" description="Java Virtual Machine arguments."/>
+        <arg name="classpath" flag="-classpath" required="false" default="@{java.class.path}"
+            description="The Java class path."/>
+        <arg name="jvmargs" required="false" quoted="false" default="${jvmMemoryArguments}"
+            description="Java Virtual Machine arguments."/>
     </arguments>
 
 </task:task>
