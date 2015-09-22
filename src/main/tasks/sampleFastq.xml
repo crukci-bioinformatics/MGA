@@ -21,7 +21,7 @@
     </program>
 
     <inputs>
-        <input name="fastqFiles" required="true" plurality="multiple"/>
+        <input name="fastqFiles" plurality="multiple"/>
     </inputs>
 
     <outputs>

@@ -19,8 +19,8 @@
     </program>
 
     <inputs>
-        <input name="queryFastaFile" required="true"/>
-        <input name="targetFastaFile" required="true"/>
+        <input name="queryFastaFile"/>
+        <input name="targetFastaFile"/>
     </inputs>
 
     <outputs>

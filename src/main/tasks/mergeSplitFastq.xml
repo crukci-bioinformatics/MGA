@@ -19,12 +19,12 @@
     </program>
 
     <inputs>
-        <input name="fastqFiles" required="true" plurality="multiple"
+        <input name="fastqFiles" plurality="multiple"
             description="The input FASTQ files."/>
     </inputs>
 
     <outputs>
-        <output name="outputFastqFiles" required="true" plurality="multiple"
+        <output name="outputFastqFiles" plurality="multiple"
             description="The file naming pattern for output FASTQ files."/>
     </outputs>
 

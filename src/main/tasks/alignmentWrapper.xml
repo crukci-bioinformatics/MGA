@@ -11,7 +11,7 @@
     </program>
 
     <inputs>
-        <input name="queryFile" required="true"/>
+        <input name="queryFile"/>
     </inputs>
 
     <outputs>

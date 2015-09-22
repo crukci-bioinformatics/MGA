@@ -23,8 +23,8 @@ ${bowtieExecutable} \
     </program>
 
     <inputs>
-        <input name="fastqFile" required="true"/>
-        <input name="indexDir" required="true"/>
+        <input name="fastqFile"/>
+        <input name="indexDir"/>
     </inputs>
 
     <outputs>

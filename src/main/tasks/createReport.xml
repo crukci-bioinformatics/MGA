@@ -29,9 +29,9 @@
     </program>
 
     <inputs>
-        <input name="countSummaryFiles" required="true" plurality="multiple"/>
-        <input name="sampleSummaryFiles" required="true" plurality="multiple"/>
-        <input name="alignmentFiles" required="true" plurality="multiple"/>
+        <input name="countSummaryFiles" plurality="multiple"/>
+        <input name="sampleSummaryFiles" plurality="multiple"/>
+        <input name="alignmentFiles" plurality="multiple"/>
     </inputs>
 
     <outputs>

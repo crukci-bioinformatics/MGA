@@ -20,7 +20,7 @@
     </program>
 
     <inputs>
-        <input name="fastqFile" required="true"/>
+        <input name="fastqFile"/>
     </inputs>
 
     <outputs>

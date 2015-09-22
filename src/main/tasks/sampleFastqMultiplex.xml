@@ -15,8 +15,8 @@
     </inputs>
 
     <outputs>
-        <output name="sampleFastqFiles" required="true" plurality="multiple"/>
-        <output name="sampleSummaryFiles" required="true" plurality="multiple"/>
+        <output name="sampleFastqFiles" plurality="multiple"/>
+        <output name="sampleSummaryFiles" plurality="multiple"/>
     </outputs>
 
 </task:task>
