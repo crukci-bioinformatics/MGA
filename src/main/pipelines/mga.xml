@@ -8,7 +8,10 @@
 
     <defaultJobName>mga.${runId}${datasetId|.%}${chunkNumber|.%}${referenceGenomeId|.%}.${task}</defaultJobName>
 
-    <metaDataValidator>org.cruk.mga.workflow.MetaDataValidator</metaDataValidator>
+    <metaDataStructure>
+        <variable name="runId"/>
+        <variable name="sampleSheetFile"/>
+    </metaDataStructure>
 
     <defaultResources>
         <memory>512M</memory>
@@ -26,7 +29,6 @@
         <xslStyleSheetFile>${install}/resources/results.xsl</xslStyleSheetFile>
         <bowtieExecutable>bowtie</bowtieExecutable>
         <exonerateExecutable>exonerate</exonerateExecutable>
-        <sampleSheetFile></sampleSheetFile>
         <sampleSize>100000</sampleSize>
         <maxNumberOfRecordsToSampleFrom>5000000</maxNumberOfRecordsToSampleFrom>
         <chunkSize>5000000</chunkSize>
