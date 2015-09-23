@@ -39,13 +39,37 @@
     <tasks>
 
         <!--
-            Counts records for each of the input FASTQ data sets
+            Extracts files for each dataset into tab-delimited file suitable
+            for use in table loops
         -->
-        <task name="countFastqMultiplex" type="countFastqMultiplex">
+        <task name="createDatasetListing" type="createDatasetListing">
 
             <inputs>
                 <input name="sampleSheetFile">${sampleSheetFile}</input>
             </inputs>
+
+            <outputs>
+                <output name="datasetListingFile">${temp}/${runId}.files.txt</output>
+            </outputs>
+
+        </task>
+
+        <!--
+            Counts records for each of the input FASTQ data sets
+        -->
+        <table name="countFastqLoop" loopInput="datasetListing" header="true" separator="tab">
+            <depends>
+                <task>createDatasetListing</task>
+            </depends>
+
+            <inputs>
+                <input name="datasetListing" origin="dependency" dependency="createDatasetListing" ref="datasetListingFile"/>
+            </inputs>
+
+            <tableVariables>
+                <var name="datasetId" columnNumber="1"/>
+                <var name="datasetFiles" columnNumber="2"/>
+            </tableVariables>
 
             <outputs>
                 <output name="countSummaryFiles" patternType="wildcard" deleteOnFailure="false">${temp}/${runId}.*.count.xml</output>
@@ -69,17 +93,24 @@
                     </arguments>
                 </task>
             </subtasks>
-
-        </task>
+        </table>
 
         <!--
             Samples records from each of the input FASTQ data sets
         -->
-        <task name="sampleFastqMultiplex" type="sampleFastqMultiplex">
+        <table name="sampleFastqLoop" loopInput="datasetListing" header="true" separator="tab">
+            <depends>
+                <task>createDatasetListing</task>
+            </depends>
 
             <inputs>
-                <input name="sampleSheetFile">${sampleSheetFile}</input>
+                <input name="datasetListing" origin="dependency" dependency="createDatasetListing" ref="datasetListingFile"/>
             </inputs>
+
+            <tableVariables>
+                <var name="datasetId" columnNumber="1"/>
+                <var name="datasetFiles" columnNumber="2"/>
+            </tableVariables>
 
             <outputs>
                 <output name="sampleFastqFiles" patternType="wildcard" deleteOnFailure="false">${temp}/${runId}.*.sampled.fq</output>
@@ -87,7 +118,6 @@
             </outputs>
 
             <subtasks>
-
                 <!--
                     Samples subset of original FASTQ file.
                 -->
@@ -115,16 +145,15 @@
                 </task>
 
             </subtasks>
-
-        </task>
+        </table>
 
         <task name="mergeAndSplitFastq" type="mergeAndSplitFastq">
             <depends>
-                <task>sampleFastqMultiplex</task>
+                <task>sampleFastqLoop</task>
             </depends>
 
             <inputs>
-                <input name="fastqFiles" origin="dependency" dependency="sampleFastqMultiplex" ref="sampleFastqFiles" ordered="true"/>
+                <input name="fastqFiles" origin="dependency" dependency="sampleFastqLoop" ref="sampleFastqFiles" ordered="true"/>
             </inputs>
 
             <outputs>
@@ -295,8 +324,8 @@
         -->
         <task name="createReport" type="createReport">
             <depends>
-                <task>countFastqMultiplex</task>
-                <task>sampleFastqMultiplex</task>
+                <task>countFastqLoop</task>
+                <task>sampleFastqLoop</task>
                 <task>sequenceChunkIterator</task>
             </depends>
 
@@ -306,8 +335,8 @@
             </resources>
 
             <inputs>
-                <input name="countSummaryFiles" origin="dependency" dependency="countFastqMultiplex" ref="countSummaryFiles"/>
-                <input name="sampleSummaryFiles" origin="dependency" dependency="sampleFastqMultiplex" ref="sampleSummaryFiles"/>
+                <input name="countSummaryFiles" origin="dependency" dependency="countFastqLoop" ref="countSummaryFiles"/>
+                <input name="sampleSummaryFiles" origin="dependency" dependency="sampleFastqLoop" ref="sampleSummaryFiles"/>
                 <input name="alignmentFiles" origin="dependency" dependency="sequenceChunkIterator" ref="outputFiles"/>
             </inputs>
 
