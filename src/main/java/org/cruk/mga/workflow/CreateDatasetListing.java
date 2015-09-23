@@ -119,6 +119,7 @@ public class CreateDatasetListing extends AbstractJavaTask
      */
     private void writeDatasetListing() throws IOException
     {
+        datasetListingFile.getParentFile().mkdirs();
         PrintWriter writer = new PrintWriter(new FileWriter(datasetListingFile));
         writer.println("ID\tFiles");
         for (String datasetId : datasetIds)
