@@ -37,15 +37,4 @@
         <arg name="exonerateExecutable" required="false" default="exonerate"
             description="Path to the exonerate executable"/>
     </arguments>
-
-<!-- exonerate --version results in non-zero exit status
-    <versions>
-        <program name="exonerate">
-            <executable>
-                ${exonerateExecutable} --version
-            </executable>
-            <extraction line="1" group="1">.*exonerate version (.+)$</extraction>
-        </program>
-    </versions>
--->
 </task:task>
