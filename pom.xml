@@ -54,17 +54,6 @@
     </repositories>
 
     <build>
-        <resources>
-          <resource>
-            <directory>src/main/tasks</directory>
-            <targetPath>tasks</targetPath>
-          </resource>
-          <resource>
-            <directory>src/main/pipelines</directory>
-            <targetPath>pipelines</targetPath>
-          </resource>
-        </resources>
-
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
