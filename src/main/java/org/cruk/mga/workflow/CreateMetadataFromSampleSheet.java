@@ -40,6 +40,8 @@ import org.cruk.workflow.util.ApplicationContextFactory;
 import org.cruk.workflow.util.FileFinder;
 import org.cruk.workflow.xml2.metadata.MetaData;
 import org.cruk.workflow.xml2.metadata.ModeConfiguration;
+import org.cruk.workflow.xml2.metadata.SummaryFile;
+import org.cruk.workflow.xml2.metadata.VersionsFile;
 import org.cruk.workflow.xml2.pipeline.FilenamePattern;
 import org.cruk.workflow.xml2.pipeline.TaskVariableSet;
 import org.springframework.context.ApplicationContext;
@@ -341,19 +343,20 @@ public class CreateMetadataFromSampleSheet extends CommandLineUtility
     {
         readSampleSheet();
 
+        meta.setPipeline("${install}/pipelines/mga.xml");
         meta.setMode(mode);
         meta.setTempDirectory(temporaryDirectory);
-        meta.setPipeline("${install}/pipelines/mga.xml");
+        meta.setJobOutputDirectory("${work}/logs");
+        meta.setSummaryFile(new SummaryFile("${work}/logs/summary.txt"));
+        meta.setVersionsFile(new VersionsFile("${work}/logs/versions.txt"));
 
         local = new ModeConfiguration("local");
-        local.setVar("outputDirectory", "${work}/logs");
-        local.setVar("maxCpuResources", Integer.toString(maxCpuResources));
+        local.setVariable("maxCpuResources", Integer.toString(maxCpuResources));
         meta.getModeConfigurations().add(local);
 
         lsf = new ModeConfiguration("lsf");
-        lsf.setVar("outputDirectory", "${work}/logs");
-        lsf.setVar("queue", queue);
-        lsf.setVar("maximumSubmittedJobs", Integer.toString(maxSubmittedJobs));
+        lsf.setVariable("queue", queue);
+        lsf.setVariable("maximumSubmittedJobs", Integer.toString(maxSubmittedJobs));
         meta.getModeConfigurations().add(lsf);
 
         meta.setVariable("runId", runId);
