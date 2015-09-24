@@ -40,7 +40,7 @@
             <directoryMode>0755</directoryMode>
         </fileSet>
         <fileSet>
-            <directory>${project.basedir}/src/main/resource_files</directory>
+            <directory>${project.basedir}/resources</directory>
             <outputDirectory>resources</outputDirectory>
             <fileMode>0644</fileMode>
             <directoryMode>0755</directoryMode>
