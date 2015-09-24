@@ -26,14 +26,14 @@
             <directoryMode>0755</directoryMode>
         </fileSet>
         <fileSet>
-            <directory>${project.basedir}/src/main/tasks</directory>
+            <directory>${project.basedir}/tasks</directory>
             <outputDirectory>tasks</outputDirectory>
             <lineEnding>unix</lineEnding>
             <fileMode>0644</fileMode>
             <directoryMode>0755</directoryMode>
         </fileSet>
         <fileSet>
-            <directory>${project.basedir}/src/main/pipelines</directory>
+            <directory>${project.basedir}/pipelines</directory>
             <outputDirectory>pipelines</outputDirectory>
             <lineEnding>unix</lineEnding>
             <fileMode>0644</fileMode>
