@@ -40,4 +40,12 @@ ${bowtieExecutable} \
             description="Path to the bowtie executable"/>
     </arguments>
 
+    <versions>
+        <program name="bowtie" stderr="true">
+            <executable>
+                ${bowtieExecutable} --version
+            </executable>
+            <extraction line="1" group="1">.*bowtie version (.+)$</extraction>
+        </program>
+    </versions>
 </task:task>
