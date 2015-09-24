@@ -87,7 +87,6 @@ public class CreateDatasetListing extends AbstractJavaTask
                         datasetFiles = new HashSet<String>();
                         files.put(id, datasetFiles);
                     }
-                    System.err.println(id + "\t" + filename);
                     datasetFiles.add(filename);
                 }
                 else
