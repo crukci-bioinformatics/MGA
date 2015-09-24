@@ -28,7 +28,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
-import java.util.Random;
 
 import nu.xom.Document;
 import nu.xom.Element;
@@ -38,6 +37,7 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.math3.random.RandomDataGenerator;
 import org.cruk.util.CommandLineUtility;
 
 /**
@@ -48,14 +48,14 @@ import org.cruk.util.CommandLineUtility;
 public class SampleFastq extends CommandLineUtility
 {
     public static int DEFAULT_SAMPLE_SIZE = 100000;
-    public static int DEFAULT_MAX_SAMPLE_FROM = 5000000;
+    public static long DEFAULT_MAX_SAMPLE_FROM = 5000000;
 
     private String datasetId;
     private String[] fastqFilenames;
     private String summaryFilename;
     private String prefix;
     private int sampleSize;
-    private int maxSampleFrom;
+    private long maxSampleFrom;
 
     /**
      * Runs the SampleFastq utility with the given command-line arguments.
@@ -128,7 +128,7 @@ public class SampleFastq extends CommandLineUtility
             {
                 try
                 {
-                    maxSampleFrom = Integer.parseInt(commandLine.getOptionValue("max-sample-from"));
+                    maxSampleFrom = Long.parseLong(commandLine.getOptionValue("max-sample-from"));
                 }
                 catch (NumberFormatException e)
                 {
@@ -227,7 +227,7 @@ public class SampleFastq extends CommandLineUtility
      * @throws IOException
      * @throws FastqFormatException
      */
-    private Fastq[] reservoirSampling(String[] fastqFilenames, int sampleSize, int maxSampleFrom, boolean removeDescriptions)
+    private Fastq[] reservoirSampling(String[] fastqFilenames, int sampleSize, long maxSampleFrom, boolean removeDescriptions)
             throws IOException, FastqFormatException
     {
         FastqReader reader = new FastqReader(fastqFilenames, true);
@@ -242,14 +242,15 @@ public class SampleFastq extends CommandLineUtility
             records[i] = record;
         }
 
-        Random rand = new Random();
-        for (int i = sampleSize + 1; i <= maxSampleFrom; i++)
+        RandomDataGenerator rand = new RandomDataGenerator();
+
+        for (long i = sampleSize; i < maxSampleFrom; i++)
         {
             Fastq record = reader.readFastq();
             if (record == null) break;
 
-            int j = rand.nextInt(i);
-            if (j < sampleSize) records[j] = record;
+            long j = rand.nextLong(0l, i);
+            if (j < sampleSize) records[(int)j] = record;
         }
 
         reader.close();
