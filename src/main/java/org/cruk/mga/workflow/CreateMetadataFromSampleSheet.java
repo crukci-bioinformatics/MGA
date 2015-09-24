@@ -68,7 +68,7 @@ public class CreateMetadataFromSampleSheet extends CommandLineUtility
     public static final String DEFAULT_EXONERATE_EXECUTABLE = "exonerate";
 
     public static final int DEFAULT_SAMPLE_SIZE = 100000;
-    public static final int DEFAULT_MAX_RECORDS_TO_SAMPLE_FROM = 5000000;
+    public static final long DEFAULT_MAX_RECORDS_TO_SAMPLE_FROM = 5000000;
     public static final int DEFAULT_CHUNK_SIZE = 5000000;
     public static final int DEFAULT_TRIM_LENGTH = 36;
 
@@ -91,7 +91,7 @@ public class CreateMetadataFromSampleSheet extends CommandLineUtility
     private String bowtieExecutable;
     private String exonerateExecutable;
     private int sampleSize;
-    private int maxNumberOfRecordsToSampleFrom;
+    private long maxNumberOfRecordsToSampleFrom;
     private int chunkSize;
     private int trimLength;
     private int plotWidth;
@@ -263,7 +263,7 @@ public class CreateMetadataFromSampleSheet extends CommandLineUtility
             {
                 try
                 {
-                    maxNumberOfRecordsToSampleFrom = Integer.parseInt(commandLine.getOptionValue("max-records-to-sample-from"));
+                    maxNumberOfRecordsToSampleFrom = Long.parseLong(commandLine.getOptionValue("max-records-to-sample-from"));
                 }
                 catch (NumberFormatException e)
                 {
@@ -371,7 +371,7 @@ public class CreateMetadataFromSampleSheet extends CommandLineUtility
         meta.setVariable("bowtieExecutable", bowtieExecutable);
         meta.setVariable("exonerateExecutable", exonerateExecutable);
         meta.setVariable("sampleSize", Integer.toString(sampleSize));
-        meta.setVariable("maxNumberOfRecordsToSampleFrom", Integer.toString(maxNumberOfRecordsToSampleFrom));
+        meta.setVariable("maxNumberOfRecordsToSampleFrom", Long.toString(maxNumberOfRecordsToSampleFrom));
         meta.setVariable("chunkSize", Integer.toString(chunkSize));
         meta.setVariable("trimLength", Integer.toString(trimLength));
         meta.setVariable("plotWidth", Integer.toString(plotWidth));
@@ -627,12 +627,12 @@ public class CreateMetadataFromSampleSheet extends CommandLineUtility
         this.sampleSize = sampleSize;
     }
 
-    public int getMaxNumberOfRecordsToSampleFrom()
+    public long getMaxNumberOfRecordsToSampleFrom()
     {
         return maxNumberOfRecordsToSampleFrom;
     }
 
-    public void setMaxNumberOfRecordsToSampleFrom(int maxNumberOfRecordsToSampleFrom)
+    public void setMaxNumberOfRecordsToSampleFrom(long maxNumberOfRecordsToSampleFrom)
     {
         this.maxNumberOfRecordsToSampleFrom = maxNumberOfRecordsToSampleFrom;
     }
