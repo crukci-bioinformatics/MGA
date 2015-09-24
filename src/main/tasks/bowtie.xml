@@ -41,7 +41,7 @@ ${bowtieExecutable} \
     </arguments>
 
     <versions>
-        <program name="bowtie" stderr="true">
+        <program name="bowtie">
             <executable>
                 ${bowtieExecutable} --version
             </executable>
