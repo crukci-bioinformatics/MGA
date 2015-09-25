@@ -3,7 +3,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
-    
+
     <groupId>org.cruk.workflow.pipelines</groupId>
     <artifactId>mga</artifactId>
     <packaging>jar</packaging>
@@ -54,6 +54,24 @@
     </repositories>
 
     <build>
+        <resources>
+            <resource>
+                <directory>${basedir}/src/main/resources</directory>
+                <targetPath>${project.build.outputDirectory}</targetPath>
+            </resource>
+            <resource>
+                <directory>${basedir}/src/test/resources</directory>
+                <targetPath>${project.build.testOutputDirectory}</targetPath>
+            </resource>
+            <resource>
+                <directory>${basedir}</directory>
+                <targetPath>META-INF</targetPath>
+                <includes>
+                    <include>LICENSE</include>
+                </includes>
+            </resource>
+        </resources>
+
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -171,7 +189,7 @@
             </extension>
         </extensions>
     </build>
-    
+
     <dependencies>
         <dependency>
             <groupId>org.cruk.workflow</groupId>
@@ -194,7 +212,7 @@
             <version>${workflow.version}</version>
             <scope>runtime</scope>
         </dependency>
-        
+
         <dependency>
             <groupId>xom</groupId>
             <artifactId>xom</artifactId>
