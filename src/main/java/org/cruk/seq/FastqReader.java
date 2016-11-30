@@ -35,18 +35,19 @@ import java.util.List;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipInputStream;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * Class for reading records from a FASTQ file or from a set of FASTQ files in 
+ * Class for reading records from a FASTQ file or from a set of FASTQ files in
  * which case records are read from each file in turn in a round-robin fashion.
  *
  * @author eldrid01
  */
 public class FastqReader
 {
-    protected Log logger = LogFactory.getLog(FastqReader.class);
+    protected Logger logger = LoggerFactory.getLogger(FastqReader.class);
+
     private boolean roundRobin = false;
     private List<BufferedReader> readers = new ArrayList<BufferedReader>();
     private int currentReaderIndex = 0;

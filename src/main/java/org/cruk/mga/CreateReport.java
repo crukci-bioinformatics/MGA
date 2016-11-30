@@ -1071,7 +1071,7 @@ public class CreateReport extends CommandLineUtility
         if (imageFilename == null) return;
 
         int n = multiGenomeAlignmentSummaries.size();
-        logger.debug(n);
+        logger.debug("Number of summaries = {}", n);
 
         scaleForPlotWidth();
 

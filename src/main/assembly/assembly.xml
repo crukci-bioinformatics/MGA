@@ -11,7 +11,7 @@
     <fileSets>
         <fileSet>
             <directory>${project.build.directory}/${application.name}</directory>
-            <outputDirectory>/</outputDirectory>
+            <outputDirectory></outputDirectory>
             <excludes>
                 <exclude>bin/**</exclude>
             </excludes>
@@ -47,7 +47,7 @@
         </fileSet>
         <fileSet>
             <directory>${project.basedir}</directory>
-            <outputDirectory>/</outputDirectory>
+            <outputDirectory></outputDirectory>
             <includes>
                 <include>README</include>
                 <include>RELEASE_NOTES</include>
