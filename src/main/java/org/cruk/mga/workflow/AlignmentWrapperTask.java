@@ -25,7 +25,7 @@ package org.cruk.mga.workflow;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
+import java.util.Collection;
 
 import org.cruk.workflow.execution.TaskMonitor;
 import org.cruk.workflow.execution.TaskRunner;
@@ -82,14 +82,14 @@ public class AlignmentWrapperTask extends AbstractJavaTask
         }
         else
         {
-            List<Task> subtasks = task.getSubtasks();
+            Collection<Task> subtasks = task.getSubtasks();
             if (subtasks.size() != 1)
             {
                 throw new Exception("Expecting a single subtask but found " + subtasks.size());
             }
             else
             {
-                Task subtask = subtasks.get(0);
+                Task subtask = subtasks.iterator().next();
                 TaskMonitor subtaskMonitor = taskRunner.runTask(configuration, subtask);
                 waitForMonitorsAndThrow("Alignment task failed", subtaskMonitor);
             }
