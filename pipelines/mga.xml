@@ -8,10 +8,7 @@
 
     <defaultJobName>${runId}${datasetId|.%}${chunkNumber|.%}${referenceGenomeId|.%}.${task}</defaultJobName>
 
-    <metaDataStructure>
-        <variable name="runId"/>
-        <variable name="sampleSheetFile"/>
-    </metaDataStructure>
+    <metaDataValidator>org.cruk.mga.workflow.MetaDataValidator</metaDataValidator>
 
     <defaultResources>
         <memory>512M</memory>
