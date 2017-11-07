@@ -74,15 +74,9 @@ Sequences were sampled<xsl:if test="$trimLength != ''">,
 trimmed to <xsl:value-of select="$trimLength"/> bases</xsl:if>
 and mapped to <xsl:value-of select="$referenceGenomeCount"/>
 reference genomes (see <a href="#referenceGenomes">list</a> below) using Bowtie.
-<p/>
-The reference genomes are sorted in the tables below according to how many
-sequences have been mapped. Sequence reads often align to multiple
-genomes. Each sequence is assigned to the genome with the most aligned sequences.
-The 'assigned' column contains the number of sequences that align to that
-particular genome but not also to another genome listed higher in the table,
-i.e. with more overall matches.
-<p/>
 Sequences containing adapters were found by ungapped alignment using Exonerate.
+Further details on the alignment results and the assignment of reads to
+genomes are given <a href="#alignmentDetails">below</a>.
 <p/>
 
 Datasets:
@@ -141,8 +135,13 @@ Datasets:
 				<th>Aligned</th>
 				<th>Aligned %</th>
 				<th>Error rate</th>
+				<th>Unique</th>
+				<th>Error rate</th>
+				<th>Best</th>
+				<th>Error rate</th>
 				<th>Assigned</th>
 				<th>Assigned %</th>
+				<th>Error rate</th>
 			</tr>
 
 			<xsl:for-each select="AlignmentSummaries/AlignmentSummary">
@@ -213,6 +212,22 @@ Datasets:
 						</xsl:if>
 					</td>
 					<td align="right">
+						<xsl:value-of select="UniquelyAlignedCount"/>
+					</td>
+					<td align="right">
+						<xsl:if test="UniquelyAlignedCount &gt; 0 and UniquelyAlignedErrorRate != ''">
+							<xsl:value-of select="format-number(UniquelyAlignedErrorRate, '0.00%')"/>
+						</xsl:if>
+					</td>
+					<td align="right">
+						<xsl:value-of select="PreferentiallyAlignedCount"/>
+					</td>
+					<td align="right">
+						<xsl:if test="PreferentiallyAlignedCount &gt; 0 and PreferentiallyAlignedErrorRate != ''">
+							<xsl:value-of select="format-number(PreferentiallyAlignedErrorRate, '0.00%')"/>
+						</xsl:if>
+					</td>
+					<td align="right">
 						<xsl:if test="AssignedCount &gt; 0">
 							<xsl:value-of select="AssignedCount"/>
 						</xsl:if>
@@ -220,6 +235,11 @@ Datasets:
 					<td align="right">
 						<xsl:if test="AssignedCount &gt; 0">
 							<xsl:value-of select="format-number($assignedFraction, '0.0%')"/>
+						</xsl:if>
+					</td>
+					<td align="right">
+						<xsl:if test="AssignedCount &gt; 0 and AssignedErrorRate != ''">
+							<xsl:value-of select="format-number(AssignedErrorRate, '0.00%')"/>
 						</xsl:if>
 					</td>
 				</tr>
@@ -231,9 +251,6 @@ Datasets:
 				<tr>
 					<td>Other</td>
 					<td><xsl:value-of select="$otherNumber"/> others</td>
-					<td/>
-					<td/>
-					<td/>
 					<td align="right">
 						<xsl:value-of select="$otherCount"/>
 					</td>
@@ -264,9 +281,6 @@ Datasets:
 				</xsl:choose>
 				<td>Unmapped</td>
 				<td></td>
-				<td></td>
-				<td></td>
-				<td></td>
 				<td align="right"><xsl:value-of select="UnmappedCount"/></td>
 				<td align="right"><xsl:value-of select="format-number($unmappedFraction, '0.0%')"/></td>
 			</tr>
@@ -292,9 +306,6 @@ Datasets:
 				<td></td>
 				<td align="right"><xsl:value-of select="AdapterCount"/></td>
 				<td align="right"><xsl:value-of select="format-number($adapterFraction, '0.0%')"/></td>
-				<td></td>
-				<td></td>
-				<td></td>
 			</tr>
 
 		</table>
@@ -330,6 +341,38 @@ Datasets:
 	</xsl:if>
 
 </xsl:for-each>
+
+<p/>
+
+<hr/>
+
+<h3 id="alignmentDetails">Alignment Details</h3>
+
+Reference genomes are sorted according to how many sequence reads have been
+assigned to each. Separate entries are given for reference genomes for which at
+least 2% of reads have been assigned or for which at least 1% of reads align
+with an average mismatch or error rate of below 0.8%.
+<p/>
+The total number of reads aligning to each reference genome and the average
+error rate for those alignments are given. In addition, the number of reads
+aligning uniquely to the reference genome and associated error rate for those
+reads are also provided.
+<p/>
+The 'Best' column and accompanying error rate refer to those reads that align
+to the reference genome with the fewest mismatches. These reads will include
+those that align uniquely and reads that also align to other genomes with the
+same number of mismatches. The 'Best' column excludes reads that align to
+another genome with fewer mismatches.
+<p/>
+Reads that align uniquely to a genome are assigned to that genome. Reads that
+align equally well to multiple genomes are assigned to the genome with the
+highest number of reads in the 'Best' column.
+<p/>
+Note that because reads are trimmed prior to alignment with Bowtie, it is
+possible for a read to be counted both as aligned to one or more of the
+reference genomes and among the reads with adapter content. The adapter will
+most likely be present in the portion of the read that has been trimmed.
+<p/>
 
 <hr/>
 
