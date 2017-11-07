@@ -30,8 +30,8 @@ import java.io.PrintStream;
 
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Base class for command line utility programs
@@ -40,7 +40,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class CommandLineUtility
 {
-    protected Logger logger = LoggerFactory.getLogger(getClass());
+    protected Log log = LogFactory.getLog(getClass());
 
     protected String argumentsDisplayString;
     protected Options options = new Options();
