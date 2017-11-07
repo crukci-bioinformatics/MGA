@@ -99,7 +99,7 @@ public class CreateDatasetListing extends AbstractJavaTask
                 if (inDatasetSection)
                 {
                     if (fields.length < 2) break;
-                    String id = fields[0].trim();
+                    String id = fields[0].trim().replaceAll("\\s+", "_");
                     String filename = fields[1].trim();
                     if (id.length() == 0) break;
                     if (filename.length() == 0) continue;
