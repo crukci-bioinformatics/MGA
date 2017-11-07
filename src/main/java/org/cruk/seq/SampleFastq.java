@@ -29,16 +29,16 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 
-import nu.xom.Document;
-import nu.xom.Element;
-import nu.xom.Serializer;
-
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.GnuParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.math3.random.RandomDataGenerator;
 import org.cruk.util.CommandLineUtility;
+
+import nu.xom.Document;
+import nu.xom.Element;
+import nu.xom.Serializer;
 
 /**
  * Program for sampling a specified number of records from a FASTQ file.
@@ -85,7 +85,7 @@ public class SampleFastq extends CommandLineUtility
      */
     protected void parseCommandLineArguments(String[] args)
     {
-        CommandLineParser parser = new GnuParser();
+        CommandLineParser parser = new DefaultParser();
 
         options.addOption("i", "dataset-id", true, "Identifier for the sequence dataset.");
         options.addOption("s", "sample-size", true, "Number of sequences to sample for alignment (default: " + DEFAULT_SAMPLE_SIZE + ")");

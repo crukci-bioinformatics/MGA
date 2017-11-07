@@ -28,15 +28,15 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.ParseException;
+import org.cruk.util.CommandLineUtility;
+
 import nu.xom.Document;
 import nu.xom.Element;
 import nu.xom.Serializer;
-
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.GnuParser;
-import org.apache.commons.cli.ParseException;
-import org.cruk.util.CommandLineUtility;
 
 /**
  * Utility for trimming entries in a FASTQ file to a given trimLength.
@@ -79,7 +79,7 @@ public class TrimFastq extends CommandLineUtility
      */
     protected void parseCommandLineArguments(String[] args)
     {
-        CommandLineParser parser = new GnuParser();
+        CommandLineParser parser = new DefaultParser();
 
         options.addOption("l", "trim-length", true, "Trim length of sequences following trimming from 3' end (default: " + DEFAULT_LENGTH + ")");
         options.addOption("o", "output-file", true, "Output file for trimmed FASTQ sequences (default: stdout)");

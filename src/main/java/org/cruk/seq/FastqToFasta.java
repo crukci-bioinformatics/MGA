@@ -25,7 +25,7 @@ package org.cruk.seq;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.GnuParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.ParseException;
 import org.cruk.util.CommandLineUtility;
 
@@ -66,7 +66,7 @@ public class FastqToFasta extends CommandLineUtility
      */
     protected void parseCommandLineArguments(String[] args)
     {
-        CommandLineParser parser = new GnuParser();
+        CommandLineParser parser = new DefaultParser();
 
         options.addOption("o", "output-file", true, "Output file for FASTA sequences (default: stdout)");
 

@@ -23,16 +23,16 @@
 
 package org.cruk.seq;
 
-import nu.xom.Document;
-import nu.xom.Element;
-import nu.xom.Serializer;
-
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.GnuParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.ParseException;
 import org.cruk.util.CommandLineUtility;
 import org.cruk.util.LineCounter;
+
+import nu.xom.Document;
+import nu.xom.Element;
+import nu.xom.Serializer;
 
 /**
  * Utility for counting records in FASTQ file(s).
@@ -72,7 +72,7 @@ public class CountFastq extends CommandLineUtility
      */
     protected void parseCommandLineArguments(String[] args)
     {
-        CommandLineParser parser = new GnuParser();
+        CommandLineParser parser = new DefaultParser();
 
         options.addOption("i", "dataset-id", true, "Identifier for the sequence dataset.");
         options.addOption("o", "output-file", true, "Output file to write number of FASTQ records to.");

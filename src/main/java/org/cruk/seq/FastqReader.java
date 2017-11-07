@@ -35,8 +35,8 @@ import java.util.List;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipInputStream;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Class for reading records from a FASTQ file or from a set of FASTQ files in
@@ -46,7 +46,7 @@ import org.slf4j.LoggerFactory;
  */
 public class FastqReader
 {
-    protected Logger logger = LoggerFactory.getLogger(FastqReader.class);
+    private static Log log = LogFactory.getLog(FastqReader.class);
 
     private boolean roundRobin = false;
     private List<BufferedReader> readers = new ArrayList<BufferedReader>();
@@ -198,7 +198,7 @@ public class FastqReader
         if (lines.length != 4)
         {
             String message = "Invalid number of lines for FASTQ entry";
-            logger.error(message);
+            log.error(message);
             throw new RuntimeException(message);
         }
 
@@ -211,7 +211,7 @@ public class FastqReader
         if (!descriptionLine.startsWith("@"))
         {
             String message = "Invalid FASTQ entry: description line must begin with a @ character";
-            logger.error(message);
+            log.error(message);
             throw new FastqFormatException(message);
         }
         String description = descriptionLine.substring(1).trim();
@@ -219,66 +219,66 @@ public class FastqReader
         if (sequenceLine == null)
         {
             String message = "Invalid FASTQ entry: truncated after description line";
-            logger.error(message);
+            log.error(message);
             throw new FastqFormatException(message);
         }
         String sequence = sequenceLine.trim();
         if (sequence.length() == 0)
         {
             String message = "Invalid FASTQ entry: zero-length sequence for entry " + description;
-            logger.error(message);
+            log.error(message);
             throw new FastqFormatException(message);
         }
         if (!sequence.matches("^[A-Za-z\\.~]+$"))
         {
             String message = "Invalid FASTQ entry: sequence string contains invalid characters for entry " + description;
-            logger.error(message);
+            log.error(message);
             throw new FastqFormatException(message);
         }
 
         if (separatorLine == null)
         {
             String message = "Invalid FASTQ entry: truncated after sequence line";
-            logger.error(message);
+            log.error(message);
             throw new FastqFormatException(message);
         }
         if (!separatorLine.startsWith("+"))
         {
             String message = "Invalid FASTQ entry: separator line must begin with a + character for entry " + description;
-            logger.error(message);
+            log.error(message);
             throw new FastqFormatException(message);
         }
         String separator = separatorLine.substring(1).trim();
         if (separator.length() > 0 && !separator.equals(description))
         {
             String message = "Invalid FASTQ entry: separator does not match descriptor for entry " + description;
-            logger.error(message);
+            log.error(message);
             throw new FastqFormatException(message);
         }
 
         if (qualityLine == null)
         {
             String message = "Invalid FASTQ entry: truncated after separator line";
-            logger.error(message);
+            log.error(message);
             throw new FastqFormatException(message);
         }
         String quality = qualityLine.trim();
         if (quality.length() == 0)
         {
             String message = "Invalid FASTQ entry: zero-length quality for entry " + description;
-            logger.error(message);
+            log.error(message);
             throw new FastqFormatException(message);
         }
         if (quality.length() != sequence.length())
         {
             String message = "Invalid FASTQ entry: sequence and quality strings of differing length for entry " + description;
-            logger.error(message);
+            log.error(message);
             throw new FastqFormatException(message);
         }
         if (!quality.matches("^[!-~]+$"))
         {
             String message = "Invalid FASTQ entry: quality string contains invalid characters for entry " + description;
-            logger.error(message);
+            log.error(message);
             throw new FastqFormatException(message);
         }
 
