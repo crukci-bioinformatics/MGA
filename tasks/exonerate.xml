@@ -43,7 +43,7 @@
             <executable>
                 ${exonerateExecutable} --version
             </executable>
-            <extraction line="1" group="1">.*exonerate version (.+)$</extraction>
+            <extraction line="1" group="1">.*version (.+)$</extraction>
         </program>
     </versions>
 </task:task>

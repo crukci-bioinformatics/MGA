@@ -45,7 +45,7 @@ ${bowtieExecutable} \
             <executable>
                 ${bowtieExecutable} --version
             </executable>
-            <extraction line="1" group="1">.*bowtie version (.+)$</extraction>
+            <extraction line="1" group="1">.*version (.+)$</extraction>
         </program>
     </versions>
 </task:task>
