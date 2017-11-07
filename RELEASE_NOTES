@@ -1,6 +1,16 @@
 Version 1.4 (TBD)
 -----------
 
+* Added details of uniquely aligning reads to the results table and for
+  preferentially aligning reads which align best, i.e. with fewest mismatches to
+  the given reference genome, possibly tied with other matches to other genomes.
+
+* Changed the logic for assigning reads to reference genomes; reads are now
+  assigned to the reference genome to which they align with the smallest number
+  of mismatches. In the event of a tie where the read aligns to more than one
+  genome with the same number of mismatches, the reference genome with the
+  largest number of preferentially aligned reads (best hits) is chosen.
+
 * Added support for large reference genomes requiring use of large bowtie
   indexes.
 
