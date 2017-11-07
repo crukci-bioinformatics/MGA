@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2013 Cancer Research UK Cambridge Institute
+ * Copyright (c) 2017 Cancer Research UK Cambridge Institute
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -32,10 +32,18 @@ package org.cruk.mga;
 public class AlignmentSummary
 {
     private String referenceGenomeId;
+    private int alignedCount = 0;
     private int totalAlignedSequenceLength = 0;
     private int totalMismatchCount = 0;
-    private int alignedCount = 0;
+    private int uniquelyAlignedCount = 0;
+    private int totalUniquelyAlignedSequenceLength = 0;
+    private int totalUniquelyAlignedMismatchCount = 0;
+    private int preferentiallyAlignedCount = 0;
+    private int totalPreferentiallyAlignedSequenceLength = 0;
+    private int totalPreferentiallyAlignedMismatchCount = 0;
     private int assignedCount = 0;
+    private int totalAssignedSequenceLength = 0;
+    private int totalAssignedMismatchCount = 0;
 
     /**
      * @return the referenceGenomeId
@@ -51,6 +59,22 @@ public class AlignmentSummary
     public void setReferenceGenomeId(String referenceGenomeId)
     {
         this.referenceGenomeId = referenceGenomeId;
+    }
+
+    /**
+     * @return the alignedCount the number of aligned sequences.
+     */
+    public int getAlignedCount()
+    {
+        return alignedCount;
+    }
+
+    /**
+     * Increments the aligned sequence count.
+     */
+    public void incrementAlignedCount()
+    {
+        alignedCount++;
     }
 
     /**
@@ -90,7 +114,7 @@ public class AlignmentSummary
     }
 
     /**
-     * @return the errorRate
+     * @return the error rate
      */
     public float getErrorRate()
     {
@@ -98,25 +122,128 @@ public class AlignmentSummary
     }
 
     /**
-     * @return the alignedCount
+     * @return the uniquely aligned sequence count.
      */
-    public int getAlignedCount()
+    public int getUniquelyAlignedCount()
     {
-        return alignedCount;
+        return uniquelyAlignedCount;
     }
 
     /**
-     * Sets the aligned sequence count.
+     * Increments the number of uniquely aligned sequences.
+     */
+    public void incrementUniquelyAlignedCount()
+    {
+        uniquelyAlignedCount++;
+    }
+
+    /**
+     * @return the total uniquely aligned sequence length.
+     */
+    public int getTotalUniquelyAlignedSequenceLength()
+    {
+        return totalUniquelyAlignedSequenceLength;
+    }
+
+    /**
+     * Adds the given uniquely aligned sequence length to the total.
      *
-     * @param alignedCount the number of aligned sequences.
+     * @param alignedLength the aligned sequence length.
      */
-    public void setAlignedCount(int alignedCount)
+    public void addUniquelyAlignedSequenceLength(int alignedLength)
     {
-        this.alignedCount = alignedCount;
+        totalUniquelyAlignedSequenceLength += alignedLength;
     }
 
     /**
-     * @return the assignedCount
+     * @return the total number of mismatches in uniquely aligned sequences.
+     */
+    public int getTotalUniquelyAlignedMismatchCount()
+    {
+        return totalUniquelyAlignedMismatchCount;
+    }
+
+    /**
+     * Adds the given number of mismatches to the total for uniquely aligned sequences.
+     *
+     * @param mismatchCount the number of mismatches.
+     */
+    public void addUniquelyAlignedMismatchCount(int mismatchCount)
+    {
+        totalUniquelyAlignedMismatchCount += mismatchCount;
+    }
+
+    /**
+     * @return the error rate for uniquely aligned sequences.
+     */
+    public float getUniquelyAlignedErrorRate()
+    {
+        return totalUniquelyAlignedSequenceLength == 0 ? 0.0f : (float)totalUniquelyAlignedMismatchCount / totalUniquelyAlignedSequenceLength;
+    }
+
+
+    /**
+     * @return the preferentially aligned sequence count.
+     */
+    public int getPreferentiallyAlignedCount()
+    {
+        return preferentiallyAlignedCount;
+    }
+
+    /**
+     * Increments the number of preferentially aligned sequences.
+     */
+    public void incrementPreferentiallyAlignedCount()
+    {
+        preferentiallyAlignedCount++;
+    }
+
+    /**
+     * @return the total preferentially aligned sequence length.
+     */
+    public int getTotalPreferentiallyAlignedSequenceLength()
+    {
+        return totalPreferentiallyAlignedSequenceLength;
+    }
+
+    /**
+     * Adds the given preferentially aligned sequence length to the total.
+     *
+     * @param alignedLength the aligned sequence length.
+     */
+    public void addPreferentiallyAlignedSequenceLength(int alignedLength)
+    {
+        totalPreferentiallyAlignedSequenceLength += alignedLength;
+    }
+
+    /**
+     * @return the total number of mismatches in preferentially aligned sequences.
+     */
+    public int getTotalPreferentiallyAlignedMismatchCount()
+    {
+        return totalPreferentiallyAlignedMismatchCount;
+    }
+
+    /**
+     * Adds the given number of mismatches to the total for preferentially aligned sequences.
+     *
+     * @param mismatchCount the number of mismatches.
+     */
+    public void addPreferentiallyAlignedMismatchCount(int mismatchCount)
+    {
+        totalPreferentiallyAlignedMismatchCount += mismatchCount;
+    }
+
+    /**
+     * @return the error rate for preferentially aligned sequences.
+     */
+    public float getPreferentiallyAlignedErrorRate()
+    {
+        return totalPreferentiallyAlignedSequenceLength == 0 ? 0.0f : (float)totalPreferentiallyAlignedMismatchCount / totalPreferentiallyAlignedSequenceLength;
+    }
+
+    /**
+     * @return the assigned sequence count.
      */
     public int getAssignedCount()
     {
@@ -124,12 +251,54 @@ public class AlignmentSummary
     }
 
     /**
-     * Sets the assigned sequence count.
-     *
-     * @param assignedCount the number of assigned sequences.
+     * Increments the number of assigned sequences.
      */
-    public void setAssignedCount(int assignedCount)
+    public void incrementAssignedCount()
     {
-        this.assignedCount = assignedCount;
+        assignedCount++;
+    }
+
+    /**
+     * @return the total assigned sequence length.
+     */
+    public int getTotalAssignedSequenceLength()
+    {
+        return totalAssignedSequenceLength;
+    }
+
+    /**
+     * Adds the given assigned sequence length to the total.
+     *
+     * @param alignedLength the aligned sequence length.
+     */
+    public void addAssignedSequenceLength(int alignedLength)
+    {
+        totalAssignedSequenceLength += alignedLength;
+    }
+
+    /**
+     * @return the total number of mismatches in assigned sequences.
+     */
+    public int getTotalAssignedMismatchCount()
+    {
+        return totalAssignedMismatchCount;
+    }
+
+    /**
+     * Adds the given number of mismatches to the total for assigned sequences.
+     *
+     * @param mismatchCount the number of mismatches.
+     */
+    public void addAssignedMismatchCount(int mismatchCount)
+    {
+        totalAssignedMismatchCount += mismatchCount;
+    }
+
+    /**
+     * @return the error rate for assigned sequences.
+     */
+    public float getAssignedErrorRate()
+    {
+        return totalAssignedSequenceLength == 0 ? 0.0f : (float)totalAssignedMismatchCount / totalAssignedSequenceLength;
     }
 }
