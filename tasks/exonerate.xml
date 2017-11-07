@@ -39,7 +39,7 @@
     </arguments>
 
     <versions>
-        <program name="bowtie">
+        <program name="exonerate">
             <executable>
                 ${exonerateExecutable} --version
             </executable>
