@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2013 Cancer Research UK Cambridge Institute
+ * Copyright (c) 2017 Cancer Research UK Cambridge Institute
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -44,7 +44,7 @@ public class MultiGenomeAlignmentSummary
     private int sampledCount;
     private int trimLength;
     private int adapterCount;
-    private int unmappedCount;
+    private int alignedCount;
     private Map<String, AlignmentSummary> alignmentSummaries = new HashMap<String, AlignmentSummary>();
     private List<OrderedProperties> sampleProperties = new ArrayList<OrderedProperties>();
 
@@ -129,19 +129,27 @@ public class MultiGenomeAlignmentSummary
     }
 
     /**
+     * @return the number of aligned sequences
+     */
+    public int getAlignedCount()
+    {
+        return alignedCount;
+    }
+
+    /**
+     * Increments the number of aligned sequences.
+     */
+    public void incrementAlignedCount()
+    {
+        alignedCount++;
+    }
+
+    /**
      * @return the unmappedCount
      */
     public int getUnmappedCount()
     {
-        return unmappedCount;
-    }
-
-    /**
-     * @param unmappedCount the unmappedCount to set
-     */
-    public void setUnmappedCount(int unmappedCount)
-    {
-        this.unmappedCount = unmappedCount;
+        return sampledCount - alignedCount;
     }
 
     /**
