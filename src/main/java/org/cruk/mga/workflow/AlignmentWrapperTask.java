@@ -25,11 +25,11 @@ package org.cruk.mga.workflow;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
 
 import org.cruk.workflow.execution.TaskMonitor;
 import org.cruk.workflow.execution.TaskRunner;
 import org.cruk.workflow.tasks.AbstractJavaTask;
+import org.cruk.workflow.xml2.pipeline.Subtasks;
 import org.cruk.workflow.xml2.pipeline.Task;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -82,7 +82,7 @@ public class AlignmentWrapperTask extends AbstractJavaTask
         }
         else
         {
-            Collection<Task> subtasks = task.getSubtasks();
+            Subtasks subtasks = task.getSubtasks();
             if (subtasks.size() != 1)
             {
                 throw new Exception("Expecting a single subtask but found " + subtasks.size());

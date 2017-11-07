@@ -32,16 +32,16 @@ import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.GnuParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.ParseException;
 import org.cruk.util.CommandLineUtility;
 import org.cruk.workflow.assembly.MetaDataLoader;
 import org.cruk.workflow.util.ApplicationContextFactory;
 import org.cruk.workflow.util.FileFinder;
+import org.cruk.workflow.xml2.metadata.LogLevel;
 import org.cruk.workflow.xml2.metadata.MetaData;
-import org.cruk.workflow.xml2.metadata.ModeConfiguration;
-import org.cruk.workflow.xml2.metadata.SummaryFile;
-import org.cruk.workflow.xml2.metadata.VersionsFile;
+import org.cruk.workflow.xml2.metadata.ModeSpecific;
+import org.cruk.workflow.xml2.metadata.VersionsFileFormat;
 import org.cruk.workflow.xml2.pipeline.FilenamePattern;
 import org.cruk.workflow.xml2.pipeline.TaskVariableSet;
 import org.springframework.context.ApplicationContext;
@@ -101,8 +101,6 @@ public class CreateMetadataFromSampleSheet extends CommandLineUtility
     private String runId;
 
     private MetaData meta;
-    private ModeConfiguration local;
-    private ModeConfiguration lsf;
 
     public static void main(String[] args)
     {
@@ -124,13 +122,13 @@ public class CreateMetadataFromSampleSheet extends CommandLineUtility
     @Override
     protected void parseCommandLineArguments(String[] args)
     {
-        CommandLineParser parser = new GnuParser();
+        CommandLineParser parser = new DefaultParser();
 
         options.addOption("o", "output-metadata-file", true, "Output pipeline metadata (configuration) file (default: stdout)");
-        options.addOption("m", "mode", true, "The run mode, either local or lsf (default: " + DEFAULT_MODE + ")");
+        options.addOption("m", "mode", true, "The run mode, either local, slurm or lsf (default: " + DEFAULT_MODE + ")");
         options.addOption("n", "max-cpu-resources", true, "Maximum number of CPU processors to use when running in local mode (default: " + DEFAULT_MAX_CPU_RESOURCES + ")");
-        options.addOption("q", "queue", true, "The queue to submit to when using the LSF scheduler (default: " + DEFAULT_QUEUE + ")");
-        options.addOption("j", "max-submitted-jobs", true, "Maximum number of submitted jobs when using the LSF scheduler (default: " + DEFAULT_MAX_SUBMITTED_JOBS + ")");
+        options.addOption("q", "queue", true, "The queue to submit to when using the Slurm or LSF scheduler (default: " + DEFAULT_QUEUE + ")");
+        options.addOption("j", "max-submitted-jobs", true, "Maximum number of submitted jobs when using the Slurm or LSF scheduler (default: " + DEFAULT_MAX_SUBMITTED_JOBS + ")");
         options.addOption("w", "working-directory", true, "The working directory (default: current directory, referred to as ${work})");
         options.addOption("t", "temp-directory", true, "The temporary directory (default: " + DEFAULT_TEMP_DIR + ")");
         options.addOption("r", "resources-directory", true, "The MGA resources directory containing the bowtie-indexes subdirectory, the adaptor sequences and the reference genome mapping (default: " + DEFAULT_RESOURCES_DIR + ", where ${install} refers to the MGA installation directory)");
@@ -177,9 +175,9 @@ public class CreateMetadataFromSampleSheet extends CommandLineUtility
             if (commandLine.hasOption("mode"))
             {
                 mode = commandLine.getOptionValue("mode").toLowerCase();
-                if (!mode.equals("local") && !mode.equals("lsf"))
+                if (!mode.equals("local") && !mode.equals("slurm") && !mode.equals("lsf"))
                 {
-                    error("Error: unrecognized execution mode: " + commandLine.getOptionValue("mode") + " (can be either local or lsf)");
+                    error("Error: unrecognized execution mode: " + commandLine.getOptionValue("mode") + " (can be either local, slurm or lsf)");
                 }
             }
 
@@ -347,17 +345,23 @@ public class CreateMetadataFromSampleSheet extends CommandLineUtility
         meta.setMode(mode);
         meta.setTempDirectory(temporaryDirectory);
         meta.setJobOutputDirectory("${work}/logs");
-        meta.setSummaryFile(new SummaryFile("${work}/logs/summary.txt"));
-        meta.setVersionsFile(new VersionsFile("${work}/logs/versions.txt"));
+        meta.setSummaryFile("${work}/logs/summary.csv", false, false);
+        meta.setVersionsFile("${work}/logs/${runId}.versions.txt", VersionsFileFormat.TEXT);
+        meta.setLogFile("${work}/logs/${runId}.pipeline.log", true, LogLevel.NORMAL);
 
-        local = new ModeConfiguration("local");
+        ModeSpecific local = new ModeSpecific("local");
         local.setVariable("maxCpuResources", Integer.toString(maxCpuResources));
         meta.getModeConfigurations().add(local);
 
-        lsf = new ModeConfiguration("lsf");
+        ModeSpecific lsf = new ModeSpecific("lsf");
         lsf.setVariable("queue", queue);
         lsf.setVariable("maximumSubmittedJobs", Integer.toString(maxSubmittedJobs));
         meta.getModeConfigurations().add(lsf);
+
+        ModeSpecific slurm = new ModeSpecific("slurm");
+        slurm.setVariable("queue", queue);
+        slurm.setVariable("maximumSubmittedJobs", Integer.toString(maxSubmittedJobs));
+        meta.getModeConfigurations().add(slurm);
 
         meta.setVariable("runId", runId);
         meta.setVariable("sampleSheetFile", sampleSheetFilename);
@@ -449,7 +453,7 @@ public class CreateMetadataFromSampleSheet extends CommandLineUtility
                             List<File> files = fileFinder.findFiles(file.getAbsolutePath(), FilenamePattern.WILDCARD, TaskVariableSet.INPUT);
                             if (files.isEmpty())
                             {
-                                logger.warn("Could not find any files matching pattern " + fields[1].trim() + " at line " + lineNumber + " of sample sheet file " + sampleSheetFilename);
+                                log.warn("Could not find any files matching pattern " + fields[1].trim() + " at line " + lineNumber + " of sample sheet file " + sampleSheetFilename);
                             }
                         }
                     }
@@ -497,56 +501,6 @@ public class CreateMetadataFromSampleSheet extends CommandLineUtility
         }
     }
 
-    public MetaData getMeta()
-    {
-        return meta;
-    }
-
-    public ModeConfiguration getLsf()
-    {
-        return lsf;
-    }
-
-    public String getMode()
-    {
-        return mode;
-    }
-
-    public void setMode(String mode)
-    {
-        this.mode = mode;
-    }
-
-    public int getMaxCpuResources()
-    {
-        return maxCpuResources;
-    }
-
-    public void setMaxCpuResources(int maxCpuResources)
-    {
-        this.maxCpuResources = maxCpuResources;
-    }
-
-    public String getQueue()
-    {
-        return queue;
-    }
-
-    public void setQueue(String queue)
-    {
-        this.queue = queue;
-    }
-
-    public int getMaxSubmittedJobs()
-    {
-        return maxSubmittedJobs;
-    }
-
-    public void setMaxSubmittedJobs(int maxSubmittedJobs)
-    {
-        this.maxSubmittedJobs = maxSubmittedJobs;
-    }
-
     public String getWorkingDirectory()
     {
         return workingDirectory;
@@ -555,16 +509,6 @@ public class CreateMetadataFromSampleSheet extends CommandLineUtility
     public void setWorkingDirectory(String workingDirectory)
     {
         this.workingDirectory = workingDirectory;
-    }
-
-    public String getTemporaryDirectory()
-    {
-        return temporaryDirectory;
-    }
-
-    public void setTemporaryDirectory(String temporaryDirectory)
-    {
-        this.temporaryDirectory = temporaryDirectory;
     }
 
     public String getResourcesDirectory()
@@ -576,115 +520,4 @@ public class CreateMetadataFromSampleSheet extends CommandLineUtility
     {
         this.resourcesDirectory = resourcesDirectory;
     }
-
-    public String getDataDirectory()
-    {
-        return dataDirectory;
-    }
-
-    public void setDataDirectory(String dataDirectory)
-    {
-        this.dataDirectory = dataDirectory;
-    }
-
-    public String getOutputDirectory()
-    {
-        return outputDirectory;
-    }
-
-    public void setOutputDirectory(String outputDirectory)
-    {
-        this.outputDirectory = outputDirectory;
-    }
-
-    public String getBowtieExecutable()
-    {
-        return bowtieExecutable;
-    }
-
-    public void setBowtieExecutable(String bowtieExecutable)
-    {
-        this.bowtieExecutable = bowtieExecutable;
-    }
-
-    public String getExonerateExecutable()
-    {
-        return exonerateExecutable;
-    }
-
-    public void setExonerateExecutable(String exonerateExecutable)
-    {
-        this.exonerateExecutable = exonerateExecutable;
-    }
-
-    public int getSampleSize()
-    {
-        return sampleSize;
-    }
-
-    public void setSampleSize(int sampleSize)
-    {
-        this.sampleSize = sampleSize;
-    }
-
-    public long getMaxNumberOfRecordsToSampleFrom()
-    {
-        return maxNumberOfRecordsToSampleFrom;
-    }
-
-    public void setMaxNumberOfRecordsToSampleFrom(long maxNumberOfRecordsToSampleFrom)
-    {
-        this.maxNumberOfRecordsToSampleFrom = maxNumberOfRecordsToSampleFrom;
-    }
-
-    public int getChunkSize()
-    {
-        return chunkSize;
-    }
-
-    public void setChunkSize(int chunkSize)
-    {
-        this.chunkSize = chunkSize;
-    }
-
-    public int getTrimLength()
-    {
-        return trimLength;
-    }
-
-    public void setTrimLength(int trimLength)
-    {
-        this.trimLength = trimLength;
-    }
-
-    public int getPlotWidth()
-    {
-        return plotWidth;
-    }
-
-    public void setPlotWidth(int plotWidth)
-    {
-        this.plotWidth = plotWidth;
-    }
-
-    public int getMinimumSequenceCount()
-    {
-        return minimumSequenceCount;
-    }
-
-    public void setMinimumSequenceCount(int minimumSequenceCount)
-    {
-        this.minimumSequenceCount = minimumSequenceCount;
-    }
-
-    public boolean isSeparateDatasetReports()
-    {
-        return separateDatasetReports;
-    }
-
-    public void setSeparateDatasetReports(boolean separateDatasetReports)
-    {
-        this.separateDatasetReports = separateDatasetReports;
-    }
-
 }
