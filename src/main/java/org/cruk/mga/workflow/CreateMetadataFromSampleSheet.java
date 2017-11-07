@@ -345,7 +345,7 @@ public class CreateMetadataFromSampleSheet extends CommandLineUtility
         meta.setMode(mode);
         meta.setTempDirectory(temporaryDirectory);
         meta.setJobOutputDirectory("${work}/logs");
-        meta.setSummaryFile("${work}/logs/summary.csv", false, false);
+        meta.setSummaryFile("${work}/logs/${runId}.summary.csv", false, false);
         meta.setVersionsFile("${work}/logs/${runId}.versions.txt", VersionsFileFormat.TEXT);
         meta.setLogFile("${work}/logs/${runId}.pipeline.log", true, LogLevel.NORMAL);
 
