@@ -115,13 +115,8 @@ public class CreateReport extends CommandLineUtility
     private float scaleFactor = 1.0f;
 
     private ReferenceGenomeSpeciesMapping referenceGenomeSpeciesMapping = new ReferenceGenomeSpeciesMapping();
-
     private Map<String, MultiGenomeAlignmentSummary> multiGenomeAlignmentSummaries = new TreeMap<String, MultiGenomeAlignmentSummary>();
-
-//    private Map<String, Integer> referenceGenomeIndexMapping = new HashMap<String, Integer>();
-//    private Map<String, Integer> datasetOffsets = new HashMap<String, Integer>();
-//    private int bytesPerSequence;
-//    private byte[] alignmentMatrix;
+    private Map<String, String> datasetDisplayLabels = new HashMap<String, String>();
 
     private Builder xmlParser = new Builder();
 
@@ -268,10 +263,8 @@ public class CreateReport extends CommandLineUtility
         readCountSummaryFiles();
         readSamplingSummaryFiles();
         readAdapterAlignmentFiles();
-//        readAlignmentFiles();
         readAlignments();
-//        assignAlignedSequences();
-        OrderedProperties runProperties = readSampleSheet(multiGenomeAlignmentSummaries);
+        OrderedProperties runProperties = readSampleSheet();
         String imageFilename = outputPrefix + ".png";
         String htmlFilename = outputPrefix + ".html";
         createSummaryPlot(multiGenomeAlignmentSummaries.values(), imageFilename);
@@ -346,7 +339,7 @@ public class CreateReport extends CommandLineUtility
     /**
      * Reads the sample sheet and adds sample information to the alignment summaries.
      */
-    private OrderedProperties readSampleSheet(Map<String, MultiGenomeAlignmentSummary> multiGenomeAlignmentSummaries)
+    private OrderedProperties readSampleSheet()
     {
         OrderedProperties properties = new OrderedProperties();
         if (sampleSheetFilename == null || sampleSheetFilename.isEmpty()) return properties;
@@ -381,8 +374,11 @@ public class CreateReport extends CommandLineUtility
 
                 if (inDatasetSection)
                 {
-                    String datasetId = fields[0];
-                    if (datasetId.length() == 0) continue;
+                    String datasetDisplayLabel = fields[0].trim();
+                    if (datasetDisplayLabel.length() == 0) continue;
+
+                    String datasetId = datasetDisplayLabel.replaceAll("\\s+", "_");
+                    datasetDisplayLabels.put(datasetId, datasetDisplayLabel);
 
                     MultiGenomeAlignmentSummary multiGenomeAlignmentSummary = multiGenomeAlignmentSummaries.get(datasetId);
                     if (multiGenomeAlignmentSummary == null) continue;
@@ -673,6 +669,12 @@ public class CreateReport extends CommandLineUtility
         }
     }
 
+    /**
+     * Read alignment files, update alignment summary objects and assign reads
+     * to reference genomes.
+     *
+     * @throws IOException
+     */
     private void readAlignments() throws IOException
     {
         // determine which results files are bowtie alignment output files
@@ -858,264 +860,6 @@ public class CreateReport extends CommandLineUtility
     }
 
     /**
-     * Identifies and reads alignment results files among the input files provided.
-     *
-     * @throws IOException
-     */
-    /*
-    private void readAlignmentFiles() throws IOException
-    {
-        // Determine how many reference genomes were aligned to from the file names
-        // and give each an index.
-        int referenceGenomeCount = 0;
-        Map<File, String> fileReferenceGenomeMapping = new HashMap<File, String>();
-        for (String filename : resultsFiles)
-        {
-            if (filename.endsWith(".bowtie.alignment"))
-            {
-                File file = new File(filename);
-                String referenceGenomeId = file.getName().replaceAll("\\.bowtie\\.alignment$", "").replaceAll("^" + runId + "\\.", "");
-                int index = referenceGenomeId.indexOf(".");
-                if (index == -1) error("Error determining reference genome for file: " + file);
-                referenceGenomeId = referenceGenomeId.substring(index + 1);
-                if (referenceGenomeId.isEmpty()) error("Error determining reference genome for file: " + file);
-                if (!referenceGenomeIndexMapping.containsKey(referenceGenomeId))
-                {
-                    referenceGenomeIndexMapping.put(referenceGenomeId, referenceGenomeCount);
-                    referenceGenomeCount++;
-                }
-                fileReferenceGenomeMapping.put(file, referenceGenomeId);
-            }
-        }
-
-        // initialize alignment summary for each reference genome and dataset
-        for (String referenceGenomeId : fileReferenceGenomeMapping.values())
-        {
-            for (MultiGenomeAlignmentSummary multiGenomeAlignmentSummary : multiGenomeAlignmentSummaries.values())
-            {
-                AlignmentSummary alignmentSummary = multiGenomeAlignmentSummary.getAlignmentSummary(referenceGenomeId);
-                if (alignmentSummary == null)
-                {
-                    alignmentSummary = new AlignmentSummary();
-                    alignmentSummary.setReferenceGenomeId(referenceGenomeId);
-                    multiGenomeAlignmentSummary.addAlignmentSummary(alignmentSummary);
-                }
-            }
-        }
-
-        // Calculate how many bytes required to hold binary alignment matrix for each
-        // dataset, sampled sequence and reference genome.
-        bytesPerSequence = referenceGenomeCount / Byte.SIZE;
-        if (referenceGenomeCount > (bytesPerSequence * Byte.SIZE)) bytesPerSequence++;
-
-        // Create byte array of sufficient length based on number of sampled sequences per
-        // dataset and determine the offset for each dataset.
-        int total = 0;
-        for (String datasetId : multiGenomeAlignmentSummaries.keySet())
-        {
-            datasetOffsets.put(datasetId, total);
-            total += multiGenomeAlignmentSummaries.get(datasetId).getSampledCount() * bytesPerSequence;
-        }
-        int length = total * bytesPerSequence;
-        alignmentMatrix = new byte[length];
-        for (int i = 0; i < length; i++) alignmentMatrix[i] = 0;
-
-        // read alignment files and set bit corresponding to the dataset, sequence id
-        // and reference genome.
-        for (File file : fileReferenceGenomeMapping.keySet())
-        {
-            String referenceGenomeId = fileReferenceGenomeMapping.get(file);
-            readAlignmentFile(file, referenceGenomeId);
-        }
-    }
-    */
-
-    /**
-     * Read the alignment results file for the given reference genome, extracting
-     * the aligned sequence length and mismatches and setting the appropriate bit
-     * in the alignment matrix corresponding to the dataset and sequence identifiers.
-     *
-     * @param file
-     * @param referenceGenomeId
-     * @throws NumberFormatException
-     * @throws IOException
-     */
-    /*
-    private void readAlignmentFile(File file, String referenceGenomeId) throws IOException
-    {
-        int referenceGenomeIndex = referenceGenomeIndexMapping.get(referenceGenomeId);
-
-        int referenceGenomeOffset = referenceGenomeIndex / Byte.SIZE;
-        byte referenceGenomeMask = 1;
-        for (int i = 0; i < referenceGenomeIndex % Byte.SIZE; i++)
-        {
-            referenceGenomeMask <<= 1;
-        }
-
-        BufferedReader reader = new BufferedReader(new FileReader(file));
-
-        int lineNumber = 0;
-        String line = null;
-        while ((line = reader.readLine()) != null)
-        {
-            lineNumber++;
-            String[] fields = line.split("\\t");
-
-            int separatorIndex = fields[0].lastIndexOf("_");
-            if (separatorIndex == -1)
-            {
-                error("Incorrect sequence identifier (" + fields[0] + ") at line " + lineNumber + " in file " + file);
-            }
-            String datasetId = fields[0].substring(0, separatorIndex);
-            int sequenceId = -1;
-            try
-            {
-                sequenceId = Integer.parseInt(fields[0].substring(separatorIndex + 1));
-            }
-            catch (NumberFormatException e)
-            {
-                error("Incorrect sequence identifier (" + fields[0] + ") at line " + lineNumber + " in file " + file);
-            }
-
-            MultiGenomeAlignmentSummary multiGenomeAlignmentSummary = multiGenomeAlignmentSummaries.get(datasetId);
-            if (multiGenomeAlignmentSummary == null)
-            {
-                error("Missing sequence count file for dataset " + datasetId + " corresponding to alignment file " + file);
-            }
-            if (sequenceId > multiGenomeAlignmentSummary.getSampledCount())
-            {
-                error("Sequence number at line " + lineNumber + " out of range, maximum value should be " + multiGenomeAlignmentSummary.getSampledCount());
-            }
-
-            AlignmentSummary alignmentSummary = multiGenomeAlignmentSummary.getAlignmentSummary(referenceGenomeId);
-
-            int alignedLength = fields[4].length();
-            alignmentSummary.addAlignedSequenceLength(alignedLength);
-
-            if (fields.length > 7)
-            {
-                String mismatches = fields[7];
-                int mismatchCount = mismatches.split(",").length;
-                alignmentSummary.addMismatchCount(mismatchCount);
-            }
-
-            int datasetOffset = datasetOffsets.get(datasetId);
-            int offset = datasetOffset + (sequenceId - 1) * bytesPerSequence + referenceGenomeOffset;
-            alignmentMatrix[offset] |= referenceGenomeMask;
-        }
-
-        reader.close();
-    }
-    */
-
-    /**
-     * Assign sequences to reference genomes for all datasets.
-     */
-    /*
-    private void assignAlignedSequences()
-    {
-        for (MultiGenomeAlignmentSummary multiGenomeAlignmentSummary : multiGenomeAlignmentSummaries.values())
-        {
-            assignAlignedSequences(multiGenomeAlignmentSummary);
-        }
-    }
-    */
-
-    /**
-     * Iterative process for assignment of aligned sequences to reference genomes
-     * based on which genome has the most hits.
-     *
-     * @param multiGenomeAlignmentSummary
-     */
-    /*
-    private void assignAlignedSequences(MultiGenomeAlignmentSummary multiGenomeAlignmentSummary)
-    {
-        int sampledCount = multiGenomeAlignmentSummary.getSampledCount();
-        int datasetOffset = datasetOffsets.get(multiGenomeAlignmentSummary.getDatasetId());
-
-        int assignedTotal = 0;
-
-        Map<String, AlignmentSummary> alignmentSummaryLookup = new HashMap<String, AlignmentSummary>();
-        for (AlignmentSummary alignmentSummary : multiGenomeAlignmentSummary.getAlignmentSummaries())
-        {
-            String referenceGenomeId = alignmentSummary.getReferenceGenomeId();
-            alignmentSummaryLookup.put(referenceGenomeId, alignmentSummary);
-        }
-
-
-//        boolean alignedCountUnset = true;
-
-        while (!alignmentSummaryLookup.isEmpty())
-        {
-            String assignedReferenceGenomeId = null;
-            int assignedCount = 0;
-            int assignedReferenceGenomeOffset = 0;
-            byte assignedReferenceGenomeMask = 0;
-
-            for (String referenceGenomeId : alignmentSummaryLookup.keySet())
-            {
-                int referenceGenomeIndex = referenceGenomeIndexMapping.get(referenceGenomeId);
-
-                int referenceGenomeOffset = referenceGenomeIndex / Byte.SIZE;
-                byte referenceGenomeMask = 1;
-                for (int i = 0; i < referenceGenomeIndex % Byte.SIZE; i++)
-                {
-                    referenceGenomeMask <<= 1;
-                }
-
-                int count = 0;
-                for (int i = 0; i < sampledCount; i++)
-                {
-                    int offset = datasetOffset + i * bytesPerSequence + referenceGenomeOffset;
-                    if ((alignmentMatrix[offset] & referenceGenomeMask) != 0)
-                    {
-                        count++;
-                    }
-                }
-
-                if (assignedReferenceGenomeId == null || count > assignedCount)
-                {
-                    assignedReferenceGenomeId = referenceGenomeId;
-                    assignedCount = count;
-                    assignedReferenceGenomeOffset = referenceGenomeOffset;
-                    assignedReferenceGenomeMask = referenceGenomeMask;
-                }
-
-//                if (alignedCountUnset)
-//                {
-//                    AlignmentSummary alignmentSummary = alignmentSummaryLookup.get(referenceGenomeId);
-//                    alignmentSummary.setAlignedCount(count);
-//                }
-            }
-
-//            alignedCountUnset = false;
-
-            if (assignedCount == 0) break;
-
-            assignedTotal += assignedCount;
-
-            AlignmentSummary assignedAlignmentSummary = alignmentSummaryLookup.remove(assignedReferenceGenomeId);
-            assignedAlignmentSummary.setAssignedCount(assignedCount);
-
-            for (int i = 0; i < sampledCount; i++)
-            {
-                int offset = datasetOffset + i * bytesPerSequence + assignedReferenceGenomeOffset;
-                if ((alignmentMatrix[offset] & assignedReferenceGenomeMask) != 0)
-                {
-                    offset -= assignedReferenceGenomeOffset;
-                    for (int j = 0; j < bytesPerSequence; j++)
-                    {
-                        alignmentMatrix[offset + j] = 0;
-                    }
-                }
-            }
-        }
-
-        multiGenomeAlignmentSummary.setUnmappedCount(sampledCount - assignedTotal);
-    }
-    */
-
-    /**
      * Writes the alignment summary report.
      *
      * @param multiGenomeAlignmentSummaries
@@ -1148,7 +892,10 @@ public class CreateReport extends CommandLineUtility
             Element multiGenomeAlignmentSummaryElement = new Element("MultiGenomeAlignmentSummary");
             root.appendChild(multiGenomeAlignmentSummaryElement);
 
-            addElement(multiGenomeAlignmentSummaryElement, "DatasetId", multiGenomeAlignmentSummary.getDatasetId());
+            String datasetId = multiGenomeAlignmentSummary.getDatasetId();
+            String datasetDisplayLabel = datasetDisplayLabels.get(datasetId);
+
+            addElement(multiGenomeAlignmentSummaryElement, "DatasetId", datasetDisplayLabel);
             addElement(multiGenomeAlignmentSummaryElement, "SequenceCount", Long.toString(multiGenomeAlignmentSummary.getSequenceCount()));
             addElement(multiGenomeAlignmentSummaryElement, "SampledCount", multiGenomeAlignmentSummary.getSampledCount());
             addElement(multiGenomeAlignmentSummaryElement, "AdapterCount", multiGenomeAlignmentSummary.getAdapterCount());
@@ -1415,7 +1162,8 @@ public class CreateReport extends CommandLineUtility
             {
                 i++;
                 String datasetId = multiGenomeAlignmentSummary.getDatasetId();
-                if (!Integer.toString(i).equals(datasetId))
+                String datasetDisplayLabel = datasetDisplayLabels.get(datasetId);
+                if (!Integer.toString(i).equals(datasetDisplayLabel))
                 {
                     drawNumbers = true;
                     break;
@@ -1440,9 +1188,10 @@ public class CreateReport extends CommandLineUtility
         maxWidth = 0;
         for (MultiGenomeAlignmentSummary multiGenomeAlignmentSummary : multiGenomeAlignmentSummaries)
         {
-            String s = multiGenomeAlignmentSummary.getDatasetId();
-            g2.drawString(s, x, y);
-            maxWidth = Math.max(maxWidth, g2.getFontMetrics().stringWidth(s));
+            String datasetId = multiGenomeAlignmentSummary.getDatasetId();
+            String datasetDisplayLabel = datasetDisplayLabels.get(datasetId);
+            g2.drawString(datasetDisplayLabel, x, y);
+            maxWidth = Math.max(maxWidth, g2.getFontMetrics().stringWidth(datasetDisplayLabel));
             y += separation;
         }
         int acceptableWidth = (int)(0.15 * plotWidth);
