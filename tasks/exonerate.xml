@@ -1,7 +1,7 @@
 <?xml version="1.1" encoding="ISO-8859-1"?>
 <task:task xmlns:task="http://cancerresearchuk.org/workflow/task"
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-           xsi:schemaLocation="http://cancerresearchuk.org/workflow/task http://content.cruk.cam.ac.uk/bioinformatics/schema/workflow/task-1.6.xsd">
+           xsi:schemaLocation="http://cancerresearchuk.org/workflow/task http://content.cruk.cam.ac.uk/bioinformatics/schema/workflow/task-1.7.xsd">
 
     <name>exonerate</name>
     <description>Task for aligning two sets of sequences using exonerate.</description>
@@ -37,4 +37,13 @@
         <arg name="exonerateExecutable" required="false" default="exonerate"
             description="Path to the exonerate executable"/>
     </arguments>
+
+    <versions>
+        <program name="bowtie">
+            <executable>
+                ${exonerateExecutable} --version
+            </executable>
+            <extraction line="1" group="1">.*exonerate version (.+)$</extraction>
+        </program>
+    </versions>
 </task:task>
