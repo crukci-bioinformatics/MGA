@@ -79,11 +79,11 @@ Further details on the alignment results and the assignment of reads to
 genomes are given <a href="#alignmentDetails">below</a>.
 <p/>
 
-Datasets:
+Datasets
 <xsl:for-each select="MultiGenomeAlignmentSummaries/MultiGenomeAlignmentSummary">
 	<xsl:sort select="DatasetId"/>
 	<xsl:variable name="datasetId"><xsl:value-of select="DatasetId"/></xsl:variable>
-	<a href="#{$datasetId}"><xsl:value-of select="DatasetId"/></a> |
+	| <a href="#{$datasetId}"><xsl:value-of select="DatasetId"/></a>
 </xsl:for-each>
 <p/>
 
