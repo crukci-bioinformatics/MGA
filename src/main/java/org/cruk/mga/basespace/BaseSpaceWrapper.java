@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2014 Cancer Research UK Cambridge Institute
+ * Copyright (c) 2017 Cancer Research UK Cambridge Institute
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -37,7 +37,7 @@ import java.util.Map;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.GnuParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.FileUtils;
@@ -105,7 +105,7 @@ public class BaseSpaceWrapper extends CommandLineUtility
     @Override
     protected void parseCommandLineArguments(String[] args)
     {
-        CommandLineParser parser = new GnuParser();
+        CommandLineParser parser = new DefaultParser();
 
         Option option = new Option("p", "project-id", true, "Project identifier.");
         option.setRequired(true);
@@ -181,7 +181,7 @@ public class BaseSpaceWrapper extends CommandLineUtility
         CommandLineOptions options = applicationContext.getBean("commandLineOptions", CommandLineOptions.class);
         options.parseCommandLine(new String[0]);
         PipelineRunner pipelineRunner = applicationContext.getBean("pipelineRunner", PipelineRunner.class);
-        pipelineRunner.runPipeline(metadataFile);
+        pipelineRunner.runPipeline(metadataFile, "local");
 
         FileUtils.copyFile(new File(workingDirectory, "results.html"), new File(resultsDirectory, "results.html"));
         FileUtils.copyFile(new File(workingDirectory, "results.png"), new File(resultsDirectory, "results.png"));
