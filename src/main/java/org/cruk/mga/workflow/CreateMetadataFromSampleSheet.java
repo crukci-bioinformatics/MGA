@@ -468,7 +468,7 @@ public class CreateMetadataFromSampleSheet extends CommandLineUtility
                         }
                         else if (runId == null && fields[0].equalsIgnoreCase("Run ID") && fields[1].trim().length() > 0)
                         {
-                            runId = fields[1];
+                            runId = fields[1].replaceAll("\\s+", "_");
                         }
                     }
                 }
