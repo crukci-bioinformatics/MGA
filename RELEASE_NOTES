@@ -14,6 +14,11 @@ Version 1.4 (TBD)
 * Colour highlighting now based on assigned reads and mismatch rates for
   assigned reads.
 
+* Added --trim-start option to prepare-pipeline to specify the position within
+  sequences from which to start trimming for subsequent alignment; any bases
+  before this position will be trimmed. This can be used to remove molecular
+  barcodes within the first 10 - 15 bases of reads.
+
 * Run ID property in sample sheet is no longer required, the run identifier can
   alternatively be specified using the --run-id option when running
   prepare-pipeline.

@@ -14,10 +14,10 @@ using exonerate.
 
 MGA samples a subset of the reads, by default 100000, prior to alignment against
 reference genome sequences and adapters. This reduces considerably the overall run
-time. In addition, the reads are trimmed to 36 bases by default, prior to alignment
-by Bowtie. This is to ensure consistency of the output mapping and error rates across
-runs of differing lengths. Exonerate alignment against adapters uses the full-length
-sequences.
+time. In addition, the reads are trimmed to the first 36 bases by default, prior to
+alignment by Bowtie. This is to ensure consistency of the output mapping and error
+rates across runs of differing lengths. Exonerate alignment against adapters uses
+the full-length sequences.
 
 
 Installation
