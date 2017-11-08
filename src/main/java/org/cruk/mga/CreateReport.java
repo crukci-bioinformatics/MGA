@@ -1387,7 +1387,7 @@ public class CreateReport extends CommandLineUtility
                     color = Color.GRAY;
                 }
 
-                float alpha = MAX_ALPHA - (MAX_ALPHA - MIN_ALPHA) * (alignmentSummary.getErrorRate() - MIN_ERROR) / (MAX_ERROR - MIN_ERROR);
+                float alpha = MAX_ALPHA - (MAX_ALPHA - MIN_ALPHA) * (alignmentSummary.getAssignedErrorRate() - MIN_ERROR) / (MAX_ERROR - MIN_ERROR);
                 alpha = Math.max(alpha, MIN_ALPHA);
                 alpha = Math.min(alpha, MAX_ALPHA);
                 if (alignmentSummary.getAssignedCount() >= 100)
