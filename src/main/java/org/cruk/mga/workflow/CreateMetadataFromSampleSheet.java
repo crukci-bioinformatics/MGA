@@ -53,6 +53,8 @@ import org.springframework.context.ApplicationContext;
  */
 public class CreateMetadataFromSampleSheet extends CommandLineUtility
 {
+    public static final String DEFAULT_RUN_ID = "MGA";
+
     public static final String DEFAULT_MODE = "local";
     public static final int DEFAULT_MAX_CPU_RESOURCES = 1;
     public static final String DEFAULT_QUEUE = "bioinformatics";
@@ -78,6 +80,7 @@ public class CreateMetadataFromSampleSheet extends CommandLineUtility
 
     private FileFinder fileFinder = new FileFinder();
 
+    private String runId;
     private String mode;
     private int maxCpuResources;
     private String queue;
@@ -97,8 +100,6 @@ public class CreateMetadataFromSampleSheet extends CommandLineUtility
     private int plotWidth;
     private int minimumSequenceCount;
     private boolean separateDatasetReports;
-
-    private String runId;
 
     private MetaData meta;
 
@@ -124,6 +125,7 @@ public class CreateMetadataFromSampleSheet extends CommandLineUtility
     {
         CommandLineParser parser = new DefaultParser();
 
+        options.addOption(null, "run-id", true, "The run identifier used for naming jobs and as a file prefix (default: " + DEFAULT_RUN_ID + ")");
         options.addOption("o", "output-metadata-file", true, "Output pipeline metadata (configuration) file (default: stdout)");
         options.addOption("m", "mode", true, "The run mode, either local, slurm or lsf (default: " + DEFAULT_MODE + ")");
         options.addOption("n", "max-cpu-resources", true, "Maximum number of CPU processors to use when running in local mode (default: " + DEFAULT_MAX_CPU_RESOURCES + ")");
@@ -166,6 +168,11 @@ public class CreateMetadataFromSampleSheet extends CommandLineUtility
         try
         {
             CommandLine commandLine = parser.parse(options, args);
+
+            if (commandLine.hasOption("run-id"))
+            {
+                runId = commandLine.getOptionValue("run-id").trim();
+            }
 
             if (commandLine.hasOption("output-metadata-file"))
             {
@@ -341,6 +348,11 @@ public class CreateMetadataFromSampleSheet extends CommandLineUtility
     {
         readSampleSheet();
 
+        if (runId == null || runId.trim().length() == 0)
+            runId = DEFAULT_RUN_ID;
+        else
+            runId = runId.trim().replaceAll("\\s+", "_");
+
         meta.setPipeline("${install}/pipelines/mga.xml");
         meta.setMode(mode);
         meta.setTempDirectory(temporaryDirectory);
@@ -466,17 +478,12 @@ public class CreateMetadataFromSampleSheet extends CommandLineUtility
                         {
                             inDatasetSection = true;
                         }
-                        else if (runId == null && fields[0].equalsIgnoreCase("Run ID") && fields[1].trim().length() > 0)
+                        else if ((runId == null || runId.trim().isEmpty()) && fields[0].equalsIgnoreCase("Run ID") && fields[1].trim().length() > 0)
                         {
-                            runId = fields[1].replaceAll("\\s+", "_");
+                            runId = fields[1].trim();
                         }
                     }
                 }
-            }
-
-            if (runId == null)
-            {
-                error("Error: Run ID must be specified in header section in sample sheet file " + sampleSheetFilename);
             }
 
             if (!inDatasetSection)

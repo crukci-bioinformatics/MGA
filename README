@@ -121,7 +121,9 @@ DatasetId	File	Sample ID	Sample name	Institute	Sequence type	End type	Experiment
 
 The first section of the file contains information about the collection of datasets,
 typically a flow cell or run on a sequencing instrument. This information is given in two
-columns as key value pairs or properties. The 'Run ID' property is required; other fields are
+columns as key value pairs or properties. The 'Run ID' property is no longer required but for
+backwards compatibility will be used to set the runId variable in the configuration file if not
+otherwise specified using the --run-id option when running prepare-pipeline. Other fields are
 optional, can take any values, and are only used in the report generated. The 'Run name' property,
 if it exists, will be used in the report title.
 
@@ -168,6 +170,9 @@ following directories:
 Paths for bowtie and exonerate executables can also be supplied to prepare-pipeline and various
 other options including the sample size for each dataset, the length to trim sequences, etc. can
 be configured.
+
+The --run-id option can be used to set a run identifier. This is used as a prefix for intermediate
+files and log files; it is also used in naming jobs submitted to a cluster if running in this mode.
 
 For further details on the options that can be configured, run the prepare-pipeline without any
 arguments.

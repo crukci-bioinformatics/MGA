@@ -11,6 +11,13 @@ Version 1.4 (TBD)
   genome with the same number of mismatches, the reference genome with the
   largest number of preferentially aligned reads (best hits) is chosen.
 
+* Colour highlighting now based on assigned reads and mismatch rates for
+  assigned reads.
+
+* Run ID property in sample sheet is no longer required, the run identifier can
+  alternatively be specified using the --run-id option when running
+  prepare-pipeline.
+
 * Added support for large reference genomes requiring use of large bowtie
   indexes.
 

@@ -42,9 +42,9 @@ public class MetaDataValidator implements org.cruk.workflow.assembly.MetaDataVal
         MetaDataException metadataException = new MetaDataException();
 
         String runId = (String)pipelineConfig.getVariable(RUN_ID);
-        if (runId == null)
+        if (runId == null || runId.trim().isEmpty())
             metadataException.addVariable(RUN_ID, "Missing '" + RUN_ID + "' variable used in job naming, output file names, etc.");
-        runId = runId.replaceAll("\\s+", "_");
+        runId = runId.trim().replaceAll("\\s+", "_");
         pipelineConfig.getCurrentMetaDefinition().setTransientVariable(RUN_ID, runId);
 
         String sampleSheetFile = (String)pipelineConfig.getVariable(SAMPLE_SHEET_FILE);
