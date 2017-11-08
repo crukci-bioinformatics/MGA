@@ -54,9 +54,9 @@
             description="To create individual reports for each dataset."/>
         <arg name="datasetReportFilePrefix" flag="-p" required="false"
             description="File name prefix for creating separate report for each dataset."/>
-        <arg name="trimStart" flag="-s" type="integer" required="false"
+        <arg name="trimStart" flag="--trim-start" type="integer" required="false"
             description="The position within sequences from which to start trimming for alignment; any bases before this position will be trimmed."/>
-        <arg name="trimLength" flag="-l" type="integer" required="false"
+        <arg name="trimLength" flag="--trim-length" type="integer" required="false"
             description="The length to trim sequences to for alignment."/>
         <arg name="plotWidth" flag="-w" type="integer" required="false"
             description="The width of the plot in pixels."/>

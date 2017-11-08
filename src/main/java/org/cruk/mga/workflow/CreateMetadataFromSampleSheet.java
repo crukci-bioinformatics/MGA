@@ -143,8 +143,8 @@ public class CreateMetadataFromSampleSheet extends CommandLineUtility
         options.addOption("s", "sample-size", true, "The number of FASTQ records to sample for each dataset (default: " + DEFAULT_SAMPLE_SIZE + ")");
         options.addOption(null, "max-records-to-sample-from", true, "The maximum number of FASTQ records to read (sample from) for each dataset (default: " + DEFAULT_MAX_RECORDS_TO_SAMPLE_FROM + ")");
         options.addOption("c", "chunk-size", true, "The maximum number of FASTQ records in each chunk/alignment job (default: " + DEFAULT_CHUNK_SIZE + ")");
-        options.addOption("s", "trim-start", true, "The position within sequences from which to start trimming for alignment; any bases before this position will be trimmed (default: " + DEFAULT_TRIM_START + ")");
-        options.addOption("l", "trim-length", true, "The length to trim sequences to for alignment (default: " + DEFAULT_TRIM_LENGTH + ")");
+        options.addOption(null, "trim-start", true, "The position within sequences from which to start trimming for alignment; any bases before this position will be trimmed (default: " + DEFAULT_TRIM_START + ")");
+        options.addOption(null, "trim-length", true, "The length to trim sequences to for alignment (default: " + DEFAULT_TRIM_LENGTH + ")");
         options.addOption(null, "plot-width", true, "The width of the stacked bar plot in pixels (default: " + DEFAULT_PLOT_WIDTH + ")");
         options.addOption(null, "min-sequence-count", true, "The minimum sequence count to use on the y-axis when creating the stacked bar plot (default: " + DEFAULT_MIN_SEQUENCE_COUNT + ")");
         options.addOption(null, "separate-dataset-reports", false, "If separate reports for each dataset are required");

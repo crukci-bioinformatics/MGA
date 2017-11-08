@@ -30,9 +30,9 @@
     </outputs>
 
     <arguments>
-        <arg name="start" flag="-s" type="integer" required="false"
+        <arg name="start" flag="--trim-start" type="integer" required="false"
             description="The position within sequences from which to start trimming for alignment; any bases before this position will be trimmed."/>
-        <arg name="length" flag="-l" type="integer" required="false"
+        <arg name="length" flag="--trim-length" type="integer" required="false"
             description="The length to trim sequences to for alignment."/>
         <arg name="classpath" flag="-classpath" required="false" default="@{java.class.path}"
             description="The Java class path."/>

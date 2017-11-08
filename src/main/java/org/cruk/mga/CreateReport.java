@@ -158,8 +158,8 @@ public class CreateReport extends CommandLineUtility
         options.addOption("p", "dataset-report-filename-prefix", true, "File name prefix for creating separate report for each dataset");
         options.addOption("w", "plot-width", true, "The width of the plot in pixels (default: " + DEFAULT_WIDTH + "");
         options.addOption("m", "minimum-sequence-count", true, "The minimum number of sequences to display on the x-axis.");
-        options.addOption("s", "trim-start", true, "The position within sequences from which to start trimming for alignment; any bases before this position will be trimmed");
-        options.addOption("l", "trim-length", true, "The length to trim sequences to for alignment");
+        options.addOption(null, "trim-start", true, "The position within sequences from which to start trimming for alignment; any bases before this position will be trimmed");
+        options.addOption(null, "trim-length", true, "The length to trim sequences to for alignment");
 
         outputPrefix = "results";
         separateDatasetReports = false;
