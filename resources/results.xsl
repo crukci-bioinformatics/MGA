@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
 <xsl:output method="html" indent="yes"/>
-<xsl:variable name="assignedFractionThreshold">0.02</xsl:variable>
+<xsl:variable name="assignedFractionThreshold">0.01</xsl:variable>
 <xsl:variable name="alignedFractionThreshold">0.01</xsl:variable>
 <xsl:variable name="errorRateThreshold">0.008</xsl:variable>
 <xsl:template match="/">
@@ -158,9 +158,9 @@ Datasets
 							<xsl:attribute name="style">
 								background-color:
 								<xsl:choose>
-									<xsl:when test="$alignedFraction &gt; 0.15">#FFA000</xsl:when>
-									<xsl:when test="$alignedFraction &gt; 0.10">#FFB400</xsl:when>
-									<xsl:when test="$alignedFraction &gt; 0.05">#FFC800</xsl:when>
+									<xsl:when test="$assignedFraction &gt; 0.15 and AssignedErrorRate &lt; 0.4">#FFA000</xsl:when>
+									<xsl:when test="$assignedFraction &gt; 0.10 and AssignedErrorRate &lt; 0.5">#FFB400</xsl:when>
+									<xsl:when test="$assignedFraction &gt; 0.05 and AssignedErrorRate &lt; 0.75">#FFC800</xsl:when>
 									<xsl:otherwise>#FFDC00</xsl:otherwise>
 								</xsl:choose>
 								;
@@ -170,10 +170,10 @@ Datasets
 							<xsl:attribute name="style">
 								background-color:
 								<xsl:choose>
-									<xsl:when test="$alignedFraction &gt; 0.8">#58FA58</xsl:when>
-									<xsl:when test="$alignedFraction &gt; 0.6">#81F781</xsl:when>
-									<xsl:when test="$alignedFraction &gt; 0.4">#A9F5A9</xsl:when>
-									<xsl:when test="$alignedFraction &gt; 0.2">#CEF6CE</xsl:when>
+									<xsl:when test="$assignedFraction &gt; 0.8 and AssignedErrorRate &lt; 0.5">#58FA58</xsl:when>
+									<xsl:when test="$assignedFraction &gt; 0.6 and AssignedErrorRate &lt; 0.6">#81F781</xsl:when>
+									<xsl:when test="$assignedFraction &gt; 0.4 and AssignedErrorRate &lt; 0.7">#A9F5A9</xsl:when>
+									<xsl:when test="$assignedFraction &gt; 0.2 and AssignedErrorRate &lt; 0.8">#CEF6CE</xsl:when>
 									<xsl:otherwise>#E0F8E0</xsl:otherwise>
 								</xsl:choose>
 								;
@@ -185,11 +185,11 @@ Datasets
 							<xsl:attribute name="style">
 								background-color:
 								<xsl:choose>
-									<xsl:when test="$assignedFraction &gt; 0.4">#FE2E2E</xsl:when>
-									<xsl:when test="$assignedFraction &gt; 0.3">#FA5858</xsl:when>
-									<xsl:when test="$assignedFraction &gt; 0.2">#F78181</xsl:when>
-									<xsl:when test="$assignedFraction &gt; 0.1">#F5A9A9</xsl:when>
-									<xsl:when test="$assignedFraction &gt; 0.05">#F6CECE</xsl:when>
+									<xsl:when test="$assignedFraction &gt; 0.4 and AssignedErrorRate &lt; 0.5">#FE2E2E</xsl:when>
+									<xsl:when test="$assignedFraction &gt; 0.3 and AssignedErrorRate &lt; 0.6">#FA5858</xsl:when>
+									<xsl:when test="$assignedFraction &gt; 0.2 and AssignedErrorRate &lt; 0.7">#F78181</xsl:when>
+									<xsl:when test="$assignedFraction &gt; 0.1 and AssignedErrorRate &lt; 0.8">#F5A9A9</xsl:when>
+									<xsl:when test="$assignedFraction &gt; 0.05 and AssignedErrorRate &lt; 1.0">#F6CECE</xsl:when>
 								</xsl:choose>
 								;
 							</xsl:attribute>
@@ -350,7 +350,7 @@ Datasets
 
 Reference genomes are sorted according to how many sequence reads have been
 assigned to each. Separate entries are given for reference genomes for which at
-least 2% of reads have been assigned or for which at least 1% of reads align
+least 1% of reads have been assigned or for which at least 1% of reads align
 with an average mismatch or error rate of below 0.8%.
 <p/>
 The total number of reads aligning to each reference genome and the average
