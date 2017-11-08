@@ -45,10 +45,12 @@ import nu.xom.Serializer;
  */
 public class TrimFastq extends CommandLineUtility
 {
+    public static int DEFAULT_START = 1;
     public static int DEFAULT_LENGTH = 36;
 
     private String fastqFilename;
     private String summaryFilename;
+    private int trimStart;
     private int trimLength;
 
     /**
@@ -81,13 +83,29 @@ public class TrimFastq extends CommandLineUtility
     {
         CommandLineParser parser = new DefaultParser();
 
-        options.addOption("l", "trim-length", true, "Trim length of sequences following trimming from 3' end (default: " + DEFAULT_LENGTH + ")");
+        options.addOption("s", "trim-start", true, "Start position for trimmed sequences (default: " + DEFAULT_START + ")");
+        options.addOption("l", "trim-length", true, "Length of trimmed sequences (default: " + DEFAULT_LENGTH + ")");
         options.addOption("o", "output-file", true, "Output file for trimmed FASTQ sequences (default: stdout)");
         options.addOption("x", "summary-file", true, "Output file containing trimming summary statistics");
+
+        trimStart = DEFAULT_START;
+        trimLength = DEFAULT_LENGTH;
 
         try
         {
             CommandLine commandLine = parser.parse(options, args);
+
+            if (commandLine.hasOption("trim-start"))
+            {
+                try
+                {
+                    trimStart = Integer.parseInt(commandLine.getOptionValue("trim-start"));
+                }
+                catch (NumberFormatException e)
+                {
+                    error("Error parsing command line option: trim-start must be an integer number.");
+                }
+            }
 
             if (commandLine.hasOption("trim-length"))
             {
@@ -99,10 +117,6 @@ public class TrimFastq extends CommandLineUtility
                 {
                     error("Error parsing command line option: trim length must be an integer number");
                 }
-            }
-            else
-            {
-                trimLength = DEFAULT_LENGTH;
             }
 
             if (commandLine.hasOption("output-file"))
@@ -141,6 +155,15 @@ public class TrimFastq extends CommandLineUtility
      */
     protected void run() throws Exception
     {
+        trimStart--;
+        if (trimStart < 0)
+            error("Invalid start position for trimming");
+
+        if (trimLength < 1)
+            error("Invalid trim length");
+
+        int trimEnd = trimStart + trimLength;
+
         try
         {
             FastqReader reader = new FastqReader(fastqFilename);
@@ -153,6 +176,9 @@ public class TrimFastq extends CommandLineUtility
             {
                 int length = fastq.getLength();
 
+                if (trimEnd > length)
+                    error("Sequence too short for trimming (" + fastq.getDescription() + ", length " + length + ")");
+
                 if (minLength == 0)
                 {
                     minLength = length;
@@ -164,7 +190,7 @@ public class TrimFastq extends CommandLineUtility
 
                 maxLength = Math.max(maxLength, length);
 
-                fastq = fastq.trim(trimLength);
+                fastq = fastq.trim(trimStart - 1, trimLength);
 
                 out.print(fastq.toString());
             }

@@ -72,6 +72,7 @@ public class CreateMetadataFromSampleSheet extends CommandLineUtility
     public static final int DEFAULT_SAMPLE_SIZE = 100000;
     public static final long DEFAULT_MAX_RECORDS_TO_SAMPLE_FROM = 5000000;
     public static final int DEFAULT_CHUNK_SIZE = 5000000;
+    public static final int DEFAULT_TRIM_START = 1;
     public static final int DEFAULT_TRIM_LENGTH = 36;
 
     public static final int DEFAULT_PLOT_WIDTH = 800;
@@ -96,6 +97,7 @@ public class CreateMetadataFromSampleSheet extends CommandLineUtility
     private int sampleSize;
     private long maxNumberOfRecordsToSampleFrom;
     private int chunkSize;
+    private int trimStart;
     private int trimLength;
     private int plotWidth;
     private int minimumSequenceCount;
@@ -141,6 +143,7 @@ public class CreateMetadataFromSampleSheet extends CommandLineUtility
         options.addOption("s", "sample-size", true, "The number of FASTQ records to sample for each dataset (default: " + DEFAULT_SAMPLE_SIZE + ")");
         options.addOption(null, "max-records-to-sample-from", true, "The maximum number of FASTQ records to read (sample from) for each dataset (default: " + DEFAULT_MAX_RECORDS_TO_SAMPLE_FROM + ")");
         options.addOption("c", "chunk-size", true, "The maximum number of FASTQ records in each chunk/alignment job (default: " + DEFAULT_CHUNK_SIZE + ")");
+        options.addOption("l", "trim-start", true, "The position within sequences from which to start trimming for alignment; any bases before this position will be trimmed (default: " + DEFAULT_TRIM_START + ")");
         options.addOption("l", "trim-length", true, "The length to trim sequences to for alignment (default: " + DEFAULT_TRIM_LENGTH + ")");
         options.addOption(null, "plot-width", true, "The width of the stacked bar plot in pixels (default: " + DEFAULT_PLOT_WIDTH + ")");
         options.addOption(null, "min-sequence-count", true, "The minimum sequence count to use on the y-axis when creating the stacked bar plot (default: " + DEFAULT_MIN_SEQUENCE_COUNT + ")");
@@ -160,6 +163,7 @@ public class CreateMetadataFromSampleSheet extends CommandLineUtility
         sampleSize = DEFAULT_SAMPLE_SIZE;
         maxNumberOfRecordsToSampleFrom = DEFAULT_MAX_RECORDS_TO_SAMPLE_FROM;
         chunkSize = DEFAULT_CHUNK_SIZE;
+        trimStart = DEFAULT_TRIM_START;
         trimLength = DEFAULT_TRIM_LENGTH;
         plotWidth = DEFAULT_PLOT_WIDTH;
         minimumSequenceCount = DEFAULT_MIN_SEQUENCE_COUNT;
@@ -288,6 +292,18 @@ public class CreateMetadataFromSampleSheet extends CommandLineUtility
                 }
             }
 
+            if (commandLine.hasOption("trim-start"))
+            {
+                try
+                {
+                    trimStart = Integer.parseInt(commandLine.getOptionValue("trim-start"));
+                }
+                catch (NumberFormatException e)
+                {
+                    error("Error parsing command line option: trim-start must be an integer number.");
+                }
+            }
+
             if (commandLine.hasOption("trim-length"))
             {
                 try
@@ -389,6 +405,7 @@ public class CreateMetadataFromSampleSheet extends CommandLineUtility
         meta.setVariable("sampleSize", Integer.toString(sampleSize));
         meta.setVariable("maxNumberOfRecordsToSampleFrom", Long.toString(maxNumberOfRecordsToSampleFrom));
         meta.setVariable("chunkSize", Integer.toString(chunkSize));
+        meta.setVariable("trimStart", Integer.toString(trimStart));
         meta.setVariable("trimLength", Integer.toString(trimLength));
         meta.setVariable("plotWidth", Integer.toString(plotWidth));
         meta.setVariable("minimumSequenceCount", Integer.toString(minimumSequenceCount));
