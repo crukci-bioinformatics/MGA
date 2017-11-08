@@ -792,9 +792,11 @@ public class CreateReport extends CommandLineUtility
             bestAlignmentCounts[bestAlignments.size()]++;
         }
 
-        for (int i = 0; i < bestAlignmentCounts.length; i++)
+        log.info("Histogram of best alignments");
+        log.info("No. genomes tied as best aligning\tCount");
+        for (int i = 1; i < bestAlignmentCounts.length; i++)
         {
-            System.out.println(i + "\t" + bestAlignmentCounts[i]);
+            log.info(i + "\t" + bestAlignmentCounts[i]);
         }
 
         // generate scores for each species based on the assigned sequences from the
