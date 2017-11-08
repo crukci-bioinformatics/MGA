@@ -29,6 +29,7 @@
         <sampleSize>100000</sampleSize>
         <maxNumberOfRecordsToSampleFrom>5000000</maxNumberOfRecordsToSampleFrom>
         <chunkSize>5000000</chunkSize>
+        <trimStart>1</trimStart>
         <trimLength>36</trimLength>
         <plotWidth>800</plotWidth>
         <minimumSequenceCount>10</minimumSequenceCount>
@@ -247,6 +248,7 @@
                     </outputs>
 
                     <arguments>
+                        <arg name="start">${trimStart}</arg>
                         <arg name="length">${trimLength}</arg>
                     </arguments>
                 </task>
@@ -351,6 +353,7 @@
                 <arg name="outputFilePrefix">${outputDir}/results</arg>
                 <arg name="separateDatasetReports">${separateDatasetReports}</arg>
                 <arg name="datasetReportFilePrefix">${outputDir}/results_</arg>
+                <arg name="trimStart">${trimStart}</arg>
                 <arg name="trimLength">${trimLength}</arg>
                 <arg name="plotWidth">${plotWidth}</arg>
                 <arg name="minimumSequenceCount">${minimumSequenceCount}</arg>
