@@ -190,7 +190,7 @@ public class TrimFastq extends CommandLineUtility
 
                 maxLength = Math.max(maxLength, length);
 
-                fastq = fastq.trim(trimStart - 1, trimLength);
+                fastq = fastq.trim(trimStart, trimLength);
 
                 out.print(fastq.toString());
             }
