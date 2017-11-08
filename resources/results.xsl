@@ -73,10 +73,10 @@
 <br/>
 Sequences were sampled<xsl:if test="$trimLength != ''">,
 trimmed to <xsl:value-of select="$trimLength"/> bases</xsl:if><xsl:if test="$trimStart != ''">
-starting from position <xsl:value-of select="$trimStart"/>
+starting from position <xsl:value-of select="$trimStart"/>,</xsl:if>
 and mapped to <xsl:value-of select="$referenceGenomeCount"/>
 reference genomes (see <a href="#referenceGenomes">list</a> below) using Bowtie.
-Sequences containing adapters were found by ungapped alignment of the full-length
+Sequences containing adapters were found by ungapped alignment of the full length
 sequence to a set of known adapter and primer sequences using Exonerate.
 Further details on the alignment results and the assignment of reads to
 genomes are given <a href="#alignmentDetails">below</a>.
@@ -356,15 +356,15 @@ assigned to each. Separate entries are given for reference genomes for which at
 least 1% of reads have been assigned or for which at least 1% of reads align
 with an average mismatch or error rate of below 0.8%.
 <p/>
-The total number of reads aligning to each reference genome and the average
-error rate for those alignments are given. In addition, the number of reads
-aligning uniquely to the reference genome and associated error rate for those
-reads are also provided.
+In addition to the total number of reads aligning to each reference genome and
+the average error rate for those alignments, details are also provided for the
+the number of reads aligning uniquely to the reference genome and and the
+associated error rate for those unique reads.
 <p/>
 The 'Best' column and accompanying error rate refer to those reads that align
-to the reference genome with the fewest mismatches. These reads will include
-those that align uniquely and reads that also align to other genomes with the
-same number of mismatches. The 'Best' column excludes reads that align to
+preferentially to the given reference genome, i.e. with the fewest mismatches.
+These reads will include those that align uniquely and those that also align
+to other genomes with the same number of mismatches but which do not align to
 another genome with fewer mismatches.
 <p/>
 Reads that align uniquely to a genome are assigned to that genome. Reads that
