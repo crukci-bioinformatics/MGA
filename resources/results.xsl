@@ -28,6 +28,7 @@
 
 <xsl:variable name="referenceGenomeCount"><xsl:value-of select="count(MultiGenomeAlignmentSummaries/ReferenceGenomes/ReferenceGenome)"/></xsl:variable>
 
+<xsl:variable name="trimStart"><xsl:value-of select="MultiGenomeAlignmentSummaries/TrimStart"/></xsl:variable>
 <xsl:variable name="trimLength"><xsl:value-of select="MultiGenomeAlignmentSummaries/TrimLength"/></xsl:variable>
 
 <xsl:variable name="totalSequenceCount"><xsl:value-of select="sum(MultiGenomeAlignmentSummaries/MultiGenomeAlignmentSummary/SequenceCount)"/></xsl:variable>
@@ -71,10 +72,12 @@
 
 <br/>
 Sequences were sampled<xsl:if test="$trimLength != ''">,
-trimmed to <xsl:value-of select="$trimLength"/> bases</xsl:if>
+trimmed to <xsl:value-of select="$trimLength"/> bases</xsl:if><xsl:if test="$trimStart != ''">
+starting from position <xsl:value-of select="$trimStart"/>
 and mapped to <xsl:value-of select="$referenceGenomeCount"/>
 reference genomes (see <a href="#referenceGenomes">list</a> below) using Bowtie.
-Sequences containing adapters were found by ungapped alignment using Exonerate.
+Sequences containing adapters were found by ungapped alignment of the full-length
+sequence to a set of known adapter and primer sequences using Exonerate.
 Further details on the alignment results and the assignment of reads to
 genomes are given <a href="#alignmentDetails">below</a>.
 <p/>

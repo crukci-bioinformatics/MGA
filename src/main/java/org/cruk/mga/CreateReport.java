@@ -98,6 +98,7 @@ public class CreateReport extends CommandLineUtility
     private static final float MAX_ERROR = 0.01f;
 
     private String runId;
+    private Integer trimStart;
     private Integer trimLength;
     private String outputPrefix;
     private String sampleSheetFilename;
@@ -157,7 +158,8 @@ public class CreateReport extends CommandLineUtility
         options.addOption("p", "dataset-report-filename-prefix", true, "File name prefix for creating separate report for each dataset");
         options.addOption("w", "plot-width", true, "The width of the plot in pixels (default: " + DEFAULT_WIDTH + "");
         options.addOption("m", "minimum-sequence-count", true, "The minimum number of sequences to display on the x-axis.");
-        options.addOption("l", "trim-length", true, "Trim length of sequences following trimming from 3' end");
+        options.addOption("s", "trim-start", true, "The position within sequences from which to start trimming for alignment; any bases before this position will be trimmed");
+        options.addOption("l", "trim-length", true, "The length to trim sequences to for alignment");
 
         outputPrefix = "results";
         separateDatasetReports = false;
@@ -228,6 +230,18 @@ public class CreateReport extends CommandLineUtility
                 catch (NumberFormatException e)
                 {
                     error("Minimum sequence count provided is not an integer value");
+                }
+            }
+
+            if (commandLine.hasOption("trim-start"))
+            {
+                try
+                {
+                    trimStart = Integer.parseInt(commandLine.getOptionValue("trim-start"));
+                }
+                catch (NumberFormatException e)
+                {
+                    error("Error parsing command line option: trim-start must be an integer number.");
                 }
             }
 
@@ -880,10 +894,8 @@ public class CreateReport extends CommandLineUtility
 
         addProperties(root, runProperties);
 
-        if (trimLength != null)
-        {
-            addElement(root, "TrimLength", trimLength);
-        }
+        if (trimStart != null) addElement(root, "TrimStart", trimStart);
+        if (trimLength != null) addElement(root, "TrimLength", trimLength);
 
         Set<String> referenceGenomeIds = new HashSet<String>();
 
