@@ -12,6 +12,7 @@
                 ${jvmargs} \
                 ${classpath} \
                 org.cruk.seq.TrimFastq \
+                ${start} \
                 ${length} \
                 ${fastqFile} \
                 ${outputFastqFile} \
@@ -29,8 +30,10 @@
     </outputs>
 
     <arguments>
+        <arg name="start" flag="-s" type="integer" required="false"
+            description="The position within sequences from which to start trimming for alignment; any bases before this position will be trimmed."/>
         <arg name="length" flag="-l" type="integer" required="false"
-            description="Length of sequences following trimming from the 3' end."/>
+            description="The length to trim sequences to for alignment."/>
         <arg name="classpath" flag="-classpath" required="false" default="@{java.class.path}"
             description="The Java class path."/>
         <arg name="jvmargs" required="false" quoted="false" default="${jvmMemoryArguments}"
