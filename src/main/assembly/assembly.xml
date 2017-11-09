@@ -46,12 +46,19 @@
             <directoryMode>0755</directoryMode>
         </fileSet>
         <fileSet>
+            <directory>${project.basedir}/licenses</directory>
+            <outputDirectory>licenses</outputDirectory>
+            <fileMode>0644</fileMode>
+            <directoryMode>0755</directoryMode>
+        </fileSet>
+        <fileSet>
             <directory>${project.basedir}</directory>
             <outputDirectory></outputDirectory>
             <includes>
                 <include>README</include>
                 <include>RELEASE_NOTES</include>
                 <include>LICENSE</include>
+                <include>NOTICES</include>
             </includes>
             <lineEnding>unix</lineEnding>
             <fileMode>0644</fileMode>
