@@ -251,16 +251,12 @@ License
 MGA is made available under the MIT License (see separate LICENSE file).
 
 
-Notices
--------
+Licenses for software dependencies
+----------------------------------
 
-MGA is packaged with the following software covered under separate licenses:
+Releases of MGA as distribution tarballs are packaged with several dependencies in the
+form of jar files. See the NOTICES file for a list of the dependencies and details of
+the licenses under which each has been redistributed. The licenses are included in the
+licenses directory.
 
-Apache XML Schema package (xercesImpl-2.11.0-xml-schema-1.1-beta)
-developed at The Apache Software Foundation (http://www.apache.org/)
-and made available under the Apache License v2.0.
-
-PsychoPath XPath 2.0 Processor (org.eclipse.wst.xml.xpath2.processor_1.0.0.jar)
-developed at The Eclipse Foundation (http://www.eclipse.org)
-and made available under the Eclipse Public License v1.0.
 

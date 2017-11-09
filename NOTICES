@@ -1,0 +1,140 @@
+Multi-Genome Alignment Contaminant Screen
+-----------------------------------------
+
+Matt Eldridge
+matthew.eldridge@cruk.cam.ac.uk
+Cancer Research UK Cambridge Institute
+University of Cambridge
+
+
+License
+-------
+
+MGA is made available under the MIT License (see separate LICENSE file).
+
+
+Notices
+-------
+
+MGA is packaged with the following software covered under separate licenses,
+available in the licenses directory:
+
+Apache Commons BeanUtils 
+https://commons.apache.org/beanutils
+Developed at The Apache Software Foundation
+and made available under the Apache License v2.0.
+
+Apache Commons CLI
+http://commons.apache.org/cli
+Developed at The Apache Software Foundation
+and made available under the Apache License v2.0.
+
+Apache Commons Codec
+https://commons.apache.org/codec
+Developed at The Apache Software Foundation
+and made available under the Apache License v2.0.
+
+Apache Commons Collections
+https://commons.apache.org/collections
+Developed at The Apache Software Foundation
+and made available under the Apache License v2.0.
+
+Apache Commons Compress
+https://commons.apache.org/compress
+Developed at The Apache Software Foundation
+and made available under the Apache License v2.0.
+
+Apache Commons IO
+https://commons.apache.org/io
+Developed at The Apache Software Foundation
+and made available under the Apache License v2.0.
+
+Apache Commons Lang
+https://commons.apache.org/lang
+Developed at The Apache Software Foundation
+and made available under the Apache License v2.0.
+
+Apache Commons Logging
+https://commons.apache.org/logging
+Developed at The Apache Software Foundation
+and made available under the Apache License v2.0.
+
+Apache Commons Math
+https://commons.apache.org/math
+Developed at The Apache Software Foundation
+and made available under the Apache License v2.0.
+
+Fast Infoset
+http://www.oracle.com/technetwork/articles/java/fastinfoset-139262.html
+Distributed through the Oracle Technology Network
+and made available under the Apache License v2.0.
+
+Istack Commons
+Made available under the Common Development and Distribution License (CDDL) v1.1
+
+Jansi
+http://fusesource.github.io/jansi
+Made available under the Apache License v2.0.
+
+Java Activation Framework
+http://www.oracle.com/technetwork/articles/java/index-135046.html
+Distributed through the Oracle Technology Network
+and made available under the Common Development and Distribution License (CDDL) v1.0
+
+Java Architecture for XML Binding (JAXB)
+http://www.oracle.com/technetwork/articles/javase/index-140168.html
+Distributed through the Oracle Technology Network
+and made available under the Common Development and Distribution License (CDDL) v1.1
+
+JavaMail API
+http://www.oracle.com/technetwork/java/javamail/index.html
+Distributed through the Oracle Technology Network
+and made available under the Common Development and Distribution License (CDDL) v1.0
+
+JSON-java
+https://github.com/stleary/JSON-java
+Made available under the JSON license.
+
+log4J
+https://logging.apache.org/log4j
+Developed at The Apache Software Foundation
+and made available under the Apache License v2.0.
+
+opencsv
+http://opencsv.sourceforge.net/
+Made available under the Apache License v2.0.
+
+PsychoPath XPath 2.0 Processor
+https://wiki.eclipse.org/PsychoPathXPathProcessor
+Developed at The Eclipse Foundation (http://www.eclipse.org)
+and made available under the Eclipse Public License v1.0.
+
+Simple Logging Facade for Java (SLF4J)
+https://www.slf4j.org
+Made available under the MIT License.
+
+Spring Framework
+https://spring.io
+Developed by Pivotal Inc.
+and made available under the Apache License v2.0.
+
+Extended StAX API
+Made available under the Common Development and Distribution License (CDDL) v1.1
+
+TXW2
+Made available under the Common Development and Distribution License (CDDL) v1.1
+
+Xerces2 XML Schema
+https://xerces.apache.org/xerces2-j/xml-schema.html
+Developed at The Apache Software Foundation
+and made available under the Apache License v2.0.
+
+Apache XML Commons XML APIs
+https://xerces.apache.org/xml-commons
+Developed at The Apache Software Foundation
+and made available under the Apache License v2.0.
+
+XOM
+https://xom.nu
+Made available under the GNU Lesser General Public License v2.1
+
