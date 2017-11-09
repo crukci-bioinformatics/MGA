@@ -1,4 +1,5 @@
-###MGA: Multi-genome alignment contaminant screen for high-throughput sequence data
+MGA: Multi-genome alignment contaminant screen for high-throughput sequence data
+================================================================================
 
 MGA is a quality control tool for high-throughput sequence data. It screens for
 contaminants by aligning sequence reads in FASTQ format against a series of
@@ -12,12 +13,12 @@ by Bowtie. This is to ensure consistency of the output mapping and error rates a
 runs of differing lengths. Exonerate alignment against adapters uses the full-length
 sequences.
 
-####Installing and running MGA
+### Installing and running MGA
 
 Please see [README](README) file for details of how to install and run MGA from
 a [pre-packaged release](https://github.com/crukci-bioinformatics/MGA/releases).
 
-####Building MGA from source
+### Building MGA from source
 
 MGA is built using Apache Maven, a software project management and build
 automation tool. Details on how to install and run Maven can be found
