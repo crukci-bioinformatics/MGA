@@ -13,8 +13,8 @@ License
 MGA is made available under the MIT License (see separate LICENSE file).
 
 
-Notices
--------
+Licenses for software dependencies
+----------------------------------
 
 MGA is packaged with the following software covered under separate licenses,
 available in the licenses directory:
@@ -137,4 +137,5 @@ and made available under the Apache License v2.0.
 XOM
 https://xom.nu
 Made available under the GNU Lesser General Public License v2.1
+
 
