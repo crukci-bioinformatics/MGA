@@ -4,7 +4,7 @@ MGA: Multi-genome alignment contaminant screen for high-throughput sequence data
 MGA is a quality control tool for high-throughput sequence data. It screens for
 contaminants by aligning sequence reads in FASTQ format against a series of
 reference genomes using Bowtie and against a set of adapter sequences using
-exonerate.
+Exonerate.
 
 MGA samples a subset of the reads, by default 100000, prior to alignment against
 reference genome sequences and adapters. This reduces considerably the overall run
