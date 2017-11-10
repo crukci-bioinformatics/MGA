@@ -3,7 +3,7 @@
 <xsl:output method="html" indent="yes"/>
 <xsl:variable name="assignedFractionThreshold">0.01</xsl:variable>
 <xsl:variable name="alignedFractionThreshold">0.01</xsl:variable>
-<xsl:variable name="errorRateThreshold">0.008</xsl:variable>
+<xsl:variable name="errorRateThreshold">0.0125</xsl:variable>
 <xsl:template match="/">
 <html>
 <head>
@@ -354,7 +354,7 @@ Datasets
 Reference genomes are sorted according to how many sequence reads have been
 assigned to each. Separate entries are given for reference genomes for which at
 least 1% of reads have been assigned or for which at least 1% of reads align
-with an average mismatch or error rate of below 0.8%.
+with an average mismatch or error rate of below 1.25%.
 <p/>
 In addition to the total number of reads aligning to each reference genome and
 the average error rate for those alignments, details are also provided for the
