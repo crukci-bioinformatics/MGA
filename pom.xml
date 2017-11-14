@@ -137,6 +137,7 @@
                         <descriptor>src/main/assembly/assembly.xml</descriptor>
                     </descriptors>
                     <tarLongFileMode>posix</tarLongFileMode>
+                    <attach>false</attach>
                 </configuration>
             </plugin>
         </plugins>

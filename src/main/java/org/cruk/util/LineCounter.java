@@ -54,7 +54,7 @@ public class LineCounter
         long lineCount = 0;
         try
         {
-            lineCount = getLineCountUnix(filename); 
+            lineCount = getLineCountUnix(filename);
         }
         catch (Exception e)
         {
@@ -133,7 +133,7 @@ public class LineCounter
             for (int i = 0; i < n; i++)
             {
                 String line = reader.readLine();
-                if (line == null) return (long)i;
+                if (line == null) return i;
                 count += line.length() + 1;
             }
             return (long)(1000 * (file.length() / (double)count));
