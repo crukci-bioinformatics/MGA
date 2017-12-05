@@ -41,7 +41,7 @@ public class Fastq
         this.description = description;
         this.sequence = sequence;
         this.quality = quality;
-        if (sequence == null || quality == null) 
+        if (sequence == null || quality == null)
             throw new IllegalStateException("Null values for FASTQ sequence and/or quality are not allowed");
         if (sequence.length() != quality.length())
             throw new IllegalStateException("Sequence and quality strings must be the same length");
@@ -79,7 +79,7 @@ public class Fastq
 
     /**
      * Returns a new Fastq sequence which has been trimmed to the given length.
-     * 
+     *
      * @param length
      * @return a trimmed Fastq sequence
      */

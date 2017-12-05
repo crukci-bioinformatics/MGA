@@ -109,7 +109,7 @@ public class CountFastq extends CommandLineUtility
     /**
      * Runs the FASTQ record counting utility.
      *
-     * @throws Exception 
+     * @throws Exception
      */
     protected void run() throws Exception
     {

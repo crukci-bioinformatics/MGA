@@ -65,7 +65,6 @@ public class BaseSpaceWrapper extends CommandLineUtility
         {
             return name.endsWith(".fastq.gz");
         }
-        
     };
 
     // TODO replace with actual controlled vocabulary term

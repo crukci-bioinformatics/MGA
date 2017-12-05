@@ -101,7 +101,7 @@ public class FastqToFasta extends CommandLineUtility
     /**
      * Runs the FASTQ to FASTA conversion utility.
      *
-     * @throws Exception 
+     * @throws Exception
      */
     protected void run() throws Exception
     {

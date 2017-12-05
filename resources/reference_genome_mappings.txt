@@ -1,6 +1,6 @@
 # This file contains mappings reference genome IDs and species for alignments
 # where the former are used as prefixes in Bowtie index file names.
-# 
+#
 # Each entry in this file corresponds to a mapping of species for a given
 # reference genome identifier in the following format
 #   key = value
@@ -10,7 +10,7 @@
 # genome.
 #
 # Note that multiple species may map to a single reference genome, for example
-# closely-related species. 
+# closely-related species.
 #
 acs.AnoCar2 = Anolis carolinensis (anole lizard) | anolis_carolinensis | anolis carolinensis | anole lizard
 ath.TAIR10 = Arabidopsis thaliana (thale cress) | arabidopsis_thaliana | arabidopsis thaliana | thale cress

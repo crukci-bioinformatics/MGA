@@ -224,7 +224,7 @@ the Sanger format, i.e. Phred quality + 33.
 2. Bowtie 64-bit indexes
 
 Since release 1.1.0 bowtie can support genomes with over 4 billion nucleotides by building
-indexes using 64-bit numbers. Previous releases of MGA did not support large indexes because 
+indexes using 64-bit numbers. Previous releases of MGA did not support large indexes because
 of a bug in the bowtie wrapper script that caused the bowtie small-index alignment tool to
 run even when presented with a large index. MGA now detects if there is a large index for
 a reference genome and ensures that bowtie uses this through the --large-index command-line

@@ -121,7 +121,7 @@ public class MergeAndSplitFastq extends CommandLineUtility
     /**
      * Merges and splits FASTQ files into chunks of the specified size.
      *
-     * @throws Exception 
+     * @throws Exception
      */
     protected void run() throws Exception
     {

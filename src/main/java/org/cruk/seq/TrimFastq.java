@@ -151,7 +151,7 @@ public class TrimFastq extends CommandLineUtility
     /**
      * Runs the FASTQ trimming utility.
      *
-     * @throws Exception 
+     * @throws Exception
      */
     protected void run() throws Exception
     {

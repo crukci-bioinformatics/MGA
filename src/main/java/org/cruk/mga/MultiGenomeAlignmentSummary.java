@@ -33,7 +33,7 @@ import org.cruk.util.OrderedProperties;
 /**
  * Class used to represent the summary of alignments of a sequence
  * dataset against a multiple reference genomes.
- * 
+ *
  * @author eldrid01
  *
  */

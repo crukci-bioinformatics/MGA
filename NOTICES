@@ -19,7 +19,7 @@ Licenses for software dependencies
 MGA is packaged with the following software covered under separate licenses,
 available in the licenses directory:
 
-Apache Commons BeanUtils 
+Apache Commons BeanUtils
 https://commons.apache.org/beanutils
 Developed at The Apache Software Foundation
 and made available under the Apache License v2.0.

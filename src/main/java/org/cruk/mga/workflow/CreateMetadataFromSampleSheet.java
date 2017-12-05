@@ -65,7 +65,7 @@ public class CreateMetadataFromSampleSheet extends CommandLineUtility
     public static final String DEFAULT_RESOURCES_DIR = "${install}/resources";
     public static final String DEFAULT_DATA_DIR = "${work}";
     public static final String DEFAULT_OUTPUT_DIR = "${work}";
-    
+
     public static final String DEFAULT_BOWTIE_EXECUTABLE = "bowtie";
     public static final String DEFAULT_EXONERATE_EXECUTABLE = "exonerate";
 
