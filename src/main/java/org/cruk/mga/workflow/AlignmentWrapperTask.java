@@ -27,11 +27,8 @@ import java.io.File;
 import java.io.IOException;
 
 import org.cruk.workflow.execution.TaskMonitor;
-import org.cruk.workflow.execution.TaskRunner;
 import org.cruk.workflow.tasks.AbstractJavaTask;
-import org.cruk.workflow.xml2.pipeline.Subtasks;
-import org.cruk.workflow.xml2.pipeline.Task;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.cruk.workflow.util.GzipUtils;
 
 /**
  * Wrapper for alignment tasks that detects zero-sized query file and
@@ -43,9 +40,6 @@ public class AlignmentWrapperTask extends AbstractJavaTask
 {
     private File queryFile;
     private File alignmentFile;
-
-    @Autowired
-    private TaskRunner taskRunner;
 
     public File getQueryFile()
     {
@@ -72,7 +66,7 @@ public class AlignmentWrapperTask extends AbstractJavaTask
     {
         // if zero-size query fasta file create an empty alignment file to avoid
         // exonerate error
-        if (queryFile.length() == 0)
+        if (GzipUtils.isEmpty(queryFile))
         {
             boolean success = alignmentFile.createNewFile();
             if (!success)
@@ -82,17 +76,7 @@ public class AlignmentWrapperTask extends AbstractJavaTask
         }
         else
         {
-            Subtasks subtasks = task.getSubtasks();
-            if (subtasks.size() != 1)
-            {
-                throw new Exception("Expecting a single subtask but found " + subtasks.size());
-            }
-            else
-            {
-                Task subtask = subtasks.iterator().next();
-                TaskMonitor subtaskMonitor = taskRunner.runTask(configuration, subtask);
-                waitForMonitorsAndThrow("Alignment task failed", subtaskMonitor);
-            }
+            runSubtasks("Alignment task failed");
         }
     }
 }

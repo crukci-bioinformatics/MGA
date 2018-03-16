@@ -4,7 +4,7 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.cruk.workflow.pipelines</groupId>
+    <groupId>org.cruk.pipelines</groupId>
     <artifactId>mga</artifactId>
     <packaging>jar</packaging>
     <version>1.4-SNAPSHOT</version>
@@ -166,12 +166,6 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
             <version>3.6</version>
-        </dependency>
-
-        <dependency>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-            <version>1.2</version>
         </dependency>
 
         <dependency>

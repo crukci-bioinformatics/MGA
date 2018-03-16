@@ -26,7 +26,10 @@ package org.cruk.mga;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
@@ -53,37 +56,41 @@ public class ReferenceGenomeSpeciesMapping
      */
     public void loadFromPropertiesFile(String referenceGenomeMappingFile) throws FileNotFoundException, IOException
     {
-        Properties properties = new Properties();
-        properties.load(new FileInputStream(referenceGenomeMappingFile));
-        Enumeration<?> referenceGenomeIds = properties.keys();
-        while (referenceGenomeIds.hasMoreElements())
+        try (InputStream fileStream = new FileInputStream(referenceGenomeMappingFile))
         {
-            String referenceGenomeId = (String)referenceGenomeIds.nextElement();
-            String[] names = properties.getProperty(referenceGenomeId).split("\\|");
+            Properties properties = new Properties();
+            properties.load(fileStream);
 
-            List<String> nameList = new ArrayList<String>();
-            for (String name : names)
+            Enumeration<?> referenceGenomeIds = properties.keys();
+            while (referenceGenomeIds.hasMoreElements())
             {
-                name = name.trim();
-                if (name.length() > 0)
-                {
-                    nameList.add(name);
-                }
-            }
+                String referenceGenomeId = (String)referenceGenomeIds.nextElement();
+                String[] names = properties.getProperty(referenceGenomeId).split("\\|");
 
-            if (nameList.isEmpty())
-            {
-                referenceGenomeSpeciesLookup.put(referenceGenomeId, "Not specified");
-            }
-            else
-            {
-                referenceGenomeSpeciesLookup.put(referenceGenomeId, nameList.get(0));
-                for (String name : nameList)
+                List<String> nameList = new ArrayList<String>();
+                for (String name : names)
                 {
-                    name = name.toLowerCase();
-                    if (!referenceGenomeIdLookup.containsKey(name))
+                    name = name.trim();
+                    if (name.length() > 0)
                     {
-                        referenceGenomeIdLookup.put(name, referenceGenomeId);
+                        nameList.add(name);
+                    }
+                }
+
+                if (nameList.isEmpty())
+                {
+                    referenceGenomeSpeciesLookup.put(referenceGenomeId, "Not specified");
+                }
+                else
+                {
+                    referenceGenomeSpeciesLookup.put(referenceGenomeId, nameList.get(0));
+                    for (String name : nameList)
+                    {
+                        name = name.toLowerCase();
+                        if (!referenceGenomeIdLookup.containsKey(name))
+                        {
+                            referenceGenomeIdLookup.put(name, referenceGenomeId);
+                        }
                     }
                 }
             }
@@ -94,7 +101,8 @@ public class ReferenceGenomeSpeciesMapping
      * Returns the reference genome ID for the given species name/synonym.
      *
      * @param species the name of the species.
-     * @return
+     *
+     * @return The reference genome ID for the given species, or null if it isn't mapped.
      */
     public String getReferenceGenomeId(String species)
     {
@@ -105,10 +113,31 @@ public class ReferenceGenomeSpeciesMapping
      * Returns the species display name for the given reference genome ID.
      *
      * @param referenceGenomeId the reference genome identifier
-     * @return
+     *
+     * @return The species of the given reference genome, or null if it isn't mapped.
      */
     public String getSpecies(String referenceGenomeId)
     {
         return referenceGenomeSpeciesLookup.get(referenceGenomeId);
+    }
+
+    /**
+     * Get an unordered list of all the reference genome identifiers.
+     *
+     * @return A list of reference genome IDs.
+     */
+    public Collection<String> listReferenceGenomeIds()
+    {
+        return Collections.unmodifiableCollection(referenceGenomeIdLookup.keySet());
+    }
+
+    /**
+     * Get an unordered list of all the species names.
+     *
+     * @return A list of species.
+     */
+    public Collection<String> listSpecies()
+    {
+        return Collections.unmodifiableCollection(referenceGenomeSpeciesLookup.keySet());
     }
 }
