@@ -23,6 +23,8 @@
 
 package org.cruk.mga;
 
+import org.cruk.workflow.util.NumericAwareComparator;
+
 public class Alignment implements Comparable<Alignment>
 {
     private String datasetId;
@@ -30,6 +32,7 @@ public class Alignment implements Comparable<Alignment>
     private String referenceGenomeId;
     private int alignedLength;
     private int mismatchCount;
+    private NumericAwareComparator numericAwareComparator = new NumericAwareComparator();
 
     public Alignment(String datasetId, int sequenceId, String referenceGenomeId, int alignedLength, int mismatchCount)
     {
@@ -68,7 +71,7 @@ public class Alignment implements Comparable<Alignment>
     @Override
     public int compareTo(Alignment other)
     {
-        int cmp = datasetId.compareTo(other.datasetId);
+        int cmp = numericAwareComparator.compare(datasetId, other.datasetId);
         if (cmp != 0) return cmp;
         cmp = sequenceId - other.sequenceId;
         if (cmp != 0) return cmp;
