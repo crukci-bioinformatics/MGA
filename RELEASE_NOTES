@@ -1,3 +1,16 @@
+Version 1.4.1 (22 May 2018)
+-------------
+
+* Fixed issue arising with sort order of alignments for sampled reads that can
+  occur when using numeric dataset identifiers. Sampled reads from multiple
+  datasets are collated in a different order to that expected by a check made
+  when reading alignments during the report generation step. The workflow
+  manager uses a numeric-aware comparator that recognizes the numeric components
+  of filenames when sorting. The comparator used when reading alignments has
+  been changed to use the same numeric-aware comparator.
+  (https://github.com/crukci-bioinformatics/MGA/issues/3) 
+
+
 Version 1.4 (27 February 2018)
 -----------
 
