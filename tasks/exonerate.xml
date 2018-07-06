@@ -39,7 +39,7 @@
     </arguments>
 
     <versions>
-        <program name="exonerate">
+        <program name="exonerate" exitCode="1">
             <executable>
                 ${exonerateExecutable} --version
             </executable>
