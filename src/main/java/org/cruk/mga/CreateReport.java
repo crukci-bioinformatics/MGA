@@ -695,14 +695,14 @@ public class CreateReport extends CommandLineUtility
         List<String> alignmentFileList = new ArrayList<String>();
         for (String resultFile : resultsFiles)
         {
-            if (resultFile.endsWith(".bowtie.alignment"))
+            if (resultFile.endsWith(".alignment") && !resultFile.endsWith(".exonerate.alignment"))
             {
                 alignmentFileList.add(resultFile);
             }
         }
         String[] alignmentFiles = alignmentFileList.toArray(new String[0]);
 
-        AlignmentReader reader = new AlignmentReader(alignmentFiles, runId);
+        AbstractAlignmentReader reader = new SAMAlignmentReader(alignmentFiles, runId);
 
         // initialize reference genome index mapping
         // initialize alignment summary for each reference genome and dataset
@@ -829,7 +829,7 @@ public class CreateReport extends CommandLineUtility
             datasetScores.put(multiGenomeAlignmentSummary.getDatasetId(), scores);
         }
 
-        reader = new AlignmentReader(alignmentFiles, runId);
+        reader = new SAMAlignmentReader(alignmentFiles, runId);
 
         while (true)
         {

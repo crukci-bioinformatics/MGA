@@ -8,7 +8,7 @@
 
     <program type="externalJava">
         <executable>
-@{java.home}/bin/java \
+${java} \
     -Djava.awt.headless=true ${jvmargs} \
     ${classpath} \
     org.cruk.mga.CreateReport \
@@ -62,10 +62,10 @@
             description="The width of the plot in pixels."/>
         <arg name="minimumSequenceCount" flag="-m" type="integer" required="false"
             description="The minimum number of sequences to display on the x-axis."/>
-        <arg name="classpath" flag="-classpath" required="false" default="@{java.class.path}"
-            description="The Java class path."/>
-        <arg name="jvmargs" required="false" quoted="false" default="${jvmMemoryArguments}"
-            description="Java Virtual Machine arguments."/>
+            
+        <arg name="java" required="false" default="@{java.home}/bin/java" description="Java Executable path"/>
+        <arg name="classpath" required="false" flag="-classpath" default="@{java.class.path}"/>
+        <arg name="jvmargs" required="false" quoted="false" default="${jvmMemoryArguments}" description="Java Virtual Machine arguments."/>
     </arguments>
 
 </task:task>

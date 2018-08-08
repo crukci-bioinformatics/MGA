@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<task:task xmlns:task="http://cancerresearchuk.org/workflow/task"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://cancerresearchuk.org/workflow/task http://content.cruk.cam.ac.uk/bioinformatics/schema/workflow/task-1.7.xsd">
+
+    <name>hisat2</name>
+
+    <description>
+        Align a unpaired FASTQ files with HISAT2,
+        and converts the SAM output to an ordered BAM with samtools.
+        Expects the FASTQ quality scores to be Phred-33 format.
+    </description>
+
+    <program type="commandLine" shell="bash">
+        <executable><![CDATA[
+set -o pipefail
+
+${hisat2} \
+    -x ${genomeBase} \
+    -U ${fastqFile} \
+    ${threads} \
+| ${samtools} view -h -b \
+    ${alignmentFile} \
+    /dev/stdin
+        ]]></executable>
+    </program>
+
+    <inputs>
+        <input name="fastqFile"
+            description="The sequence FastQ file for the unpaired reads."/>
+    </inputs>
+
+    <outputs>
+        <output name="alignmentFile" flag="-o" description="The HiSAT2 aligned BAM file."/>
+    </outputs>
+
+    <arguments>
+        <arg name="genomeBase"
+            description="The basename of the index for the reference genome."/>
+
+        <arg name="hisat2" required="false" default="${hisat2}"
+            description="The path to the HISAT2 executable."/>
+
+        <arg name="samtools" required="false" default="${samtools}"
+            description="The path to the samtools executable."/>
+
+        <arg name="threads" required="false" flag="--threads" type="integer" default="${task.processors}"
+            description="number of alignment threads to launch."/>
+     </arguments>
+
+    <versions>
+        <program name="hisat2">
+            <executable>
+                ${hisat2} --version
+            </executable>
+            <extraction group="1" line="1">^.*version\s(.+)$</extraction>
+        </program>
+        <program name="samtools">
+            <executable>
+                ${samtools} --version
+            </executable>
+            <extraction group="1" line="1">^samtools\s(.+)$</extraction>
+        </program>
+    </versions>
+
+</task:task>

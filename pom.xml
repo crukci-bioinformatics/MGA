@@ -194,6 +194,12 @@
         </dependency>
 
         <dependency>
+            <groupId>org.cruk.pipelines</groupId>
+            <artifactId>picard-tasks</artifactId>
+            <version>2.9-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
             <groupId>com.io7m.xom</groupId>
             <artifactId>xom</artifactId>
             <version>1.2.10</version>
