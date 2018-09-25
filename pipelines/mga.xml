@@ -25,9 +25,10 @@
         <adapterFastaFile>${resourcesDir}/adapters.fa</adapterFastaFile>
         <referenceGenomeMappingFile>${resourcesDir}/reference_genome_mappings.txt</referenceGenomeMappingFile>
         <xslStyleSheetFile>${install}/resources/results.xsl</xslStyleSheetFile>
-        <hisat2>/home/bioinformatics/pipelinesoftware/alignment/el7/hisat2-2.1.0/hisat2</hisat2>
-        <samtools>/home/bioinformatics/pipelinesoftware/alignment/el7/samtools-1.6/samtools</samtools>
-        <bedtools>/home/bioinformatics/pipelinesoftware/alignment/el7/bedtools-2.17.0/bin/bedtools</bedtools>
+        <softwareDir>/home/bioinformatics/pipelinesoftware/alignment/@{rhel.version}</softwareDir>
+        <hisat2>${softwareDir}/hisat2-2.1.0/hisat2</hisat2>
+        <samtools>${softwareDir}/samtools-1.6/samtools</samtools>
+        <bedtools>${softwareDir}/bedtools-2.17.0/bin/bedtools</bedtools>
         <exonerate>/home/bioinformatics/software/exonerate/exonerate-2.2.0-x86_64/bin/exonerate</exonerate>
         <sampleSize>100000</sampleSize>
         <maxNumberOfRecordsToSampleFrom>5000000</maxNumberOfRecordsToSampleFrom>

@@ -66,9 +66,6 @@ public class CreateMetadataFromSampleSheet extends CommandLineUtility
     public static final String DEFAULT_DATA_DIR = "${work}";
     public static final String DEFAULT_OUTPUT_DIR = "${work}";
 
-    public static final String DEFAULT_BOWTIE_EXECUTABLE = "bowtie";
-    public static final String DEFAULT_EXONERATE_EXECUTABLE = "exonerate";
-
     public static final int DEFAULT_SAMPLE_SIZE = 100000;
     public static final long DEFAULT_MAX_RECORDS_TO_SAMPLE_FROM = 5000000;
     public static final int DEFAULT_CHUNK_SIZE = 5000000;
@@ -92,8 +89,6 @@ public class CreateMetadataFromSampleSheet extends CommandLineUtility
     private String resourcesDirectory;
     private String dataDirectory;
     private String outputDirectory;
-    private String bowtieExecutable;
-    private String exonerateExecutable;
     private int sampleSize;
     private long maxNumberOfRecordsToSampleFrom;
     private int chunkSize;
@@ -138,8 +133,6 @@ public class CreateMetadataFromSampleSheet extends CommandLineUtility
         options.addOption("r", "resources-directory", true, "The MGA resources directory containing the bowtie-indexes subdirectory, the adaptor sequences and the reference genome mapping (default: " + DEFAULT_RESOURCES_DIR + ", where ${install} refers to the MGA installation directory)");
         options.addOption("d", "data-directory", true, "The data directory containing the FASTQ sequence files (default: " + DEFAULT_DATA_DIR + ")");
         options.addOption(null, "output-directory", true, "The output directory in which the report is created (default: " + DEFAULT_OUTPUT_DIR + ")");
-        options.addOption("b", "bowtie-executable", true, "The path for the bowtie executable (default: " + DEFAULT_BOWTIE_EXECUTABLE + ")");
-        options.addOption("e", "exonerate-executable", true, "The path for the exonerate executable (default: " + DEFAULT_EXONERATE_EXECUTABLE + ")");
         options.addOption("s", "sample-size", true, "The number of FASTQ records to sample for each dataset (default: " + DEFAULT_SAMPLE_SIZE + ")");
         options.addOption(null, "max-records-to-sample-from", true, "The maximum number of FASTQ records to read (sample from) for each dataset (default: " + DEFAULT_MAX_RECORDS_TO_SAMPLE_FROM + ")");
         options.addOption("c", "chunk-size", true, "The maximum number of FASTQ records in each chunk/alignment job (default: " + DEFAULT_CHUNK_SIZE + ")");
@@ -158,8 +151,6 @@ public class CreateMetadataFromSampleSheet extends CommandLineUtility
         resourcesDirectory = DEFAULT_RESOURCES_DIR;
         dataDirectory = DEFAULT_DATA_DIR;
         outputDirectory = DEFAULT_OUTPUT_DIR;
-        bowtieExecutable = DEFAULT_BOWTIE_EXECUTABLE;
-        exonerateExecutable = DEFAULT_EXONERATE_EXECUTABLE;
         sampleSize = DEFAULT_SAMPLE_SIZE;
         maxNumberOfRecordsToSampleFrom = DEFAULT_MAX_RECORDS_TO_SAMPLE_FROM;
         chunkSize = DEFAULT_CHUNK_SIZE;
@@ -244,16 +235,6 @@ public class CreateMetadataFromSampleSheet extends CommandLineUtility
             if (commandLine.hasOption("output-directory"))
             {
                 outputDirectory = commandLine.getOptionValue("output-directory");
-            }
-
-            if (commandLine.hasOption("bowtie-executable"))
-            {
-                bowtieExecutable = commandLine.getOptionValue("bowtie-executable");
-            }
-
-            if (commandLine.hasOption("exonerate-executable"))
-            {
-                exonerateExecutable = commandLine.getOptionValue("exonerate-executable");
             }
 
             if (commandLine.hasOption("sample-size"))
@@ -400,8 +381,6 @@ public class CreateMetadataFromSampleSheet extends CommandLineUtility
         meta.setVariable("bowtieIndexDir", "${resourcesDir}/bowtie_indexes");
         meta.setVariable("adapterFastaFile", "${resourcesDir}/adapters.fa");
         meta.setVariable("referenceGenomeMappingFile", "${resourcesDir}/reference_genome_mappings.txt");
-        meta.setVariable("bowtieExecutable", bowtieExecutable);
-        meta.setVariable("exonerateExecutable", exonerateExecutable);
         meta.setVariable("sampleSize", Integer.toString(sampleSize));
         meta.setVariable("maxNumberOfRecordsToSampleFrom", Long.toString(maxNumberOfRecordsToSampleFrom));
         meta.setVariable("chunkSize", Integer.toString(chunkSize));

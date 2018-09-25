@@ -691,7 +691,7 @@ public class CreateReport extends CommandLineUtility
      */
     private void readAlignments() throws IOException
     {
-        // determine which results files are bowtie alignment output files
+        // determine which results files are non-exonerate alignment output files
         List<String> alignmentFileList = new ArrayList<String>();
         for (String resultFile : resultsFiles)
         {

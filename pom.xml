@@ -95,6 +95,7 @@
                     <platforms>
                         <platform>unix</platform>
                     </platforms>
+                    <extraJvmArguments>-ea -Drhel.version=$(uname -r | cut -d '.' -f 6)</extraJvmArguments>
                     <programs>
                         <program>
                             <mainClass>org.cruk.workflow.PipelineRunner</mainClass>

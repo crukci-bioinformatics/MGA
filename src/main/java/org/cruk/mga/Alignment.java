@@ -23,6 +23,8 @@
 
 package org.cruk.mga;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.cruk.workflow.util.NumericAwareComparator;
 
 public class Alignment implements Comparable<Alignment>
@@ -78,5 +80,17 @@ public class Alignment implements Comparable<Alignment>
         cmp = mismatchCount - other.mismatchCount;
         if (cmp != 0) return cmp;
         return referenceGenomeId.compareTo(other.referenceGenomeId);
+    }
+
+    @Override
+    public String toString()
+    {
+        ToStringBuilder sb = new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE);
+        sb.append("datasetId", datasetId);
+        sb.append("sequenceId", sequenceId);
+        sb.append("referenceGenomeId", referenceGenomeId);
+        sb.append("alignedLength", alignedLength);
+        sb.append("mismatchCount", mismatchCount);
+        return sb.toString();
     }
 }
