@@ -743,6 +743,7 @@ public class CreateReport extends CommandLineUtility
 
         // first pass through alignments
         int[] bestAlignmentCounts = new int[referenceGenomeIds.size() + 1];
+        List<Alignment> bestAlignments = new ArrayList<Alignment>(bestAlignmentCounts.length);
 
         while (true)
         {
@@ -766,7 +767,7 @@ public class CreateReport extends CommandLineUtility
 
             multiGenomeAlignmentSummary.incrementAlignedCount();
 
-            List<Alignment> bestAlignments = new ArrayList<Alignment>();
+            bestAlignments.clear();
 
             for (Alignment alignment : alignments)
             {
@@ -847,7 +848,7 @@ public class CreateReport extends CommandLineUtility
 
             MultiGenomeAlignmentSummary multiGenomeAlignmentSummary = multiGenomeAlignmentSummaries.get(datasetId);
 
-            List<Alignment> bestAlignments = new ArrayList<Alignment>();
+            bestAlignments.clear();
             for (Alignment alignment : alignments)
             {
                 if (alignment.getMismatchCount() == mismatchCount)
