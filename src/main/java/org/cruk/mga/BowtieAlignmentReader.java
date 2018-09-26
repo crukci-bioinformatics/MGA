@@ -36,7 +36,7 @@ public class BowtieAlignmentReader extends AbstractAlignmentReader
 
     public BowtieAlignmentReader(String[] alignmentFiles, String runId) throws IOException
     {
-        super(alignmentFiles, runId);
+        super("bowtie", alignmentFiles, runId);
 
         int n = alignmentFiles.length;
 

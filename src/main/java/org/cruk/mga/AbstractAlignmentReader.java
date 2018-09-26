@@ -39,7 +39,7 @@ public abstract class AbstractAlignmentReader
     protected String[] referenceGenomeIds;
     protected TreeMap<Alignment, Integer> lookup = new TreeMap<Alignment, Integer>();
 
-    public AbstractAlignmentReader(String[] alignmentFiles, String runId) throws IOException
+    protected AbstractAlignmentReader(String alignerName, String[] alignmentFiles, String runId) throws IOException
     {
         this.alignmentFiles = alignmentFiles;
 
@@ -51,7 +51,7 @@ public abstract class AbstractAlignmentReader
         {
             File file = new File(alignmentFiles[i]);
 
-            String referenceGenomeId = file.getName().replaceAll("\\.\\w+\\.alignment$", "").replaceAll("^" + runId + "\\.", "");
+            String referenceGenomeId = file.getName().replaceAll("\\Q." + alignerName + ".alignment\\E$", "").replaceAll("^" + runId + "\\.", "");
             int index = referenceGenomeId.indexOf(".");
             if (index == -1)
                 throw new RuntimeException("Error determining reference genome for file: " + file.getAbsolutePath());
@@ -113,12 +113,10 @@ public abstract class AbstractAlignmentReader
         }
         else
         {
-            /*
             if (alignment.compareTo(newAlignment) >= 0)
             {
                 throw new RuntimeException("Alignments in unexpected sort order at line " + getLineNumber(index) + " in file " + alignmentFiles[index]);
             }
-            */
 
             lookup.put(newAlignment, index);
         }

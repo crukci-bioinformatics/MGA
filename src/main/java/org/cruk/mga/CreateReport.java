@@ -97,6 +97,8 @@ public class CreateReport extends CommandLineUtility
     private static final float MIN_ERROR = 0.0025f;
     private static final float MAX_ERROR = 0.01f;
 
+    private String alignerUsed = "bowtie";
+
     private String runId;
     private Integer trimStart;
     private Integer trimLength;
@@ -691,18 +693,19 @@ public class CreateReport extends CommandLineUtility
      */
     private void readAlignments() throws IOException
     {
-        // determine which results files are non-exonerate alignment output files
+        // determine which results files are from the regular (non-exonerate) aligner
         List<String> alignmentFileList = new ArrayList<String>();
         for (String resultFile : resultsFiles)
         {
-            if (resultFile.endsWith(".alignment") && !resultFile.endsWith(".exonerate.alignment"))
+            if (resultFile.endsWith(alignerUsed + ".alignment"))
             {
                 alignmentFileList.add(resultFile);
             }
         }
         String[] alignmentFiles = alignmentFileList.toArray(new String[0]);
 
-        AbstractAlignmentReader reader = new SAMAlignmentReader(alignmentFiles, runId);
+        //AbstractAlignmentReader reader = new SAMAlignmentReader("hisat2", alignmentFiles, runId);
+        AbstractAlignmentReader reader = new BowtieAlignmentReader(alignmentFiles, runId);
 
         // initialize reference genome index mapping
         // initialize alignment summary for each reference genome and dataset
@@ -829,7 +832,8 @@ public class CreateReport extends CommandLineUtility
             datasetScores.put(multiGenomeAlignmentSummary.getDatasetId(), scores);
         }
 
-        reader = new SAMAlignmentReader(alignmentFiles, runId);
+        //reader = new SAMAlignmentReader("hisat2", alignmentFiles, runId);
+        reader = new BowtieAlignmentReader(alignmentFiles, runId);
 
         while (true)
         {

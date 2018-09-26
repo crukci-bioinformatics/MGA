@@ -9,6 +9,9 @@
         Align a unpaired FASTQ files with HISAT2,
         and converts the SAM output to an ordered BAM with samtools.
         Expects the FASTQ quality scores to be Phred-33 format.
+        
+        NB. For disabling gapped alignment:
+        https://www.biostars.org/p/179056/#179057
     </description>
 
     <program type="commandLine" shell="bash">
@@ -19,6 +22,10 @@ ${hisat2} \
     -x ${genomeBase} \
     -U ${fastqFile} \
     ${threads} \
+    --no-spliced-alignment \
+    --end-to-end \
+    --rdg 10000,10000 \
+    --rfg 10000,10000 \
 | ${samtools} view -h -b \
     ${alignmentFile} \
     /dev/stdin

@@ -7,6 +7,7 @@ import org.apache.commons.lang3.ClassUtils;
 
 import htsjdk.samtools.SAMRecord;
 import htsjdk.samtools.SAMRecordIterator;
+import htsjdk.samtools.SAMTagUtil;
 import htsjdk.samtools.SamReaderFactory;
 import htsjdk.samtools.ValidationStringency;
 
@@ -15,9 +16,9 @@ public class SAMAlignmentReader extends AbstractAlignmentReader
     private SAMRecordIterator[] readers;
     private int[] lineNumbers;
 
-    public SAMAlignmentReader(String[] alignmentFiles, String runId) throws IOException
+    public SAMAlignmentReader(String aligner, String[] alignmentFiles, String runId) throws IOException
     {
-        super(alignmentFiles, runId);
+        super(aligner, alignmentFiles, runId);
 
         SamReaderFactory factory = SamReaderFactory.makeDefault();
         factory.validationStringency(ValidationStringency.SILENT);
@@ -117,7 +118,7 @@ public class SAMAlignmentReader extends AbstractAlignmentReader
 
         int alignedLength = next.getAlignmentEnd() - next.getAlignmentStart();
 
-        int mismatchCount = next.getCigarLength();
+        int mismatchCount = ((Number)next.getAttribute(SAMTagUtil.getSingleton().NM)).intValue();
 
         return new Alignment(datasetId, sequenceId, referenceGenomeIds[index], alignedLength, mismatchCount);
     }
