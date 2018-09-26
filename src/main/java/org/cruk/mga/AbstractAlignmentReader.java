@@ -32,26 +32,32 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public abstract class AbstractAlignmentReader
 {
-    protected String[] alignmentFiles;
+    protected List<String> alignmentFiles;
     protected String[] referenceGenomeIds;
     protected TreeMap<Alignment, Integer> lookup = new TreeMap<Alignment, Integer>();
 
-    protected AbstractAlignmentReader(String alignerName, String[] alignmentFiles, String runId) throws IOException
+    protected AbstractAlignmentReader(String alignerName, String[] allAlignmentFiles, String runId) throws IOException
     {
-        this.alignmentFiles = alignmentFiles;
+        // Filter for those alignment files created by the named aligner only.
 
-        int n = alignmentFiles.length;
+        String acceptedSuffix = "." + alignerName + ".alignment";
+
+        alignmentFiles = Stream.of(allAlignmentFiles).filter(f -> f.endsWith(acceptedSuffix)).collect(Collectors.toList());
+
+        int n = alignmentFiles.size();
 
         referenceGenomeIds = new String[n];
 
         for (int i = 0; i < n; i++)
         {
-            File file = new File(alignmentFiles[i]);
+            File file = new File(alignmentFiles.get(i));
 
-            String referenceGenomeId = file.getName().replaceAll("\\Q." + alignerName + ".alignment\\E$", "").replaceAll("^" + runId + "\\.", "");
+            String referenceGenomeId = file.getName().replaceAll("\\Q" + acceptedSuffix + "\\E$", "").replaceAll("^\\Q" + runId + ".\\E", "");
             int index = referenceGenomeId.indexOf(".");
             if (index == -1)
                 throw new RuntimeException("Error determining reference genome for file: " + file.getAbsolutePath());
@@ -60,6 +66,11 @@ public abstract class AbstractAlignmentReader
                 throw new RuntimeException("Error determining reference genome for file: " + file.getAbsolutePath());
             referenceGenomeIds[i] = referenceGenomeId;
         }
+    }
+
+    public List<String> getAlignmentFiles()
+    {
+        return Collections.unmodifiableList(alignmentFiles);
     }
 
     public Set<String> getReferenceGenomeIds()
@@ -115,7 +126,8 @@ public abstract class AbstractAlignmentReader
         {
             if (alignment.compareTo(newAlignment) >= 0)
             {
-                throw new RuntimeException("Alignments in unexpected sort order at line " + getLineNumber(index) + " in file " + alignmentFiles[index]);
+                alignment.compareTo(newAlignment);
+                throw new RuntimeException("Alignments in unexpected sort order at line " + getLineNumber(index) + " in file " + alignmentFiles.get(index));
             }
 
             lookup.put(newAlignment, index);

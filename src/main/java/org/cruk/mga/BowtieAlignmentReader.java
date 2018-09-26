@@ -34,18 +34,18 @@ public class BowtieAlignmentReader extends AbstractAlignmentReader
     private BufferedReader[] readers;
     private int[] lineNumbers;
 
-    public BowtieAlignmentReader(String[] alignmentFiles, String runId) throws IOException
+    public BowtieAlignmentReader(String[] allAlignmentFiles, String runId) throws IOException
     {
-        super("bowtie", alignmentFiles, runId);
+        super("bowtie", allAlignmentFiles, runId);
 
-        int n = alignmentFiles.length;
+        int n = alignmentFiles.size();
 
         readers = new BufferedReader[n];
         lineNumbers = new int[n];
 
         for (int i = 0; i < n; i++)
         {
-            File file = new File(alignmentFiles[i]);
+            File file = new File(alignmentFiles.get(i));
 
             readers[i] = new BufferedReader(new FileReader(file));
             lineNumbers[i] = 0;
@@ -110,7 +110,7 @@ public class BowtieAlignmentReader extends AbstractAlignmentReader
         int separatorIndex = fields[0].lastIndexOf("_");
         if (separatorIndex == -1)
         {
-            throw new RuntimeException("Incorrect sequence identifier (" + fields[0] + ") at line " + lineNumbers[index] + " in file " + alignmentFiles[index]);
+            throw new RuntimeException("Incorrect sequence identifier (" + fields[0] + ") at line " + lineNumbers[index] + " in file " + alignmentFiles.get(index));
         }
 
         String datasetId = fields[0].substring(0, separatorIndex);
@@ -121,7 +121,7 @@ public class BowtieAlignmentReader extends AbstractAlignmentReader
         }
         catch (NumberFormatException e)
         {
-            throw new RuntimeException("Incorrect sequence identifier (" + fields[0] + ") at line " + lineNumbers[index] + " in file " + alignmentFiles[index]);
+            throw new RuntimeException("Incorrect sequence identifier (" + fields[0] + ") at line " + lineNumbers[index] + " in file " + alignmentFiles.get(index));
         }
 
         int alignedLength = fields[4].length();

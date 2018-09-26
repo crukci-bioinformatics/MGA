@@ -74,12 +74,21 @@ public class Alignment implements Comparable<Alignment>
     public int compareTo(Alignment other)
     {
         int cmp = numericAwareComparator.compare(datasetId, other.datasetId);
-        if (cmp != 0) return cmp;
-        cmp = sequenceId - other.sequenceId;
-        if (cmp != 0) return cmp;
-        cmp = mismatchCount - other.mismatchCount;
-        if (cmp != 0) return cmp;
-        return referenceGenomeId.compareTo(other.referenceGenomeId);
+        if (cmp == 0)
+        {
+            cmp = sequenceId - other.sequenceId;
+
+            if (cmp == 0)
+            {
+                cmp = mismatchCount - other.mismatchCount;
+
+                if (cmp == 0)
+                {
+                    cmp = referenceGenomeId.compareTo(other.referenceGenomeId);
+                }
+            }
+        }
+        return cmp;
     }
 
     @Override

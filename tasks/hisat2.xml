@@ -12,6 +12,8 @@
         
         NB. For disabling gapped alignment:
         https://www.biostars.org/p/179056/#179057
+        
+        The output needs to be sorted by read name.
     </description>
 
     <program type="commandLine" shell="bash">
@@ -26,9 +28,13 @@ ${hisat2} \
     --end-to-end \
     --rdg 10000,10000 \
     --rfg 10000,10000 \
-| ${samtools} view -h -b \
+| ${samtools} sort \
+    -n -O bam ${compressionLevel} \
+    ${samtoolsThreads} ${memoryPerSamtoolsThread} \
+    ${sortingPrefix} \
     ${alignmentFile} \
     /dev/stdin
+
         ]]></executable>
     </program>
 
@@ -44,6 +50,9 @@ ${hisat2} \
     <arguments>
         <arg name="genomeBase"
             description="The basename of the index for the reference genome."/>
+        
+        <arg name="sortingPrefix" flag="-T"
+            description="Temporary directory and prefix for samtools sort."/>
 
         <arg name="hisat2" required="false" default="${hisat2}"
             description="The path to the HISAT2 executable."/>
@@ -52,7 +61,16 @@ ${hisat2} \
             description="The path to the samtools executable."/>
 
         <arg name="threads" required="false" flag="--threads" type="integer" default="${task.processors}"
-            description="number of alignment threads to launch."/>
+            description="Number of alignment threads to launch."/>
+
+        <arg name="samtoolsThreads" required="false" flag="-@" type="integer" default="${task.processors}"
+            description="Number of samtools sorting threads to use."/>
+
+        <arg name="memoryPerSamtoolsThread" required="false" flag="-m" default="${task.processors}"
+            description="Set maximum memory per samtools thread. Suffix K/M/G recognised "/>
+            
+        <arg name="compressionLevel" required="false" flag="-l" default="0"
+            description="BAM compression level, from 0 (uncompressed) to 9 (best)"/>
      </arguments>
 
     <versions>

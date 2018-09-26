@@ -374,7 +374,7 @@
                                     <resources>
                                         <memory>16G</memory>
                                         <maxMemory>64G</maxMemory>
-                                        <processors>4</processors>
+                                        <processors>6</processors>
                                     </resources>
 
                                     <inputs>
@@ -387,6 +387,11 @@
 
                                     <arguments>
                                         <arg name="genomeBase">${hisat2IndexDir}/${referenceGenomeId}</arg>
+                                        <arg name="sortingPrefix">${temp}/${runId}.${chunkNumber}.${referenceGenomeId}.sorttemp</arg>
+                                        <arg name="threads">4</arg>
+                                        <arg name="samtoolsThreads">2</arg>
+                                        <arg name="memoryPerSamtoolsThread">512M</arg>
+                                        <arg name="compressionLevel">0</arg>
                                     </arguments>
                                 </task>
                             </subtasks>
