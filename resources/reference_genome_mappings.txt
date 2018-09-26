@@ -1,6 +1,6 @@
 # This file contains mappings reference genome IDs and species for alignments
 # where the former are used as prefixes in Bowtie index file names.
-#
+# 
 # Each entry in this file corresponds to a mapping of species for a given
 # reference genome identifier in the following format
 #   key = value
@@ -10,35 +10,32 @@
 # genome.
 #
 # Note that multiple species may map to a single reference genome, for example
-# closely-related species.
+# closely-related species. 
 #
-acs.AnoCar2 = Anolis carolinensis (anole lizard) | anolis_carolinensis | anolis carolinensis | anole lizard
 ath.TAIR10 = Arabidopsis thaliana (thale cress) | arabidopsis_thaliana | arabidopsis thaliana | thale cress
 bacteria.NCBI = Bacteria
+bta.UMD3.1 = Bos taurus (cow) | bos_taurus | bos taurus | cow
 cel.WBcel235 = Caenorhabditis elegans (roundworm) | caenorhabditis_elegans | caenorhabditis elegans | c elegans
 cfa.CanFam3.1 = Canis familiaris (dog) | canis_familiaris | canis familiaris | dog
 cjc.C_jacchus3.2.1 = Callithrix jacchus (marmoset) | callithrix_jacchus | callithrix jacchus | marmoset
-cpo.cavPor3 = Cavia porcellus (guinea pig) | cavia_porcellus | cavia porcellus | guinea pig
-ddi.dictybase.01 = Dictyostelium discoideum (slime mold) | dictyostelium_discoideum | dictyostelium discoideum
-dme.BDGP6 = Drosophila melanogaster (fruitfly) | drosophila_melanogaster | drosophila melanogaster | fruitfly | fruit fly
+ddi.dicty_2.7 = Dictyostelium discoideum (slime mold) | dictyostelium_discoideum | dictyostelium discoideum
+dme.dm6 = Drosophila melanogaster (fruitfly) | drosophila_melanogaster | drosophila melanogaster | fruitfly | fruit fly
 dre.GRCz10 = Danio rerio (zebrafish) | danio_rerio | danio rerio | zebrafish
-eco.ASM1024v1 = Escherichia coli | escherichia_coli | e coli
+ecb.EquCab2 = Equus caballus (horse) | equus caballus | equus caballus | horse
+eco.HUSEC2011CHR1 = Escherichia coli | escherichia_coli | e coli
 fungi.NCBI = Fungi
-gga.Galgal4 = Gallus gallus (chicken) | gallus_gallus | gallus gallus | chicken
-ggo.gorGor3.1 = Gorilla gorilla | gorilla_gorilla | gorilla gorilla | gorilla
-hsa.GRCh37 = Homo sapiens (human) | homo_sapiens | homo sapiens | human
-mcc.MMUL1 = Macaca mulatta (Rhesus macaque) | macaca_mulatta | macaca mulatta | rhesus macaque | macaque
+gga.Gallus_gallus-5.0 = Gallus gallus (chicken) | gallus_gallus | gallus gallus | chicken
+hsa.GRCh38 = Homo sapiens (human) | homo_sapiens | homo sapiens | human
+mcc.Mmul_8.0.1 = Macaca mulatta (Rhesus macaque) | macaca_mulatta | macaca mulatta | rhesus macaque | macaque
 mdo.monDom5 = Monodelphis domestica (opossum) | monodelphis_domestica | monodelphis domestica | opossum
+mmc.CAST_EiJ_v1 = Mus musculus castaneus (Southeastern Asian house mouse) | mus_musculus_castaneus | mus musculus castaneus
 mmu.GRCm38 = Mus musculus (mouse) | mus_musculus | mus musculus | mouse | mus_spretus | mus spretus
-nle.Nleu1 = Nomascus leucogenys (northern white-cheeked gibbon) | nomascus_leucogenys | nomascus leucogenys | gibbon
-ocu.OryCun2 = Oryctolagus cuniculus (rabbit) | oryctolagus_cuniculus | oryctolagus cuniculus | rabbit
-pan.PapAnu2 = Papio anubis (olive baboon) | papio_anubis | papio anubis | olive baboon | baboon
+ocu.OryCun2.0 = Oryctolagus cuniculus (rabbit) | oryctolagus_cuniculus | oryctolagus cuniculus | rabbit
 phix.Illumina.RTA = Phi X 174 | phix
-pon.PPYG2 = Pongo abelii (orangutan) | pongo_abelii | pongo abelii | orangutan
-ptr.CHIMP2.1.4 = Pan troglodytes (chimpanzee) | pan_troglodytes | pan troglodytes | chimpanzee
 ribosomal_RNA = Ribomsomal RNA (human)
-rno.Rnor6 = Rattus norvegicus (rat) | rattus_norvegicus | rattus norvegicus | rat
+rno.Rnor_6.0 = Rattus norvegicus (rat) | rattus_norvegicus | rattus norvegicus | rat
 sce.R64-1-1 = Saccharomyces cerevisiae (brewer's yeast) | saccharomyces_cerevisiae | saccharomyces cerevisiae | yeast
+ssc.Sscrofa11.1 = Sus scrofa (pig) | sus_scrofa | sus scrofa
 tni.TETRAODON8 = Tetraodon nigroviridis (pufferfish) | tetraodon_nigroviridis | tetraodon nigroviridis | pufferfish
 viruses.NCBI = Viruses
-xtr.JGI_4.2 = Xenopus tropicalis (western clawed frog) | xenopus_tropicalis | xenopus tropicalis | frog
+xla.XL9.2 = Xenopus laevis (African clawed frog) | xenopus_laevis | xenopus laevis | frog | xenopus_tropicalis | xenopus tropicalis
