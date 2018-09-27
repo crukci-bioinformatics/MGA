@@ -28,9 +28,12 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.text.MessageFormat;
 
 public class BowtieAlignmentReader extends AbstractAlignmentReader
 {
+    private static final String INCORRECT_ID_MESSAGE = "Incorrect sequence identifier ({0}) at line {1} in file {2}";
+
     private BufferedReader[] readers;
     private int[] lineNumbers;
 
@@ -115,7 +118,7 @@ public class BowtieAlignmentReader extends AbstractAlignmentReader
         int separatorIndex = fields[0].lastIndexOf("_");
         if (separatorIndex == -1)
         {
-            throw new RuntimeException("Incorrect sequence identifier (" + fields[0] + ") at line " + lineNumbers[index] + " in file " + alignmentFiles.get(index));
+            throw new RuntimeException(MessageFormat.format(INCORRECT_ID_MESSAGE, fields[0], lineNumbers[index], alignmentFiles.get(index)));
         }
 
         String datasetId = fields[0].substring(0, separatorIndex);
@@ -126,7 +129,7 @@ public class BowtieAlignmentReader extends AbstractAlignmentReader
         }
         catch (NumberFormatException e)
         {
-            throw new RuntimeException("Incorrect sequence identifier (" + fields[0] + ") at line " + lineNumbers[index] + " in file " + alignmentFiles.get(index));
+            throw new RuntimeException(MessageFormat.format(INCORRECT_ID_MESSAGE, fields[0], lineNumbers[index], alignmentFiles.get(index)));
         }
 
         int alignedLength = fields[4].length();

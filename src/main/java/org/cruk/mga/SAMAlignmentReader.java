@@ -2,9 +2,11 @@ package org.cruk.mga;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.MessageFormat;
 
 import org.apache.commons.lang3.ClassUtils;
 
+import htsjdk.samtools.SAMFlag;
 import htsjdk.samtools.SAMRecord;
 import htsjdk.samtools.SAMRecordIterator;
 import htsjdk.samtools.SAMTagUtil;
@@ -13,6 +15,10 @@ import htsjdk.samtools.ValidationStringency;
 
 public class SAMAlignmentReader extends AbstractAlignmentReader
 {
+    private static final String INCORRECT_ID_MESSAGE = "Incorrect sequence identifier ({0}) for record {1} in file {2}";
+
+    private static final int FLAG_MASK = SAMFlag.NOT_PRIMARY_ALIGNMENT.intValue() | SAMFlag.SUPPLEMENTARY_ALIGNMENT.intValue();
+
     private SAMRecordIterator[] readers;
     private int[] recordNumbers;
 
@@ -101,38 +107,38 @@ public class SAMAlignmentReader extends AbstractAlignmentReader
             SAMRecord next = reader.next();
             ++recordNumbers[index];
 
-            if (next.getNotPrimaryAlignmentFlag() && !next.getReadUnmappedFlag())
-            {
-                continue;
-            }
+            // Skip reads that are secondary or supplementary reads.
 
-            int separatorIndex = next.getReadName().lastIndexOf("_");
-            if (separatorIndex == -1)
+            if ((next.getFlags() & FLAG_MASK) == 0)
             {
-                throw new RuntimeException("Incorrect sequence identifier (" + next.getReadName() + ") for record " + recordNumbers[index] + " in file " + alignmentFiles.get(index));
-            }
+                int separatorIndex = next.getReadName().lastIndexOf("_");
+                if (separatorIndex == -1)
+                {
+                    throw new RuntimeException(MessageFormat.format(INCORRECT_ID_MESSAGE, next.getReadName(), recordNumbers[index], alignmentFiles.get(index)));
+                }
 
-            String datasetId = next.getReadName().substring(0, separatorIndex);
-            int sequenceId = -1;
-            try
-            {
-                sequenceId = Integer.parseInt(next.getReadName().substring(separatorIndex + 1));
-            }
-            catch (NumberFormatException e)
-            {
-                throw new RuntimeException("Incorrect sequence identifier (" + next.getReadName() + ") for record " + recordNumbers[index] + " in file " + alignmentFiles.get(index));
-            }
+                String datasetId = next.getReadName().substring(0, separatorIndex);
+                int sequenceId = -1;
+                try
+                {
+                    sequenceId = Integer.parseInt(next.getReadName().substring(separatorIndex + 1));
+                }
+                catch (NumberFormatException e)
+                {
+                    throw new RuntimeException(MessageFormat.format(INCORRECT_ID_MESSAGE, next.getReadName(), recordNumbers[index], alignmentFiles.get(index)));
+                }
 
-            int alignedLength = next.getReadLength();
+                int alignedLength = next.getReadLength();
 
-            int mismatchCount = 255;
-            Object nm = next.getAttribute(SAMTagUtil.getSingleton().NM);
-            if (nm != null)
-            {
-                mismatchCount = ((Number)nm).intValue();
+                int mismatchCount = 255;
+                Object nm = next.getAttribute(SAMTagUtil.getSingleton().NM);
+                if (nm != null)
+                {
+                    mismatchCount = ((Number)nm).intValue();
+                }
+
+                return new Alignment(datasetId, sequenceId, referenceGenomeIds[index], alignedLength, mismatchCount);
             }
-
-            return new Alignment(datasetId, sequenceId, referenceGenomeIds[index], alignedLength, mismatchCount);
         }
 
         readerFinished(index);
