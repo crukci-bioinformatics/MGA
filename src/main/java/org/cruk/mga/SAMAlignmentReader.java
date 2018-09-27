@@ -57,7 +57,7 @@ public class SAMAlignmentReader extends AbstractAlignmentReader
     }
 
     @Override
-    protected void finalize() throws Throwable
+    public void close()
     {
         if (readers != null)
         {
@@ -65,13 +65,18 @@ public class SAMAlignmentReader extends AbstractAlignmentReader
             {
                 try
                 {
-                    r.close();
+                    if (r != null)
+                    {
+                        r.close();
+                    }
                 }
                 catch (Exception e)
                 {
                     // Ignore.
                 }
             }
+
+            readers = null;
         }
     }
 

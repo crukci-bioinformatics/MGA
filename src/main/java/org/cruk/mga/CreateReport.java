@@ -796,6 +796,8 @@ public class CreateReport extends CommandLineUtility
             bestAlignmentCounts[bestAlignments.size()]++;
         }
 
+        reader.close();
+
         log.info("Histogram of best alignments");
         log.info("No. genomes tied as best aligning\tCount");
         for (int i = 1; i < bestAlignmentCounts.length; i++)
@@ -879,6 +881,8 @@ public class CreateReport extends CommandLineUtility
             alignmentSummary.addAssignedSequenceLength(assigned.getAlignedLength());
             alignmentSummary.addAssignedMismatchCount(assigned.getMismatchCount());
         }
+
+        reader.close();
     }
 
     /**

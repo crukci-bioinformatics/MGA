@@ -23,6 +23,7 @@
 
 package org.cruk.mga;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -35,7 +36,7 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public abstract class AbstractAlignmentReader
+public abstract class AbstractAlignmentReader implements Closeable
 {
     protected List<String> alignmentFiles;
     protected String[] referenceGenomeIds;
@@ -66,6 +67,12 @@ public abstract class AbstractAlignmentReader
                 throw new RuntimeException("Error determining reference genome for file: " + file.getAbsolutePath());
             referenceGenomeIds[i] = referenceGenomeId;
         }
+    }
+
+    @Override
+    protected void finalize() throws Throwable
+    {
+        close();
     }
 
     public List<String> getAlignmentFiles()
