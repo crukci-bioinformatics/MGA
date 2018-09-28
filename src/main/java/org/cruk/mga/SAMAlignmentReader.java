@@ -17,7 +17,8 @@ public class SAMAlignmentReader extends AbstractAlignmentReader
 {
     private static final String INCORRECT_ID_MESSAGE = "Incorrect sequence identifier ({0}) for record {1} in file {2}";
 
-    private static final int FLAG_MASK = SAMFlag.NOT_PRIMARY_ALIGNMENT.intValue() | SAMFlag.SUPPLEMENTARY_ALIGNMENT.intValue();
+    private static final int FLAG_MASK =
+            SAMFlag.NOT_PRIMARY_ALIGNMENT.intValue() | SAMFlag.SUPPLEMENTARY_ALIGNMENT.intValue() | SAMFlag.READ_UNMAPPED.intValue();
 
     private SAMRecordIterator[] readers;
     private int[] recordNumbers;
@@ -130,7 +131,7 @@ public class SAMAlignmentReader extends AbstractAlignmentReader
 
                 int alignedLength = next.getReadLength();
 
-                int mismatchCount = 255;
+                int mismatchCount = 0;
                 Object nm = next.getAttribute(SAMTagUtil.getSingleton().NM);
                 if (nm != null)
                 {
