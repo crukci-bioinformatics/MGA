@@ -36,6 +36,7 @@
         <separateDatasetReports>true</separateDatasetReports>
 
         <softwareDir>/home/bioinformatics/pipelinesoftware/mga/@{rhel.version}</softwareDir>
+        <bowtie>${softwareDir}/bowtie-1.1.1/bowtie</bowtie>
         <hisat2>${softwareDir}/hisat2-2.1.0/hisat2</hisat2>
         <samtools>${softwareDir}/samtools-1.6/samtools</samtools>
         <exonerate>${softwareDir}/exonerate-2.2.0-x86_64/bin/exonerate</exonerate>
