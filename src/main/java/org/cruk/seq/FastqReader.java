@@ -23,20 +23,14 @@
 
 package org.cruk.seq;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.ZipInputStream;
+import java.util.NoSuchElementException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import htsjdk.samtools.SAMException;
+import htsjdk.samtools.fastq.FastqRecord;
 
 /**
  * Class for reading records from a FASTQ file or from a set of FASTQ files in
@@ -46,10 +40,8 @@ import org.slf4j.LoggerFactory;
  */
 public class FastqReader
 {
-    private static Logger log = LoggerFactory.getLogger(FastqReader.class);
-
     private boolean roundRobin = false;
-    private List<BufferedReader> readers = new ArrayList<BufferedReader>();
+    private List<htsjdk.samtools.fastq.FastqReader> readers = new ArrayList<>();
     private int currentReaderIndex = 0;
 
     /**
@@ -71,7 +63,7 @@ public class FastqReader
      */
     public FastqReader(File fastqFile) throws IOException
     {
-        readers.add(getBufferedReader(fastqFile));
+        readers.add(getFastqReader(fastqFile));
     }
 
     /**
@@ -87,33 +79,8 @@ public class FastqReader
         this.roundRobin = roundRobin;
         for (String fastqFilename : fastqFilenames)
         {
-            readers.add(getBufferedReader(new File(fastqFilename)));
+            readers.add(getFastqReader(new File(fastqFilename)));
         }
-    }
-
-    /**
-     * Returns a new input stream for the given file allowing for decompression
-     * if the extension indicates either a gzipped or zippped file.
-     *
-     * @param file the file
-     * @return the input stream
-     * @throws IOException
-     */
-    private InputStream getInputStream(File file) throws IOException
-    {
-        String filename = file.getName();
-        InputStream inputStream = new FileInputStream(file);
-        if (filename.endsWith(".gz"))
-        {
-            inputStream = new GZIPInputStream(inputStream);
-        }
-        else if (filename.toLowerCase().endsWith(".zip"))
-        {
-            // assumes single entry in the zip archive
-            inputStream = new ZipInputStream(inputStream);
-            ((ZipInputStream)inputStream).getNextEntry();
-        }
-        return inputStream;
     }
 
     /**
@@ -121,18 +88,17 @@ public class FastqReader
      * if the extension indicates either a gzipped or zippped file.
      *
      * @param file the file
-     * @return the buffered reader
+     * @return the HTS JDK FastqReader
      * @throws IOException
      */
-    private BufferedReader getBufferedReader(File file) throws IOException
+    private htsjdk.samtools.fastq.FastqReader getFastqReader(File file) throws IOException
     {
-        InputStream inputStream = getInputStream(file);
-        return new BufferedReader(new InputStreamReader(inputStream));
+        return new htsjdk.samtools.fastq.FastqReader(file);
     }
 
     public void close() throws IOException
     {
-        for (Reader reader : readers)
+        for (htsjdk.samtools.fastq.FastqReader reader : readers)
         {
             reader.close();
         }
@@ -143,145 +109,35 @@ public class FastqReader
      * Reads the next FASTQ entry from the current reader and moves the
      * index of the current reader forward if in round-robin mode.
      *
-     * @return a Fastq object or null if there are no more files containing records.
-     * @throws FastqFormatException
+     * @return a FastqRecord object or null if there are no more files containing records.
+     * @throws SAMException if the FASTQ record is invalid.
      * @throws IOException
      */
-    public Fastq readFastq() throws FastqFormatException, IOException
+    public FastqRecord readFastq() throws SAMException, IOException
     {
         while (!readers.isEmpty())
         {
-            if (roundRobin && currentReaderIndex >= readers.size()) currentReaderIndex = 0;
-            BufferedReader reader = readers.get(currentReaderIndex);
-            Fastq fastq = readFastq(reader);
-            if (fastq == null)
+            if (roundRobin && currentReaderIndex >= readers.size())
+            {
+                currentReaderIndex = 0;
+            }
+
+            htsjdk.samtools.fastq.FastqReader reader = readers.get(currentReaderIndex);
+            try
+            {
+                FastqRecord fastq = reader.next();
+                if (roundRobin)
+                {
+                    currentReaderIndex++;
+                }
+                return fastq;
+            }
+            catch (NoSuchElementException e)
             {
                 reader.close();
                 readers.remove(currentReaderIndex);
             }
-            else
-            {
-                if (roundRobin) currentReaderIndex++;
-                return fastq;
-            }
         }
         return null;
-    }
-
-    /**
-     * Reads the next FASTQ entry from the given reader.
-     *
-     * @param reader the FASTQ file reader.
-     * @return a Fastq object or null if there are no more files containing records.
-     * @throws FastqFormatException
-     * @throws IOException
-     */
-    private Fastq readFastq(BufferedReader reader) throws FastqFormatException, IOException
-    {
-        String[] lines = new String[4];
-        for (int i = 0; i < 4; i++)
-        {
-            lines[i] = reader.readLine();
-        }
-        return createFastq(lines);
-    }
-
-    /**
-     * Creates a Fastq object from the given lines validating as appropriate.
-     *
-     * @param lines
-     * @return
-     * @throws FastqFormatException
-     */
-    private Fastq createFastq(String[] lines) throws FastqFormatException
-    {
-        if (lines.length != 4)
-        {
-            String message = "Invalid number of lines for FASTQ entry";
-            log.error(message);
-            throw new RuntimeException(message);
-        }
-
-        String descriptionLine = lines[0];
-        String sequenceLine = lines[1];
-        String separatorLine = lines[2];
-        String qualityLine = lines[3];
-
-        if (descriptionLine == null) return null;
-        if (!descriptionLine.startsWith("@"))
-        {
-            String message = "Invalid FASTQ entry: description line must begin with a @ character";
-            log.error(message);
-            throw new FastqFormatException(message);
-        }
-        String description = descriptionLine.substring(1).trim();
-
-        if (sequenceLine == null)
-        {
-            String message = "Invalid FASTQ entry: truncated after description line";
-            log.error(message);
-            throw new FastqFormatException(message);
-        }
-        String sequence = sequenceLine.trim();
-        if (sequence.length() == 0)
-        {
-            String message = "Invalid FASTQ entry: zero-length sequence for entry " + description;
-            log.error(message);
-            throw new FastqFormatException(message);
-        }
-        if (!sequence.matches("^[A-Za-z\\.~]+$"))
-        {
-            String message = "Invalid FASTQ entry: sequence string contains invalid characters for entry " + description;
-            log.error(message);
-            throw new FastqFormatException(message);
-        }
-
-        if (separatorLine == null)
-        {
-            String message = "Invalid FASTQ entry: truncated after sequence line";
-            log.error(message);
-            throw new FastqFormatException(message);
-        }
-        if (!separatorLine.startsWith("+"))
-        {
-            String message = "Invalid FASTQ entry: separator line must begin with a + character for entry " + description;
-            log.error(message);
-            throw new FastqFormatException(message);
-        }
-        String separator = separatorLine.substring(1).trim();
-        if (separator.length() > 0 && !separator.equals(description))
-        {
-            String message = "Invalid FASTQ entry: separator does not match descriptor for entry " + description;
-            log.error(message);
-            throw new FastqFormatException(message);
-        }
-
-        if (qualityLine == null)
-        {
-            String message = "Invalid FASTQ entry: truncated after separator line";
-            log.error(message);
-            throw new FastqFormatException(message);
-        }
-        String quality = qualityLine.trim();
-        if (quality.length() == 0)
-        {
-            String message = "Invalid FASTQ entry: zero-length quality for entry " + description;
-            log.error(message);
-            throw new FastqFormatException(message);
-        }
-        if (quality.length() != sequence.length())
-        {
-            String message = "Invalid FASTQ entry: sequence and quality strings of differing length for entry " + description;
-            log.error(message);
-            throw new FastqFormatException(message);
-        }
-        if (!quality.matches("^[!-~]+$"))
-        {
-            String message = "Invalid FASTQ entry: quality string contains invalid characters for entry " + description;
-            log.error(message);
-            throw new FastqFormatException(message);
-        }
-
-        return new Fastq(description, sequence, quality);
     }
 }

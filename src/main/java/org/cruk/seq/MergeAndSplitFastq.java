@@ -32,6 +32,9 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.ParseException;
 import org.cruk.util.CommandLineUtility;
 
+import htsjdk.samtools.SAMException;
+import htsjdk.samtools.fastq.FastqRecord;
+
 /**
  * Utility for combining FASTQ files and splitting into chunks with up to a
  * specified number of records.
@@ -54,6 +57,8 @@ public class MergeAndSplitFastq extends CommandLineUtility
      */
     public static void main(String[] args)
     {
+        System.setProperty("line.separator", "\n");
+
         MergeAndSplitFastq mergeAndSplitFastq = new MergeAndSplitFastq(args);
         mergeAndSplitFastq.execute();
     }
@@ -135,7 +140,7 @@ public class MergeAndSplitFastq extends CommandLineUtility
             {
                 FastqReader reader = new FastqReader(fastqFilename);
 
-                Fastq fastq;
+                FastqRecord fastq;
                 while ((fastq = reader.readFastq()) != null)
                 {
                     if (writer == null)
@@ -143,7 +148,7 @@ public class MergeAndSplitFastq extends CommandLineUtility
                         outputFileCount++;
                         writer = new PrintWriter(new FileWriter(this.outputFilePrefix + "." + outputFileCount + ".fq"));
                     }
-                    writer.print(fastq);
+                    writer.println(fastq.toFastQString());
                     recordCount++;
                     if (recordCount == recordsPerFile)
                     {
@@ -158,7 +163,7 @@ public class MergeAndSplitFastq extends CommandLineUtility
 
             if (writer != null) writer.close();
         }
-        catch (FastqFormatException e)
+        catch (SAMException e)
         {
             error(e.getMessage());
         }

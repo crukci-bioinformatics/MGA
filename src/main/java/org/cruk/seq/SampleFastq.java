@@ -36,6 +36,8 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.math3.random.RandomDataGenerator;
 import org.cruk.util.CommandLineUtility;
 
+import htsjdk.samtools.SAMException;
+import htsjdk.samtools.fastq.FastqRecord;
 import nu.xom.Document;
 import nu.xom.Element;
 import nu.xom.Serializer;
@@ -64,6 +66,8 @@ public class SampleFastq extends CommandLineUtility
      */
     public static void main(String[] args)
     {
+        System.setProperty("line.separator", "\n");
+
         SampleFastq sampleFastq = new SampleFastq(args);
         sampleFastq.execute();
     }
@@ -189,7 +193,7 @@ public class SampleFastq extends CommandLineUtility
     {
         try
         {
-            Fastq[] records = reservoirSampling(fastqFilenames, sampleSize, maxSampleFrom, prefix != null);
+            FastqRecord[] records = reservoirSampling(fastqFilenames, sampleSize, maxSampleFrom, prefix != null);
 
             // Later code requires that the prefix ends with an underscore.
             String safePrefix = prefix;
@@ -200,17 +204,17 @@ public class SampleFastq extends CommandLineUtility
 
             for (int i = 0; i < records.length; i++)
             {
-                Fastq record = records[i];
+                FastqRecord record = records[i];
                 if (prefix != null)
                 {
-                    record.setDescription(safePrefix + (i + 1));
+                    record = new FastqRecord(safePrefix + (i + 1), record.getReadString(), record.getBaseQualityHeader(), record.getBaseQualityString());
                 }
-                out.print(record);
+                out.println(record.toFastQString());
             }
 
             writeSummary(datasetId, records.length);
         }
-        catch (FastqFormatException e)
+        catch (SAMException e)
         {
             error(e.getMessage());
         }
@@ -225,20 +229,28 @@ public class SampleFastq extends CommandLineUtility
      * @param removeDescriptions to remove sequence identifiers/descriptions to save on space.
      * @return the sampled FASTQ records.
      * @throws IOException
-     * @throws FastqFormatException
+     * @throws SAMException if the FASTQ record is invalid.
      */
-    private Fastq[] reservoirSampling(String[] fastqFilenames, int sampleSize, long maxSampleFrom, boolean removeDescriptions)
-            throws IOException, FastqFormatException
+    private FastqRecord[] reservoirSampling(String[] fastqFilenames, int sampleSize, long maxSampleFrom, boolean removeDescriptions)
+            throws IOException, SAMException
     {
         FastqReader reader = new FastqReader(fastqFilenames, true);
 
-        Fastq[] records = new Fastq[sampleSize];
+        FastqRecord[] records = new FastqRecord[sampleSize];
 
         for (int i = 0; i < sampleSize; i++)
         {
-            Fastq record = reader.readFastq();
-            if (record == null) return Arrays.copyOf(records, i);
-            if (removeDescriptions) record.setDescription(null);
+            FastqRecord record = reader.readFastq();
+            if (record == null)
+            {
+                return Arrays.copyOf(records, i);
+            }
+
+            if (removeDescriptions)
+            {
+                record = new FastqRecord(null, record.getReadString(), record.getBaseQualityHeader(), record.getBaseQualityString());
+            }
+
             records[i] = record;
         }
 
@@ -246,11 +258,17 @@ public class SampleFastq extends CommandLineUtility
 
         for (long i = sampleSize; i < maxSampleFrom; i++)
         {
-            Fastq record = reader.readFastq();
-            if (record == null) break;
+            FastqRecord record = reader.readFastq();
+            if (record == null)
+            {
+                break;
+            }
 
             long j = rand.nextLong(0l, i);
-            if (j < sampleSize) records[(int)j] = record;
+            if (j < sampleSize)
+            {
+                records[(int)j] = record;
+            }
         }
 
         reader.close();

@@ -24,6 +24,7 @@
 package org.cruk.seq;
 
 import java.io.BufferedOutputStream;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -34,6 +35,9 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.ParseException;
 import org.cruk.util.CommandLineUtility;
 
+import htsjdk.samtools.SAMException;
+import htsjdk.samtools.fastq.FastqReader;
+import htsjdk.samtools.fastq.FastqRecord;
 import nu.xom.Document;
 import nu.xom.Element;
 import nu.xom.Serializer;
@@ -60,6 +64,8 @@ public class TrimFastq extends CommandLineUtility
      */
     public static void main(String[] args)
     {
+        System.setProperty("line.separator", "\n");
+
         TrimFastq trimFastq = new TrimFastq(args);
         trimFastq.execute();
     }
@@ -148,6 +154,16 @@ public class TrimFastq extends CommandLineUtility
         }
     }
 
+    public static FastqRecord trim(FastqRecord fastq, int start, int length)
+    {
+        int end = Math.min(start + length, fastq.getReadLength());
+        return new FastqRecord(
+                fastq.getReadName(),
+                fastq.getReadString().substring(start, end),
+                fastq.getBaseQualityHeader(),
+                fastq.getBaseQualityString().substring(start, end));
+    }
+
     /**
      * Runs the FASTQ trimming utility.
      *
@@ -166,18 +182,19 @@ public class TrimFastq extends CommandLineUtility
 
         try
         {
-            FastqReader reader = new FastqReader(fastqFilename);
+            FastqReader reader = new FastqReader(new File(fastqFilename));
 
             int minLength = 0;
             int maxLength = 0;
 
-            Fastq fastq;
-            while ((fastq = reader.readFastq()) != null)
+            while (reader.hasNext())
             {
-                int length = fastq.getLength();
+                FastqRecord fastq = reader.next();
+
+                int length = fastq.getReadLength();
 
                 if (trimEnd > length)
-                    error("Sequence too short for trimming (" + fastq.getDescription() + ", length " + length + ")");
+                    error("Sequence too short for trimming (" + fastq.getReadName() + ", length " + length + ")");
 
                 if (minLength == 0)
                 {
@@ -190,16 +207,16 @@ public class TrimFastq extends CommandLineUtility
 
                 maxLength = Math.max(maxLength, length);
 
-                fastq = fastq.trim(trimStart, trimLength);
+                fastq = trim(fastq, trimStart, trimLength);
 
-                out.print(fastq.toString());
+                out.println(fastq.toFastQString());
             }
 
             reader.close();
 
             writeSummary(trimLength, minLength, maxLength);
         }
-        catch (FastqFormatException e)
+        catch (SAMException e)
         {
             error(e.getMessage());
         }

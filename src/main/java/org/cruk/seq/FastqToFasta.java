@@ -23,11 +23,17 @@
 
 package org.cruk.seq;
 
+import java.io.File;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.ParseException;
 import org.cruk.util.CommandLineUtility;
+
+import htsjdk.samtools.SAMException;
+import htsjdk.samtools.fastq.FastqReader;
+import htsjdk.samtools.fastq.FastqRecord;
 
 /**
  * Utility for converting a FASTQ file to FASTA format.
@@ -45,6 +51,8 @@ public class FastqToFasta extends CommandLineUtility
      */
     public static void main(String[] args)
     {
+        System.setProperty("line.separator", "\n");
+
         FastqToFasta fastqToFasta = new FastqToFasta(args);
         fastqToFasta.execute();
     }
@@ -105,17 +113,24 @@ public class FastqToFasta extends CommandLineUtility
      */
     protected void run() throws Exception
     {
-        try
+        try (FastqReader reader = new FastqReader(new File(fastqFilename)))
         {
-            FastqReader reader = new FastqReader(fastqFilename);
-            Fastq fastq;
-            while ((fastq = reader.readFastq()) != null)
+            while (reader.hasNext())
             {
-                out.print(fastq.toFasta());
+                FastqRecord fastq = reader.next();
+
+                out.print(">");
+                out.println(fastq.getReadName());
+                String sequence = fastq.getReadString();
+                int nchars = 70;
+                int length = sequence.length();
+                for (int i = 0; i < length; i += nchars)
+                {
+                    out.println(sequence.substring(i, Math.min(length, i + nchars)));
+                }
             }
-            reader.close();
         }
-        catch (FastqFormatException e)
+        catch (SAMException e)
         {
             error(e.getMessage());
         }

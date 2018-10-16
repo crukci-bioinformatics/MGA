@@ -100,7 +100,7 @@ public abstract class CommandLineUtility
         {
             try
             {
-                out = new PrintStream(new BufferedOutputStream(new FileOutputStream(outputFilename)));
+                out = new PrintStream(new BufferedOutputStream(new FileOutputStream(outputFilename)), false);
             }
             catch (IOException e)
             {

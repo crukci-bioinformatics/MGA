@@ -67,12 +67,12 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.io.IOUtils;
 import org.cruk.util.CommandLineUtility;
 import org.cruk.util.OrderedProperties;
 
 import com.opencsv.CSVWriter;
 
+import htsjdk.samtools.util.CloserUtil;
 import nu.xom.Attribute;
 import nu.xom.Builder;
 import nu.xom.Document;
@@ -776,7 +776,7 @@ public class CreateReport extends CommandLineUtility
             List<Alignment> alignments = reader.getNextAlignments();
             if (alignments.isEmpty())
             {
-                IOUtils.closeQuietly(mismatchedAlignmentWriter);
+                CloserUtil.close(mismatchedAlignmentWriter);
                 break;
             }
 
