@@ -22,6 +22,7 @@
         <outputDir>${work}</outputDir>
         <resourcesDir>${install}/resources</resourcesDir>
         <hisat2IndexDir>${resourcesDir}/hisat2_indexes</hisat2IndexDir>
+        <bowtieIndexDir>${resourcesDir}/bowtie_indexes</bowtieIndexDir>
         <adapterFastaFile>${resourcesDir}/adapters.fa</adapterFastaFile>
         <referenceGenomeMappingFile>${resourcesDir}/reference_genome_mappings.txt</referenceGenomeMappingFile>
         <xslStyleSheetFile>${install}/resources/results.xsl</xslStyleSheetFile>
@@ -35,6 +36,7 @@
         <separateDatasetReports>true</separateDatasetReports>
 
         <softwareDir>/home/bioinformatics/pipelinesoftware/mga/@{rhel.version}</softwareDir>
+        <bowtie>${softwareDir}/bowtie-1.1.1/bowtie</bowtie>
         <hisat2>${softwareDir}/hisat2-2.1.0/hisat2</hisat2>
         <samtools>${softwareDir}/samtools-1.6/samtools</samtools>
         <exonerate>${softwareDir}/exonerate-2.2.0-x86_64/bin/exonerate</exonerate>
@@ -262,6 +264,71 @@
                         <arg name="length">${trimLength}</arg>
                     </arguments>
                 </task>
+
+                <!--
+                    Aligns sequences against multiple reference genomes using Bowtie.
+                -->
+                <foreach name="alignReferenceGenomesBowtie" loopInput="referenceGenome">
+                    <depends>
+                        <task>trimFastq</task>
+                    </depends>
+
+                    <inputs>
+                        <input name="referenceGenome">${bowtieIndexDir}/${referenceGenomeId}\.rev\.1\.ebwtl?</input>
+                        <input name="fastqFile" origin="dependency" dependency="trimFastq" ref="outputFastqFile"/>
+                    </inputs>
+
+                    <variables>
+                        <var name="referenceGenomeId" pattern=".+"/>
+                    </variables>
+
+                    <outputs>
+                        <output name="alignmentFiles" required="nice" patternType="wildcard" deleteOnFailure="false">${temp}/${runId}.${chunkNumber}.*.bowtie.alignment</output>
+                    </outputs>
+
+                    <subtasks>
+                        <!--
+                            Aligns sequences against a specific reference genome using Bowtie.
+
+                            The alignReferenceGenomes parent foreach task introduces the following
+                            custom parameter the bowtie task:
+
+                            ${referenceGenomeId} - the reference genome identifier
+                        -->
+                        <task name="alignAdaptersWrapper" type="alignmentWrapper">
+                            <inputs>
+                                <input name="queryFile" origin="inherited" ref="fastqFile"/>
+                            </inputs>
+
+                            <outputs>
+                                <output name="alignmentFile">${temp}/${runId}.${chunkNumber}.${referenceGenomeId}.bowtie.alignment</output>
+                            </outputs>
+
+                            <subtasks>
+                                <task name="bowtie" type="bowtie">
+                                    <resources>
+                                        <memory>4G</memory>
+                                        <maxMemory>16G</maxMemory>
+                                    </resources>
+
+                                    <inputs>
+                                        <input name="fastqFile" origin="inherited" ref="queryFile"/>
+                                        <input name="indexDir">${bowtieIndexDir}</input>
+                                    </inputs>
+
+                                    <outputs>
+                                        <output name="alignmentFile" origin="inherited" ref="alignmentFile"/>
+                                    </outputs>
+
+                                    <arguments>
+                                        <arg name="indexName">${referenceGenomeId}</arg>
+                                        <arg name="bowtieExecutable">${bowtie}</arg>
+                                    </arguments>
+                                </task>
+                            </subtasks>
+                        </task>
+                    </subtasks>
+                </foreach>
 
                 <!--
                     Aligns sequences against multiple reference genomes using HISAT2.

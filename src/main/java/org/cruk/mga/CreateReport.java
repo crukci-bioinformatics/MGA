@@ -811,7 +811,10 @@ public class CreateReport extends CommandLineUtility
         for (MultiGenomeAlignmentSummary multiGenomeAlignmentSummary : multiGenomeAlignmentSummaries.values())
         {
             List<Double> scores = new ArrayList<Double>(referenceGenomeIds.size());
-            for (int i = 0; i < referenceGenomeIds.size(); i++) scores.add(0.0);
+            for (int i = 0; i < referenceGenomeIds.size(); i++)
+            {
+                scores.add(0.0);
+            }
 
             int preferentiallyAlignedTotal = 0;
             for (String referenceGenomeId : referenceGenomeIds)
