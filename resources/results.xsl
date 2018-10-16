@@ -75,7 +75,7 @@ Sequences were sampled<xsl:if test="$trimLength != ''">,
 trimmed to <xsl:value-of select="$trimLength"/> bases</xsl:if><xsl:if test="$trimStart != ''">
 starting from position <xsl:value-of select="$trimStart"/>,</xsl:if>
 and mapped to <xsl:value-of select="$referenceGenomeCount"/>
-reference genomes (see <a href="#referenceGenomes">list</a> below) using Bowtie.
+reference genomes (see <a href="#referenceGenomes">list</a> below) using HISAT2.
 Sequences containing adapters were found by ungapped alignment of the full length
 sequence to a set of known adapter and primer sequences using Exonerate.
 Further details on the alignment results and the assignment of reads to
