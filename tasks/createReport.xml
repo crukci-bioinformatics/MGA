@@ -23,6 +23,7 @@ ${java} \
     ${trimLength} \
     ${plotWidth} \
     ${minimumSequenceCount} \
+    ${mismatchingAlignments} \
     ${countSummaryFiles} \
     ${sampleSummaryFiles} \
     ${alignmentFiles}
@@ -37,6 +38,8 @@ ${java} \
 
     <outputs>
         <output name="outputReportFile" safeNaming="false"/>
+        <output name="mismatchingAlignments" required="false" flag="--mismatching-alignments"
+                description="A file to write alignments whose mismatches increase the error rate."/> 
     </outputs>
 
     <arguments>

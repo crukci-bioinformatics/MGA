@@ -38,6 +38,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -66,8 +67,11 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.IOUtils;
 import org.cruk.util.CommandLineUtility;
 import org.cruk.util.OrderedProperties;
+
+import com.opencsv.CSVWriter;
 
 import nu.xom.Attribute;
 import nu.xom.Builder;
@@ -109,6 +113,7 @@ public class CreateReport extends CommandLineUtility
     private int plotWidth;
     private long minimumSequenceCount;
     private String[] resultsFiles;
+    private File mismatchingAlignmentsFile;
 
     private Font font = new Font("SansSerif", Font.PLAIN, DEFAULT_FONT_SIZE);
     private Font axisFont = new Font("SansSerif", Font.PLAIN, DEFAULT_AXIS_FONT_SIZE);
@@ -160,6 +165,7 @@ public class CreateReport extends CommandLineUtility
         options.addOption("m", "minimum-sequence-count", true, "The minimum number of sequences to display on the x-axis.");
         options.addOption(null, "trim-start", true, "The position within sequences from which to start trimming for alignment; any bases before this position will be trimmed");
         options.addOption(null, "trim-length", true, "The length to trim sequences to for alignment");
+        options.addOption(null, "mismatching-alignments", true, "Write mismatching alignments to this file");
 
         outputPrefix = "results";
         separateDatasetReports = false;
@@ -255,6 +261,11 @@ public class CreateReport extends CommandLineUtility
                 {
                     error("The trim length provided is not an integer value");
                 }
+            }
+
+            if (commandLine.hasOption("mismatching-alignments"))
+            {
+                mismatchingAlignmentsFile = new File(commandLine.getOptionValue("mismatching-alignments"));
             }
 
             if (args.length == 0)
@@ -745,10 +756,43 @@ public class CreateReport extends CommandLineUtility
         int[] bestAlignmentCounts = new int[referenceGenomeIds.size() + 1];
         List<Alignment> bestAlignments = new ArrayList<Alignment>(bestAlignmentCounts.length);
 
+        CSVWriter mismatchedAlignmentWriter = null;
+        String[] mismatchedLine = null;
+        if (mismatchingAlignmentsFile != null)
+        {
+            try
+            {
+                mismatchedAlignmentWriter = new CSVWriter(new FileWriter(mismatchingAlignmentsFile));
+                mismatchedLine = new String[3];
+            }
+            catch (IOException e)
+            {
+                log.error("Failed to open file for writing mismatched alignments: {}", e.getMessage());
+            }
+        }
+
         while (true)
         {
             List<Alignment> alignments = reader.getNextAlignments();
-            if (alignments.isEmpty()) break;
+            if (alignments.isEmpty())
+            {
+                IOUtils.closeQuietly(mismatchedAlignmentWriter);
+                break;
+            }
+
+            if (mismatchedAlignmentWriter != null)
+            {
+                for (Alignment a : alignments)
+                {
+                    if (a.getMismatchCount() > 0)
+                    {
+                        mismatchedLine[0] = a.getDatasetId();
+                        mismatchedLine[1] = Integer.toString(a.getSequenceId());
+                        mismatchedLine[2] = Integer.toString(a.getMismatchCount());
+                        mismatchedAlignmentWriter.writeNext(mismatchedLine, false);
+                    }
+                }
+            }
 
             Alignment first = alignments.get(0);
             String datasetId = first.getDatasetId();

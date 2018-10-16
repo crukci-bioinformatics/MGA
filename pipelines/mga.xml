@@ -424,6 +424,7 @@
 
             <outputs>
                 <output name="outputReportFile">${outputDir}/results.html</output>
+                <output name="mismatchingAlignments">${temp}/${runId}.mismatchingalignments.csv</output>
             </outputs>
 
             <arguments>
