@@ -371,7 +371,7 @@ Reads that align uniquely to a genome are assigned to that genome. Reads that
 align equally well to multiple genomes are assigned to the genome with the
 highest number of reads in the 'Best' column.
 <p/>
-Note that because reads are trimmed prior to alignment with Bowtie, it is
+Note that because reads are trimmed prior to alignment with HISAT2, it is
 possible for a read to be counted both as aligned to one or more of the
 reference genomes and among the reads with adapter content. The adapter will
 most likely be present in the portion of the read that has been trimmed.
