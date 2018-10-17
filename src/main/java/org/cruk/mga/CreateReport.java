@@ -66,6 +66,7 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.PatternOptionBuilder;
 import org.apache.commons.codec.binary.Base64;
 import org.cruk.util.CommandLineUtility;
 import org.cruk.util.OrderedProperties;
@@ -100,20 +101,22 @@ public class CreateReport extends CommandLineUtility
     private static final float MIN_ALPHA = 0.1f;
     private static final float MIN_ERROR = 0.0025f;
     private static final float MAX_ERROR = 0.01f;
+    private static final String DEFAULT_ALIGNER = "hisat2";
 
     private String runId;
     private Integer trimStart;
     private Integer trimLength;
     private String outputPrefix;
-    private String sampleSheetFilename;
-    private String referenceGenomeMappingFilename;
-    private String xslStyleSheetFilename;
+    private File sampleSheetFile;
+    private File referenceGenomeMappingFile;
+    private File xslStyleSheetFile;
     private boolean separateDatasetReports;
     private String datasetReportFilenamePrefix;
     private int plotWidth;
     private long minimumSequenceCount;
     private String[] resultsFiles;
     private File mismatchingAlignmentsFile;
+    private String aligner;
 
     private Font font = new Font("SansSerif", Font.PLAIN, DEFAULT_FONT_SIZE);
     private Font axisFont = new Font("SansSerif", Font.PLAIN, DEFAULT_AXIS_FONT_SIZE);
@@ -154,22 +157,62 @@ public class CreateReport extends CommandLineUtility
 
         Option option = new Option("i", "run-id", true, "The run identifier");
         option.setRequired(true);
+        option.setArgName("id");
         options.addOption(option);
-        options.addOption("o", "output-filename-prefix", true, "File name prefix for output report, image and xml file");
-        options.addOption("s", "sample-sheet-file", true, "Sample sheet file");
-        options.addOption("r", "reference-genome-mapping-file", true, "Reference genome to species mapping file");
-        options.addOption("x", "xsl-stylesheet-file", true, "XSL stylesheet file");
-        options.addOption("d", "separate-dataset-reports", false, "To create individual reports for each dataset");
-        options.addOption("p", "dataset-report-filename-prefix", true, "File name prefix for creating separate report for each dataset");
-        options.addOption("w", "plot-width", true, "The width of the plot in pixels (default: " + DEFAULT_WIDTH + "");
-        options.addOption("m", "minimum-sequence-count", true, "The minimum number of sequences to display on the x-axis.");
-        options.addOption(null, "trim-start", true, "The position within sequences from which to start trimming for alignment; any bases before this position will be trimmed");
-        options.addOption(null, "trim-length", true, "The length to trim sequences to for alignment");
-        options.addOption(null, "mismatching-alignments", true, "Write mismatching alignments to this file");
 
-        outputPrefix = "results";
-        separateDatasetReports = false;
-        datasetReportFilenamePrefix = "results_";
+        option = new Option("o", "output-filename-prefix", true, "File name prefix for output report, image and xml file");
+        option.setArgName("prefix");
+        options.addOption(option);
+
+        option = new Option("s", "sample-sheet-file", true, "Sample sheet file");
+        option.setArgName("file");
+        option.setType(PatternOptionBuilder.FILE_VALUE);
+        options.addOption(option);
+
+        option = new Option("r", "reference-genome-mapping-file", true, "Reference genome to species mapping file");
+        option.setArgName("file");
+        option.setType(PatternOptionBuilder.FILE_VALUE);
+        options.addOption(option);
+
+        option = new Option("x", "xsl-stylesheet-file", true, "XSL stylesheet file");
+        option.setArgName("file");
+        option.setType(PatternOptionBuilder.FILE_VALUE);
+        options.addOption(option);
+
+        options.addOption("d", "separate-dataset-reports", false, "To create individual reports for each dataset");
+
+        option = new Option("p", "dataset-report-filename-prefix", true, "File name prefix for creating separate report for each dataset");
+        option.setArgName("prefix");
+        options.addOption(option);
+
+        option = new Option("w", "plot-width", true, "The width of the plot in pixels (default: " + DEFAULT_WIDTH + "");
+        option.setArgName("integer");
+        option.setType(PatternOptionBuilder.NUMBER_VALUE);
+        options.addOption(option);
+
+        option = new Option("m", "minimum-sequence-count", true, "The minimum number of sequences to display on the x-axis.");
+        option.setArgName("integer");
+        option.setType(PatternOptionBuilder.NUMBER_VALUE);
+        options.addOption(option);
+
+        option = new Option(null, "trim-start", true, "The position within sequences from which to start trimming for alignment; any bases before this position will be trimmed");
+        option.setArgName("integer");
+        option.setType(PatternOptionBuilder.NUMBER_VALUE);
+        options.addOption(option);
+
+        option = new Option(null, "trim-length", true, "The length to trim sequences to for alignment");
+        option.setArgName("integer");
+        option.setType(PatternOptionBuilder.NUMBER_VALUE);
+        options.addOption(option);
+
+        option = new Option(null, "mismatching-alignments", true, "Write mismatching alignments to this file");
+        option.setArgName("file");
+        option.setType(PatternOptionBuilder.FILE_VALUE);
+        options.addOption(option);
+
+        option = new Option(null, "aligner", true, "The name of the aligner used, if not HISAT2");
+        option.setArgName("name");
+        options.addOption(option);
 
         try
         {
@@ -177,48 +220,23 @@ public class CreateReport extends CommandLineUtility
 
             runId = commandLine.getOptionValue("run-id");
 
-            if (commandLine.hasOption("output-filename-prefix"))
-            {
-                outputPrefix = commandLine.getOptionValue("output-filename-prefix");
-            }
+            outputPrefix = commandLine.getOptionValue("output-filename-prefix", "results");
             outputFilename = outputPrefix + ".xml";
 
-            if (commandLine.hasOption("sample-sheet-file"))
-            {
-                sampleSheetFilename = commandLine.getOptionValue("sample-sheet-file");
-            }
+            sampleSheetFile = (File)commandLine.getParsedOptionValue("sample-sheet-file");
 
-            if (commandLine.hasOption("reference-genome-mapping-file"))
-            {
-                referenceGenomeMappingFilename = commandLine.getOptionValue("reference-genome-mapping-file");
-            }
+            referenceGenomeMappingFile = (File)commandLine.getParsedOptionValue("reference-genome-mapping-file");
 
-            if (commandLine.hasOption("xsl-stylesheet-file"))
-            {
-                xslStyleSheetFilename = commandLine.getOptionValue("xsl-stylesheet-file");
-            }
+            xslStyleSheetFile = (File)commandLine.getParsedOptionValue("xsl-stylesheet-file");
 
-            if (commandLine.hasOption("separate-dataset-reports"))
-            {
-                separateDatasetReports = true;
-            }
+            separateDatasetReports = commandLine.hasOption("separate-dataset-reports");
 
-            if (commandLine.hasOption("dataset-report-filename-prefix"))
-            {
-                datasetReportFilenamePrefix = commandLine.getOptionValue("dataset-report-filename-prefix");
-            }
+            datasetReportFilenamePrefix = commandLine.getOptionValue("dataset-report-filename-prefix", "results_");
 
             plotWidth = DEFAULT_WIDTH;
             if (commandLine.hasOption("plot-width"))
             {
-                try
-                {
-                    plotWidth = Integer.parseInt(commandLine.getOptionValue("plot-width"));
-                }
-                catch (NumberFormatException e)
-                {
-                    error("Width provided is not an integer value");
-                }
+                plotWidth = ((Number)commandLine.getParsedOptionValue("plot-width")).intValue();
             }
             if (plotWidth < MINIMUM_WIDTH)
             {
@@ -229,44 +247,22 @@ public class CreateReport extends CommandLineUtility
             minimumSequenceCount = MINIMUM_SEQUENCE_COUNT;
             if (commandLine.hasOption("minimum-sequence-count"))
             {
-                try
-                {
-                    minimumSequenceCount = Long.parseLong(commandLine.getOptionValue("minimum-sequence-count"));
-                }
-                catch (NumberFormatException e)
-                {
-                    error("Minimum sequence count provided is not an integer value");
-                }
+                minimumSequenceCount = ((Number)commandLine.getParsedOptionValue("minimum-sequence-count")).longValue();
             }
 
             if (commandLine.hasOption("trim-start"))
             {
-                try
-                {
-                    trimStart = Integer.parseInt(commandLine.getOptionValue("trim-start"));
-                }
-                catch (NumberFormatException e)
-                {
-                    error("Error parsing command line option: trim-start must be an integer number.");
-                }
+                trimStart = ((Number)commandLine.getParsedOptionValue("trim-start")).intValue();
             }
 
             if (commandLine.hasOption("trim-length"))
             {
-                try
-                {
-                    trimLength = Integer.parseInt(commandLine.getOptionValue("trim-length"));
-                }
-                catch (NumberFormatException e)
-                {
-                    error("The trim length provided is not an integer value");
-                }
+                trimLength = ((Number)commandLine.getParsedOptionValue("trim-length")).intValue();
             }
 
-            if (commandLine.hasOption("mismatching-alignments"))
-            {
-                mismatchingAlignmentsFile = new File(commandLine.getOptionValue("mismatching-alignments"));
-            }
+            mismatchingAlignmentsFile = (File)commandLine.getParsedOptionValue("mismatching-alignments");
+
+            aligner = commandLine.getOptionValue("aligner", DEFAULT_ALIGNER);
 
             if (args.length == 0)
             {
@@ -323,9 +319,9 @@ public class CreateReport extends CommandLineUtility
      */
     private void readReferenceGenomeMapping() throws FileNotFoundException, IOException
     {
-        if (referenceGenomeMappingFilename != null)
+        if (referenceGenomeMappingFile != null)
         {
-            referenceGenomeSpeciesMapping.loadFromPropertiesFile(referenceGenomeMappingFilename);
+            referenceGenomeSpeciesMapping.loadFromPropertiesFile(referenceGenomeMappingFile);
         }
     }
 
@@ -367,19 +363,12 @@ public class CreateReport extends CommandLineUtility
     private OrderedProperties readSampleSheet()
     {
         OrderedProperties properties = new OrderedProperties();
-        if (sampleSheetFilename == null || sampleSheetFilename.isEmpty()) return properties;
-
-        BufferedReader reader = null;
-        try
+        if (sampleSheetFile == null)
         {
-            reader = new BufferedReader(new FileReader(sampleSheetFilename));
-        }
-        catch (FileNotFoundException e)
-        {
-            error("Error: could not find file " + sampleSheetFilename);
+            return properties;
         }
 
-        try
+        try (BufferedReader reader = new BufferedReader(new FileReader(sampleSheetFile)))
         {
             boolean inDatasetSection = false;
             String[] samplePropertyNames = null;
@@ -460,17 +449,6 @@ public class CreateReport extends CommandLineUtility
         catch (IOException e)
         {
             error(e);
-        }
-        finally
-        {
-            try
-            {
-                reader.close();
-            }
-            catch (IOException e)
-            {
-                error("Error closing file " + sampleSheetFilename);
-            }
         }
 
         return properties;
@@ -704,8 +682,12 @@ public class CreateReport extends CommandLineUtility
      */
     private AbstractAlignmentReader createAlignmentReader() throws IOException
     {
-        return new SAMAlignmentReader("hisat2", resultsFiles, runId);
-        //return new BowtieAlignmentReader(resultsFiles, runId);
+        if (aligner.equalsIgnoreCase("bowtie"))
+        {
+            return new BowtieAlignmentReader(resultsFiles, runId);
+        }
+
+        return new SAMAlignmentReader(aligner, resultsFiles, runId);
     }
 
     /**
@@ -944,7 +926,9 @@ public class CreateReport extends CommandLineUtility
      * @throws IOException
      * @throws TransformerException
      */
-    private void writeReport(Collection<MultiGenomeAlignmentSummary> multiGenomeAlignmentSummaries, OrderedProperties runProperties, PrintStream out, String imageFilename, String xmlFilename, String htmlFilename)
+    private void writeReport(Collection<MultiGenomeAlignmentSummary> multiGenomeAlignmentSummaries,
+                             OrderedProperties runProperties, PrintStream out,
+                             String imageFilename, String xmlFilename, String htmlFilename)
             throws IOException, TransformerException
     {
         Element root = new Element("MultiGenomeAlignmentSummaries");
@@ -1026,7 +1010,7 @@ public class CreateReport extends CommandLineUtility
         serializer.write(document);
         out.close();
 
-        if (xslStyleSheetFilename != null)
+        if (xslStyleSheetFile != null)
         {
             File imageFile = new File(imageFilename);
             FileInputStream imageInputStream = new FileInputStream(imageFile);
@@ -1036,7 +1020,7 @@ public class CreateReport extends CommandLineUtility
 
             String imageBase64String = Base64.encodeBase64String(imageByteArray);
             TransformerFactory factory = TransformerFactory.newInstance();
-            Source xslt = new StreamSource(new File(xslStyleSheetFilename));
+            Source xslt = new StreamSource(xslStyleSheetFile);
             Transformer transformer = factory.newTransformer(xslt);
             transformer.setParameter("image", imageBase64String);
             Source xmlSource = new StreamSource(new File(xmlFilename));

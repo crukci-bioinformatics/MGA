@@ -424,7 +424,7 @@
 
             <outputs>
                 <output name="outputReportFile">${outputDir}/results.html</output>
-                <output name="mismatchingAlignments">${temp}/${runId}.mismatchingalignments.csv</output>
+                <output name="mismatchingAlignments">${temp}/${runId}.mismatchingalignments.hisat2.csv</output>
             </outputs>
 
             <arguments>
@@ -439,6 +439,48 @@
                 <arg name="trimLength">${trimLength}</arg>
                 <arg name="plotWidth">${plotWidth}</arg>
                 <arg name="minimumSequenceCount">${minimumSequenceCount}</arg>
+            </arguments>
+        </task>
+        
+        <!--
+            Testing task to create a report based on Bowtie alignments.
+        -->
+        <task name="createReportFromBowtie" type="createReport">
+            <depends>
+                <task>countFastqLoop</task>
+                <task>sampleFastqLoop</task>
+                <task>sequenceChunkIterator</task>
+            </depends>
+
+            <resources>
+                <memory>1G</memory>
+                <maxMemory>6G</maxMemory>
+            </resources>
+
+            <inputs>
+                <input name="countSummaryFiles" origin="dependency" dependency="countFastqLoop" ref="countSummaryFiles"/>
+                <input name="sampleSummaryFiles" origin="dependency" dependency="sampleFastqLoop" ref="sampleSummaryFiles"/>
+                <input name="alignmentFiles" origin="dependency" dependency="sequenceChunkIterator" ref="outputFiles"/>
+            </inputs>
+
+            <outputs>
+                <output name="outputReportFile">${outputDir}/results_bowtie.html</output>
+                <output name="mismatchingAlignments">${temp}/${runId}.mismatchingalignments.bowtie.csv</output>
+            </outputs>
+
+            <arguments>
+                <arg name="runId">${runId}</arg>
+                <arg name="sampleSheetFile">${sampleSheetFile}</arg>
+                <arg name="referenceGenomeMappingFile">${referenceGenomeMappingFile}</arg>
+                <arg name="xslStyleSheetFile">${xslStyleSheetFile}</arg>
+                <arg name="outputFilePrefix">${outputDir}/results_bowtie</arg>
+                <arg name="separateDatasetReports">${separateDatasetReports}</arg>
+                <arg name="datasetReportFilePrefix">${outputDir}/results_bowtie_</arg>
+                <arg name="trimStart">${trimStart}</arg>
+                <arg name="trimLength">${trimLength}</arg>
+                <arg name="plotWidth">${plotWidth}</arg>
+                <arg name="minimumSequenceCount">${minimumSequenceCount}</arg>
+                <arg name="aligner">bowtie</arg>
             </arguments>
         </task>
     </tasks>

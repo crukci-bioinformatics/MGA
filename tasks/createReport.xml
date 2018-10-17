@@ -23,6 +23,7 @@ ${java} \
     ${trimLength} \
     ${plotWidth} \
     ${minimumSequenceCount} \
+    ${aligner} \
     ${mismatchingAlignments} \
     ${countSummaryFiles} \
     ${sampleSummaryFiles} \
@@ -65,6 +66,8 @@ ${java} \
             description="The width of the plot in pixels."/>
         <arg name="minimumSequenceCount" flag="-m" type="integer" required="false"
             description="The minimum number of sequences to display on the x-axis."/>
+        <arg name="aligner" flag="--aligner" required="false"
+            description="The name of the aligner used. The default is the standard one for the pipeline: hisat2"/>
             
         <arg name="java" required="false" default="@{java.home}/bin/java" description="Java Executable path"/>
         <arg name="classpath" required="false" flag="-classpath" default="@{java.class.path}"/>
