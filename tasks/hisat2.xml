@@ -26,10 +26,11 @@ ${hisat2} \
     ${threads} \
     --no-spliced-alignment \
     --end-to-end \
-    --rdg 10000,10000 \
-    --rfg 10000,10000 \
+    --rdg "10000,10000" \
+    --rfg "10000,10000" \
+    --no-softclip -k 1 \
 | ${samtools} sort \
-    -n -O bam ${compressionLevel} \
+    -n -O sam ${compressionLevel} \
     ${samtoolsThreads} ${memoryPerSamtoolsThread} \
     ${sortingPrefix} \
     ${alignmentFile} \

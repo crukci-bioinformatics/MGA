@@ -411,6 +411,8 @@
                 <task>sequenceChunkIterator</task>
             </depends>
 
+            <jobName>${runId}.createReport.hisat2</jobName>
+            
             <resources>
                 <memory>1G</memory>
                 <maxMemory>6G</maxMemory>
@@ -423,7 +425,7 @@
             </inputs>
 
             <outputs>
-                <output name="outputReportFile">${outputDir}/results.html</output>
+                <output name="outputReportFile">${outputDir}/results_hisat2.html</output>
                 <output name="mismatchingAlignments">${temp}/${runId}.mismatchingalignments.hisat2.csv</output>
             </outputs>
 
@@ -432,9 +434,9 @@
                 <arg name="sampleSheetFile">${sampleSheetFile}</arg>
                 <arg name="referenceGenomeMappingFile">${referenceGenomeMappingFile}</arg>
                 <arg name="xslStyleSheetFile">${xslStyleSheetFile}</arg>
-                <arg name="outputFilePrefix">${outputDir}/results</arg>
+                <arg name="outputFilePrefix">${outputDir}/results_hisat2</arg>
                 <arg name="separateDatasetReports">${separateDatasetReports}</arg>
-                <arg name="datasetReportFilePrefix">${outputDir}/results_</arg>
+                <arg name="datasetReportFilePrefix">${outputDir}/results_hisat2_</arg>
                 <arg name="trimStart">${trimStart}</arg>
                 <arg name="trimLength">${trimLength}</arg>
                 <arg name="plotWidth">${plotWidth}</arg>
@@ -451,6 +453,8 @@
                 <task>sampleFastqLoop</task>
                 <task>sequenceChunkIterator</task>
             </depends>
+            
+            <jobName>${runId}.createReport.bowtie</jobName>
 
             <resources>
                 <memory>1G</memory>

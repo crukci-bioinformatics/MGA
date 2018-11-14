@@ -745,7 +745,7 @@ public class CreateReport extends CommandLineUtility
             try
             {
                 mismatchedAlignmentWriter = new CSVWriter(new FileWriter(mismatchingAlignmentsFile));
-                mismatchedLine = new String[3];
+                mismatchedLine = new String[4];
             }
             catch (IOException e)
             {
@@ -769,8 +769,9 @@ public class CreateReport extends CommandLineUtility
                     if (a.getMismatchCount() > 0)
                     {
                         mismatchedLine[0] = a.getDatasetId();
-                        mismatchedLine[1] = Integer.toString(a.getSequenceId());
-                        mismatchedLine[2] = Integer.toString(a.getMismatchCount());
+                        mismatchedLine[1] = a.getReferenceGenomeId();
+                        mismatchedLine[2] = Integer.toString(a.getSequenceId());
+                        mismatchedLine[3] = Integer.toString(a.getMismatchCount());
                         mismatchedAlignmentWriter.writeNext(mismatchedLine, false);
                     }
                 }

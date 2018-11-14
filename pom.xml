@@ -118,6 +118,10 @@
                             <mainClass>org.cruk.seq.FastqToFasta</mainClass>
                             <name>fastq-to-fasta</name>
                         </program>
+                        <program>
+                            <mainClass>org.cruk.mga.MismatchDifferences</mainClass>
+                            <name>individual</name>
+                        </program>
                     </programs>
                 </configuration>
             </plugin>
