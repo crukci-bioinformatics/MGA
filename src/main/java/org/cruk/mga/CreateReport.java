@@ -116,6 +116,7 @@ public class CreateReport extends CommandLineUtility
     private long minimumSequenceCount;
     private String[] resultsFiles;
     private File mismatchingAlignmentsFile;
+    private File bestAlignmentsFile;
     private String aligner;
 
     private Font font = new Font("SansSerif", Font.PLAIN, DEFAULT_FONT_SIZE);
@@ -210,6 +211,11 @@ public class CreateReport extends CommandLineUtility
         option.setType(PatternOptionBuilder.FILE_VALUE);
         options.addOption(option);
 
+        option = new Option(null, "best-alignments", true, "Write best alignments to this file");
+        option.setArgName("file");
+        option.setType(PatternOptionBuilder.FILE_VALUE);
+        options.addOption(option);
+
         option = new Option(null, "aligner", true, "The name of the aligner used, if not HISAT2");
         option.setArgName("name");
         options.addOption(option);
@@ -261,6 +267,8 @@ public class CreateReport extends CommandLineUtility
             }
 
             mismatchingAlignmentsFile = (File)commandLine.getParsedOptionValue("mismatching-alignments");
+
+            bestAlignmentsFile = (File)commandLine.getParsedOptionValue("best-alignments");
 
             aligner = commandLine.getOptionValue("aligner", DEFAULT_ALIGNER);
 
@@ -869,10 +877,29 @@ public class CreateReport extends CommandLineUtility
 
         reader = createAlignmentReader();
 
+        CSVWriter bestAlignmentsWriter = null;
+        String[] bestLine = null;
+        if (bestAlignmentsFile != null)
+        {
+            try
+            {
+                bestAlignmentsWriter = new CSVWriter(new FileWriter(bestAlignmentsFile));
+                bestLine = new String[3];
+            }
+            catch (IOException e)
+            {
+                log.error("Failed to open file for writing best alignments: {}", e.getMessage());
+            }
+        }
+
         while (true)
         {
             List<Alignment> alignments = reader.getNextAlignments();
-            if (alignments.isEmpty()) break;
+            if (alignments.isEmpty())
+            {
+                CloserUtil.close(bestAlignmentsWriter);
+                break;
+            }
 
             Alignment first = alignments.get(0);
             String datasetId = first.getDatasetId();
@@ -910,6 +937,14 @@ public class CreateReport extends CommandLineUtility
             alignmentSummary.incrementAssignedCount();
             alignmentSummary.addAssignedSequenceLength(assigned.getAlignedLength());
             alignmentSummary.addAssignedMismatchCount(assigned.getMismatchCount());
+
+            if (bestAlignmentsWriter != null)
+            {
+                bestLine[0] = assigned.getDatasetId();
+                bestLine[1] = assigned.getReferenceGenomeId();
+                bestLine[2] = Integer.toString(assigned.getSequenceId());
+                bestAlignmentsWriter.writeNext(bestLine, false);
+            }
         }
 
         reader.close();

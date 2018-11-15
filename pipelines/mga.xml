@@ -427,6 +427,7 @@
             <outputs>
                 <output name="outputReportFile">${outputDir}/results_hisat2.html</output>
                 <output name="mismatchingAlignments">${temp}/${runId}.mismatchingalignments.hisat2.csv</output>
+                <output name="bestAlignments">${temp}/${runId}.bestalignments.hisat2.csv</output>
             </outputs>
 
             <arguments>
@@ -470,6 +471,7 @@
             <outputs>
                 <output name="outputReportFile">${outputDir}/results_bowtie.html</output>
                 <output name="mismatchingAlignments">${temp}/${runId}.mismatchingalignments.bowtie.csv</output>
+                <output name="bestAlignments">${temp}/${runId}.bestalignments.bowtie.csv</output>
             </outputs>
 
             <arguments>

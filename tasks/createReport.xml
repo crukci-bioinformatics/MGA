@@ -25,6 +25,7 @@ ${java} \
     ${minimumSequenceCount} \
     ${aligner} \
     ${mismatchingAlignments} \
+    ${bestAlignments} \
     ${countSummaryFiles} \
     ${sampleSummaryFiles} \
     ${alignmentFiles}
@@ -41,6 +42,8 @@ ${java} \
         <output name="outputReportFile" safeNaming="false"/>
         <output name="mismatchingAlignments" required="false" flag="--mismatching-alignments"
                 description="A file to write alignments whose mismatches increase the error rate."/> 
+        <output name="bestAlignments" required="false" flag="--best-alignments"
+                description="A file to write the best alignments to."/> 
     </outputs>
 
     <arguments>
