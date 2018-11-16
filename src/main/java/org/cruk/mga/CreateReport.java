@@ -777,8 +777,8 @@ public class CreateReport extends CommandLineUtility
                     if (a.getMismatchCount() > 0)
                     {
                         mismatchedLine[0] = a.getDatasetId();
-                        mismatchedLine[1] = a.getReferenceGenomeId();
-                        mismatchedLine[2] = Integer.toString(a.getSequenceId());
+                        mismatchedLine[1] = Integer.toString(a.getSequenceId());
+                        mismatchedLine[2] = a.getReferenceGenomeId();
                         mismatchedLine[3] = Integer.toString(a.getMismatchCount());
                         mismatchedAlignmentWriter.writeNext(mismatchedLine, false);
                     }
@@ -941,8 +941,8 @@ public class CreateReport extends CommandLineUtility
             if (bestAlignmentsWriter != null)
             {
                 bestLine[0] = assigned.getDatasetId();
-                bestLine[1] = assigned.getReferenceGenomeId();
-                bestLine[2] = Integer.toString(assigned.getSequenceId());
+                bestLine[1] = Integer.toString(assigned.getSequenceId());
+                bestLine[2] = assigned.getReferenceGenomeId();
                 bestAlignmentsWriter.writeNext(bestLine, false);
             }
         }
