@@ -23,7 +23,7 @@
 
 package org.cruk.mga;
 
-import org.cruk.workflow.util.NumericAwareComparator;
+import org.cruk.common.comparators.numericname.NumericAwareComparator;
 
 public class Alignment implements Comparable<Alignment>
 {
