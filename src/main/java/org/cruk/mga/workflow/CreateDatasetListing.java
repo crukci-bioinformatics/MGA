@@ -74,11 +74,20 @@ public class CreateDatasetListing extends AbstractJavaTask
         this.datasetListingFile = datasetListingFile;
     }
 
+    
     @Override
     public void execute(TaskMonitor arg0) throws Throwable
     {
         readSampleSheet();
         writeDatasetListing();
+    }
+
+    public static void main(String[] args) throws Throwable
+    {
+        CreateDatasetListing task = new CreateDatasetListing();
+        task.setSampleSheetFile(new File("samplesheet.txt"));
+        task.setDatasetListingFile(new File("/matt/dev/pipelines/MGA/files.txt"));
+        task.execute(null);
     }
 
     /**
@@ -120,6 +129,8 @@ public class CreateDatasetListing extends AbstractJavaTask
                     }
                 }
             }
+            if (!inDatasetSection)
+                throw new RuntimeException("Dataset section not found, expecting line with DatasetId and File column headings (exact case) as first 2 columns");
         }
         finally
         {
