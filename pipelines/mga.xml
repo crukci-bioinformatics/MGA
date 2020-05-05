@@ -1,7 +1,7 @@
 <?xml version="1.1" encoding="ISO-8859-1"?>
 <pipe:pipeline xmlns:pipe="http://cancerresearchuk.org/workflow/pipeline"
                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-               xsi:schemaLocation="http://cancerresearchuk.org/workflow/pipeline http://content.cruk.cam.ac.uk/bioinformatics/schema/workflow/pipeline-1.7.xsd">
+               xsi:schemaLocation="http://cancerresearchuk.org/workflow/pipeline http://content.cruk.cam.ac.uk/bioinformatics/schema/workflow/pipeline-1.8.xsd">
 
     <name>Multi-Genome Alignment Pipeline</name>
     <description>Contaminant screen for high-throughput sequencing data that aligns to multiple reference genomes and adapter sequences.</description>
