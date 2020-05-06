@@ -24,8 +24,6 @@
 package org.cruk.seq;
 
 import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.ParseException;
 import org.cruk.util.CommandLineUtility;
 
@@ -69,40 +67,25 @@ public class FastqToFasta extends CommandLineUtility
     }
 
     /**
-     * Parse command line arguments.
-     *
-     * @param args
+     * {@inheritDoc}
      */
-    protected void parseCommandLineArguments(String[] args)
+    @Override
+    protected void parseCommandLine(CommandLine commandLine) throws ParseException
     {
-        CommandLineParser parser = new DefaultParser();
+        outputFilename = commandLine.getOptionValue("output-file");
 
-        try
+        String[] args = commandLine.getArgs();
+
+        if (args.length == 0)
         {
-            CommandLine commandLine = parser.parse(options, args);
-
-            if (commandLine.hasOption("output-file"))
-            {
-                outputFilename = commandLine.getOptionValue("output-file");
-            }
-
-            args = commandLine.getArgs();
-
-            if (args.length == 0)
-            {
-                error("Error parsing command line: missing FASTQ filename", true);
-            }
-            if (args.length > 1)
-            {
-                error("Error parsing command line: additional arguments and/or unrecognized options");
-            }
-
-            fastqFilename = args[0];
+            error("Error parsing command line: missing FASTQ filename", true);
         }
-        catch (ParseException e)
+        if (args.length > 1)
         {
-            error("Error parsing command-line options: " + e.getMessage(), true);
+            error("Error parsing command line: additional arguments and/or unrecognized options");
         }
+
+        fastqFilename = args[0];
     }
 
     /**

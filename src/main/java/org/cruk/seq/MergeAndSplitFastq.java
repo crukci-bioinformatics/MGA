@@ -27,9 +27,9 @@ import java.io.FileWriter;
 import java.io.PrintWriter;
 
 import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.Option;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.PatternOptionBuilder;
 import org.cruk.util.CommandLineUtility;
 
 /**
@@ -41,11 +41,11 @@ import org.cruk.util.CommandLineUtility;
 public class MergeAndSplitFastq extends CommandLineUtility
 {
     public static String DEFAULT_OUTPUT_PREFIX = "sequences";
-    public static int DEFAULT_RECORDS_PER_FILE = 5000000;
+    public static long DEFAULT_RECORDS_PER_FILE = 5000000;
 
     private String[] fastqFilenames;
     private String outputFilePrefix;
-    private int recordsPerFile;
+    private long recordsPerFile;
 
     /**
      * Runs the MergeAndSplitFastq utility with the given command-line arguments.
@@ -74,55 +74,27 @@ public class MergeAndSplitFastq extends CommandLineUtility
     @Override
     protected void setupOptions()
     {
-        options.addOption("p", "output-prefix", true, "The prefix to use for merged/split FASTQ output files (default: " + outputFilePrefix + ")");
-        options.addOption("n", "records-per-file", true, "The maximum number of records per FASTQ output file (default: " + recordsPerFile + ")");
+        options.addOption("p", "output-prefix", true, "The prefix to use for merged/split FASTQ output files (default: " + DEFAULT_OUTPUT_PREFIX + ")");
+
+        Option option = new Option("n", "records-per-file", true, "The maximum number of records per FASTQ output file (default: " + DEFAULT_RECORDS_PER_FILE + ")");
+        option.setType(PatternOptionBuilder.NUMBER_VALUE);
+        option.setArgName("<int>");
+        options.addOption(option);
     }
 
     /**
-     * Parse command line arguments.
-     *
-     * @param args
+     * {@inheritDoc}
      */
-    protected void parseCommandLineArguments(String[] args)
+    @Override
+    protected void parseCommandLine(CommandLine commandLine) throws ParseException
     {
-        CommandLineParser parser = new DefaultParser();
+        outputFilePrefix = commandLine.getOptionValue("output-prefix", DEFAULT_OUTPUT_PREFIX);
+        outputFilePrefix = outputFilePrefix.replaceAll("\\.$", "");
 
-        try
-        {
-            CommandLine commandLine = parser.parse(options, args);
+        Number recordsPerFileN = (Number)commandLine.getParsedOptionValue("records-per-file");
+        recordsPerFile = recordsPerFileN == null ? DEFAULT_RECORDS_PER_FILE : recordsPerFileN.longValue();
 
-            if (commandLine.hasOption("output-prefix"))
-            {
-                outputFilePrefix = commandLine.getOptionValue("output-prefix");
-                outputFilePrefix = outputFilePrefix.replaceAll("\\.$", "");
-            }
-            else
-            {
-                outputFilePrefix = DEFAULT_OUTPUT_PREFIX;
-            }
-
-            if (commandLine.hasOption("records-per-file"))
-            {
-                try
-                {
-                    recordsPerFile = Integer.parseInt(commandLine.getOptionValue("records-per-file"));
-                }
-                catch (NumberFormatException e)
-                {
-                    error("Error parsing command line option: the number of records per file must be an integer number");
-                }
-            }
-            else
-            {
-                recordsPerFile = DEFAULT_RECORDS_PER_FILE;
-            }
-
-            fastqFilenames = commandLine.getArgs();
-        }
-        catch (ParseException e)
-        {
-            error("Error parsing command-line options: " + e.getMessage(), true);
-        }
+        fastqFilenames = commandLine.getArgs();
     }
 
     /**

@@ -28,8 +28,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,13 +82,39 @@ public abstract class CommandLineUtility
     protected abstract void setupOptions();
 
     /**
-     * Parses command line arguments. Subclasses should implement this abstract
+     * Parses command line arguments. Subclasses may implement this abstract
      * method to parse the given arguments and populate the command line options
-     * object.
+     * object, but this default implementation would be typical to parse the
+     * options and pass to {@link #parseCommandLine(CommandLine)} to process
+     * the parsed values. Errors are reported and the utility terminated if there
+     * are any.
      *
-     * @param args
+     * @param args The raw command line arguments given to the JVM.
      */
-    protected abstract void parseCommandLineArguments(String[] args);
+    protected void parseCommandLineArguments(String[] args)
+    {
+        CommandLineParser parser = new DefaultParser();
+
+        try
+        {
+            CommandLine commandLine = parser.parse(options, args);
+            parseCommandLine(commandLine);
+        }
+        catch (ParseException e)
+        {
+            error("Error parsing command-line options: " + e.getMessage(), true);
+        }
+    }
+
+    /**
+     * Process the parsed command line arguments.  Subclasses should implement this abstract
+     * method to process the parsed options.
+     *
+     * @param commandLine The parsed command line.
+     *
+     * @throws ParseException if there is a problem with any argument.
+     */
+    protected abstract void parseCommandLine(CommandLine commandLine) throws ParseException;
 
     /**
      * Abstract method for running the utility.

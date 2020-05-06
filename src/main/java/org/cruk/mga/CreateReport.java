@@ -61,10 +61,9 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.PatternOptionBuilder;
 import org.apache.commons.codec.binary.Base64;
 import org.cruk.util.CommandLineUtility;
 import org.cruk.util.OrderedProperties;
@@ -98,8 +97,8 @@ public class CreateReport extends CommandLineUtility
     private static final float MAX_ERROR = 0.01f;
 
     protected String runId;
-    protected Integer trimStart;
-    protected Integer trimLength;
+    protected Number trimStart;
+    protected Number trimLength;
     protected String outputPrefix;
     protected String sampleSheetFilename;
     protected String referenceGenomeMappingFilename;
@@ -135,13 +134,16 @@ public class CreateReport extends CommandLineUtility
     /**
      * Initializes a new CreateFastq utility instance with the given command-line arguments.
      *
-     * @param args
+     * @param args The raw command line arguments given to the JVM.
      */
     protected CreateReport(String[] args)
     {
         super("results_files", args);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     protected void setupOptions()
     {
         Option option = new Option("i", "run-id", true, "The run identifier");
@@ -153,123 +155,68 @@ public class CreateReport extends CommandLineUtility
         options.addOption("x", "xsl-stylesheet-file", true, "XSL stylesheet file");
         options.addOption("d", "separate-dataset-reports", false, "To create individual reports for each dataset");
         options.addOption("p", "dataset-report-filename-prefix", true, "File name prefix for creating separate report for each dataset");
-        options.addOption("w", "plot-width", true, "The width of the plot in pixels (default: " + DEFAULT_WIDTH + "");
-        options.addOption("m", "minimum-sequence-count", true, "The minimum number of sequences to display on the x-axis.");
-        options.addOption(null, "trim-start", true, "The position within sequences from which to start trimming for alignment; any bases before this position will be trimmed");
-        options.addOption(null, "trim-length", true, "The length to trim sequences to for alignment");
+
+        option = new Option("m", "minimum-sequence-count", true, "The minimum number of sequences to display on the x-axis.");
+        option.setType(PatternOptionBuilder.NUMBER_VALUE);
+        option.setArgName("<int>");
+        options.addOption(option);
+
+        option = new Option("w", "plot-width", true, "The width of the plot in pixels (default: " + DEFAULT_WIDTH + ")");
+        option.setType(PatternOptionBuilder.NUMBER_VALUE);
+        option.setArgName("<size>");
+        options.addOption(option);
+
+        option = new Option(null, "trim-start", true, "The position within sequences from which to start trimming for alignment; any bases before this position will be trimmed");
+        option.setType(PatternOptionBuilder.NUMBER_VALUE);
+        option.setArgName("<int>");
+        options.addOption(option);
+
+        option = new Option(null, "trim-length", true, "The length to trim sequences to for alignment");
+        option.setType(PatternOptionBuilder.NUMBER_VALUE);
+        option.setArgName("<int>");
+        options.addOption(option);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    protected void parseCommandLineArguments(String[] args)
+    protected void parseCommandLine(CommandLine commandLine) throws ParseException
     {
-        CommandLineParser parser = new DefaultParser();
+        runId = commandLine.getOptionValue("run-id");
 
-        outputPrefix = "results";
-        separateDatasetReports = false;
-        datasetReportFilenamePrefix = "results_";
+        outputPrefix = commandLine.getOptionValue("output-filename-prefix", "results");
+        outputFilename = outputPrefix + ".xml";
 
-        try
+        sampleSheetFilename = commandLine.getOptionValue("sample-sheet-file");
+
+        referenceGenomeMappingFilename = commandLine.getOptionValue("reference-genome-mapping-file");
+
+        xslStyleSheetFilename = commandLine.getOptionValue("xsl-stylesheet-file");
+
+        separateDatasetReports = commandLine.hasOption("separate-dataset-reports");
+
+        datasetReportFilenamePrefix = commandLine.getOptionValue("dataset-report-filename-prefix", "results_");
+
+        Number plotWidthN = (Number)commandLine.getParsedOptionValue("plot-width");
+        plotWidth = plotWidthN == null ? DEFAULT_WIDTH : plotWidthN.intValue();
+        if (plotWidth < MINIMUM_WIDTH)
         {
-            CommandLine commandLine = parser.parse(options, args);
-
-            runId = commandLine.getOptionValue("run-id");
-
-            if (commandLine.hasOption("output-filename-prefix"))
-            {
-                outputPrefix = commandLine.getOptionValue("output-filename-prefix");
-            }
-            outputFilename = outputPrefix + ".xml";
-
-            if (commandLine.hasOption("sample-sheet-file"))
-            {
-                sampleSheetFilename = commandLine.getOptionValue("sample-sheet-file");
-            }
-
-            if (commandLine.hasOption("reference-genome-mapping-file"))
-            {
-                referenceGenomeMappingFilename = commandLine.getOptionValue("reference-genome-mapping-file");
-            }
-
-            if (commandLine.hasOption("xsl-stylesheet-file"))
-            {
-                xslStyleSheetFilename = commandLine.getOptionValue("xsl-stylesheet-file");
-            }
-
-            if (commandLine.hasOption("separate-dataset-reports"))
-            {
-                separateDatasetReports = true;
-            }
-
-            if (commandLine.hasOption("dataset-report-filename-prefix"))
-            {
-                datasetReportFilenamePrefix = commandLine.getOptionValue("dataset-report-filename-prefix");
-            }
-
-            plotWidth = DEFAULT_WIDTH;
-            if (commandLine.hasOption("plot-width"))
-            {
-                try
-                {
-                    plotWidth = Integer.parseInt(commandLine.getOptionValue("plot-width"));
-                }
-                catch (NumberFormatException e)
-                {
-                    error("Width provided is not an integer value");
-                }
-            }
-            if (plotWidth < MINIMUM_WIDTH)
-            {
-                log.warn("Minimum width of plot is 400 pixels.");
-                plotWidth = MINIMUM_WIDTH;
-            }
-
-            minimumSequenceCount = MINIMUM_SEQUENCE_COUNT;
-            if (commandLine.hasOption("minimum-sequence-count"))
-            {
-                try
-                {
-                    minimumSequenceCount = Long.parseLong(commandLine.getOptionValue("minimum-sequence-count"));
-                }
-                catch (NumberFormatException e)
-                {
-                    error("Minimum sequence count provided is not an integer value");
-                }
-            }
-
-            if (commandLine.hasOption("trim-start"))
-            {
-                try
-                {
-                    trimStart = Integer.parseInt(commandLine.getOptionValue("trim-start"));
-                }
-                catch (NumberFormatException e)
-                {
-                    error("Error parsing command line option: trim-start must be an integer number.");
-                }
-            }
-
-            if (commandLine.hasOption("trim-length"))
-            {
-                try
-                {
-                    trimLength = Integer.parseInt(commandLine.getOptionValue("trim-length"));
-                }
-                catch (NumberFormatException e)
-                {
-                    error("The trim length provided is not an integer value");
-                }
-            }
-
-            if (args.length == 0)
-            {
-                error("Error parsing command line: missing arguments", true);
-            }
-
-            resultsFiles = commandLine.getArgs();
+            log.warn("Minimum width of plot is 400 pixels.");
+            plotWidth = MINIMUM_WIDTH;
         }
-        catch (ParseException e)
+
+        Number minimumSequenceCountN = (Number)commandLine.getParsedOptionValue("minimum-sequence-count");
+        minimumSequenceCount = minimumSequenceCountN == null ? MINIMUM_SEQUENCE_COUNT : minimumSequenceCountN.longValue();
+
+        trimStart = (Number)commandLine.getParsedOptionValue("trim-start");
+        trimLength = (Number)commandLine.getParsedOptionValue("trim-length");
+
+        resultsFiles = commandLine.getArgs();
+
+        if (resultsFiles.length == 0)
         {
-            error("Error parsing command-line options: " + e.getMessage(), true);
+            error("Error parsing command line: missing arguments", true);
         }
     }
 
@@ -913,8 +860,8 @@ public class CreateReport extends CommandLineUtility
 
         addProperties(root, runProperties);
 
-        if (trimStart != null) addElement(root, "TrimStart", trimStart);
-        if (trimLength != null) addElement(root, "TrimLength", trimLength);
+        if (trimStart != null) addElement(root, "TrimStart", trimStart.intValue());
+        if (trimLength != null) addElement(root, "TrimLength", trimLength.intValue());
 
         Set<String> referenceGenomeIds = new HashSet<String>();
 

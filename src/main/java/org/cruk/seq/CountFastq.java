@@ -26,9 +26,6 @@ package org.cruk.seq;
 import java.io.File;
 
 import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.ParseException;
 import org.cruk.util.CommandLineUtility;
 import org.cruk.util.LineCounter;
 
@@ -78,41 +75,21 @@ public class CountFastq extends CommandLineUtility
     }
 
     /**
-     * Parse command line arguments.
-     *
-     * @param args
+     * {@inheritDoc}
      */
-    protected void parseCommandLineArguments(String[] args)
+    protected void parseCommandLine(CommandLine commandLine)
     {
-        CommandLineParser parser = new DefaultParser();
+        datasetId = commandLine.getOptionValue("dataset-id");
+        outputFilename = commandLine.getOptionValue("output-file");
 
-        try
+        String[] args = commandLine.getArgs();
+
+        if (args.length == 0)
         {
-            CommandLine commandLine = parser.parse(options, args);
-
-            if (commandLine.hasOption("dataset-id"))
-            {
-                datasetId = commandLine.getOptionValue("dataset-id");
-            }
-
-            if (commandLine.hasOption("output-file"))
-            {
-                outputFilename = commandLine.getOptionValue("output-file");
-            }
-
-            args = commandLine.getArgs();
-
-            if (args.length == 0)
-            {
-                error("Error parsing command line: missing FASTQ filename.", true);
-            }
-
-            fastqFilenames = args;
+            error("Error parsing command line: missing FASTQ filename.", true);
         }
-        catch (ParseException e)
-        {
-            error("Error parsing command-line options: " + e.getMessage(), true);
-        }
+
+        fastqFilenames = args;
     }
 
     /**

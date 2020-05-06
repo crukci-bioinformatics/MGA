@@ -29,9 +29,9 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.Option;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.PatternOptionBuilder;
 import org.cruk.util.CommandLineUtility;
 
 import nu.xom.Document;
@@ -80,79 +80,48 @@ public class TrimFastq extends CommandLineUtility
     @Override
     protected void setupOptions()
     {
-        options.addOption("s", "trim-start", true, "Start position for trimmed sequences (default: " + DEFAULT_START + ")");
-        options.addOption("l", "trim-length", true, "Length of trimmed sequences (default: " + DEFAULT_LENGTH + ")");
         options.addOption("o", "output-file", true, "Output file for trimmed FASTQ sequences (default: stdout)");
         options.addOption("x", "summary-file", true, "Output file containing trimming summary statistics");
+
+        Option option = new Option("s", "trim-start", true, "Start position for trimmed sequences (default: " + DEFAULT_START + ")");
+        option.setType(PatternOptionBuilder.NUMBER_VALUE);
+        option.setArgName("<int>");
+        options.addOption(option);
+
+        option = new Option("l", "trim-length", true, "Length of trimmed sequences (default: " + DEFAULT_LENGTH + ")");
+        option.setType(PatternOptionBuilder.NUMBER_VALUE);
+        option.setArgName("<int>");
+        options.addOption(option);
     }
 
-    /**
-     * Parse command line arguments.
-     *
-     * @param args
-     */
-    protected void parseCommandLineArguments(String[] args)
+    @Override
+    protected void parseCommandLine(CommandLine commandLine) throws ParseException
     {
-        CommandLineParser parser = new DefaultParser();
-
         trimStart = DEFAULT_START;
         trimLength = DEFAULT_LENGTH;
 
-        try
+        Number trimStartN = (Number)commandLine.getParsedOptionValue("trim-start");
+        trimStart = trimStartN == null ? DEFAULT_START : trimStartN.intValue();
+
+        Number trimLengthN = (Number)commandLine.getParsedOptionValue("trim-length");
+        trimLength = trimLengthN == null ? DEFAULT_LENGTH : trimLengthN.intValue();
+
+        outputFilename = commandLine.getOptionValue("output-file");
+
+        summaryFilename = commandLine.getOptionValue("summary-file");
+
+        String[] args = commandLine.getArgs();
+
+        if (args.length == 0)
         {
-            CommandLine commandLine = parser.parse(options, args);
-
-            if (commandLine.hasOption("trim-start"))
-            {
-                try
-                {
-                    trimStart = Integer.parseInt(commandLine.getOptionValue("trim-start"));
-                }
-                catch (NumberFormatException e)
-                {
-                    error("Error parsing command line option: trim-start must be an integer number.");
-                }
-            }
-
-            if (commandLine.hasOption("trim-length"))
-            {
-                try
-                {
-                    trimLength = Integer.parseInt(commandLine.getOptionValue("trim-length"));
-                }
-                catch (NumberFormatException e)
-                {
-                    error("Error parsing command line option: trim length must be an integer number");
-                }
-            }
-
-            if (commandLine.hasOption("output-file"))
-            {
-                outputFilename = commandLine.getOptionValue("output-file");
-            }
-
-            if (commandLine.hasOption("summary-file"))
-            {
-                summaryFilename = commandLine.getOptionValue("summary-file");
-            }
-
-            args = commandLine.getArgs();
-
-            if (args.length == 0)
-            {
-                error("Error parsing command line: missing FASTQ filename", true);
-            }
-            if (args.length > 1)
-            {
-                error("Error parsing command line: additional arguments and/or unrecognized options");
-            }
-
-            fastqFilename = args[0];
+            error("Error parsing command line: missing FASTQ filename", true);
         }
-        catch (ParseException e)
+        if (args.length > 1)
         {
-            error("Error parsing command-line options: " + e.getMessage(), true);
+            error("Error parsing command line: additional arguments and/or unrecognized options");
         }
+
+        fastqFilename = args[0];
     }
 
     /**

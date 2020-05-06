@@ -36,10 +36,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Option;
-import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.FileUtils;
 import org.cruk.mga.workflow.CreateMetadataFromSampleSheet;
 import org.cruk.util.CommandLineUtility;
@@ -94,7 +91,7 @@ public class BaseSpaceWrapper extends CommandLineUtility
     /**
      * Initializes a new BaseSpaceWrapper instance with the given command-line arguments.
      *
-     * @param args
+     * @param args The raw command line arguments given to the JVM.
      */
     private BaseSpaceWrapper(String[] args)
     {
@@ -113,60 +110,36 @@ public class BaseSpaceWrapper extends CommandLineUtility
     }
 
     @Override
-    protected void parseCommandLineArguments(String[] args)
+    protected void parseCommandLine(CommandLine commandLine)
     {
-        CommandLineParser parser = new DefaultParser();
+        projectId = commandLine.getOptionValue("project-id");
 
-        resourcesDirectory = CreateMetadataFromSampleSheet.DEFAULT_RESOURCES_DIR;
-        workingDirectory = DEFAULT_WORKING_DIR;
-        controlSpecies = DEFAULT_CONTROL_SPECIES;
+        resourcesDirectory = commandLine.getOptionValue("resources-directory", CreateMetadataFromSampleSheet.DEFAULT_RESOURCES_DIR);
 
-        try
+        workingDirectory = commandLine.getOptionValue("work-directory", DEFAULT_WORKING_DIR);
+
+        controlSpecies = commandLine.getOptionValue("control-species", DEFAULT_CONTROL_SPECIES);
+
+        File projectOutputDirectory = new File(APP_RESULTS_DIR, projectId);
+        projectOutputDirectory.mkdir();
+
+        resultsDirectory = new File(projectOutputDirectory, "results");
+        resultsDirectory.mkdir();
+
+        outputFilename = new File(resultsDirectory, "results.txt").getAbsolutePath();
+
+        String[] args = commandLine.getArgs();
+
+        if (args.length == 0)
         {
-            CommandLine commandLine = parser.parse(options, args);
-
-            projectId = commandLine.getOptionValue("project-id");
-
-            if (commandLine.hasOption("resources-directory"))
-            {
-                resourcesDirectory = commandLine.getOptionValue("resources-directory");
-            }
-
-            if (commandLine.hasOption("work-directory"))
-            {
-                workingDirectory = commandLine.getOptionValue("work-directory");
-            }
-
-            if (commandLine.hasOption("control-species"))
-            {
-                controlSpecies = commandLine.getOptionValue("control-species");
-            }
-
-            File projectOutputDirectory = new File(APP_RESULTS_DIR, projectId);
-            projectOutputDirectory.mkdir();
-
-            resultsDirectory = new File(projectOutputDirectory, "results");
-            resultsDirectory.mkdir();
-
-            outputFilename = new File(resultsDirectory, "results.txt").getAbsolutePath();
-
-            args = commandLine.getArgs();
-
-            if (args.length == 0)
-            {
-                error("Error parsing command line: missing AppSession JSON file name.", true);
-            }
-            if (args.length > 1)
-            {
-                error("Error parsing command line: additional arguments and/or unrecognized options.");
-            }
-
-            appSessionFilename = args[0];
+            error("Error parsing command line: missing AppSession JSON file name.", true);
         }
-        catch (ParseException e)
+        if (args.length > 1)
         {
-            error("Error parsing command-line options: " + e.getMessage(), true);
+            error("Error parsing command line: additional arguments and/or unrecognized options.");
         }
+
+        appSessionFilename = args[0];
     }
 
     @Override

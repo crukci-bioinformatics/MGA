@@ -30,9 +30,9 @@ import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 
 import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.Option;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.PatternOptionBuilder;
 import org.apache.commons.math3.random.RandomDataGenerator;
 import org.cruk.util.CommandLineUtility;
 
@@ -85,106 +85,66 @@ public class SampleFastq extends CommandLineUtility
     protected void setupOptions()
     {
         options.addOption("i", "dataset-id", true, "Identifier for the sequence dataset.");
-        options.addOption("s", "sample-size", true, "Number of sequences to sample for alignment (default: " + DEFAULT_SAMPLE_SIZE + ")");
-        options.addOption("m", "max-sample-from", true, "Maximum number of sequences to sample from (default: " + DEFAULT_MAX_SAMPLE_FROM + ")");
-        options.addOption("o", "output-file", true, "Output file for sampled FASTQ sequences");
         options.addOption("x", "summary-file", true, "Output file containing sampling summary statistics");
         options.addOption("p", "seq-id-prefix", true, "The prefix to use if renaming sequence identifiers");
+
+        Option option = new Option("o", "output-file", true, "Output file for sampled FASTQ sequences");
+        option.setRequired(true);
+        options.addOption(option);
+
+        option = new Option("s", "sample-size", true, "Number of sequences to sample for alignment (default: " + DEFAULT_SAMPLE_SIZE + ")");
+        option.setType(PatternOptionBuilder.NUMBER_VALUE);
+        option.setArgName("<int>");
+        options.addOption(option);
+
+        option = new Option("m", "max-sample-from", true, "Maximum number of sequences to sample from (default: " + DEFAULT_MAX_SAMPLE_FROM + ")");
+        option.setType(PatternOptionBuilder.NUMBER_VALUE);
+        option.setArgName("<int>");
+        options.addOption(option);
     }
 
     /**
-     * Parse command line arguments.
-     *
-     * @param args
+     * {@inheritDoc}
      */
-    protected void parseCommandLineArguments(String[] args)
+    @Override
+    protected void parseCommandLine(CommandLine commandLine) throws ParseException
     {
-        CommandLineParser parser = new DefaultParser();
+        datasetId = commandLine.getOptionValue("dataset-id");
 
-        try
+        Number sampleSizeN = (Number)commandLine.getParsedOptionValue("sample-size");
+        sampleSize = sampleSizeN == null ? DEFAULT_SAMPLE_SIZE : sampleSizeN.intValue();
+
+        if (sampleSize < 1)
         {
-            CommandLine commandLine = parser.parse(options, args);
-
-            if (commandLine.hasOption("dataset-id"))
-            {
-                datasetId = commandLine.getOptionValue("dataset-id");
-            }
-
-            if (commandLine.hasOption("sample-size"))
-            {
-                try
-                {
-                    sampleSize = Integer.parseInt(commandLine.getOptionValue("sample-size"));
-                }
-                catch (NumberFormatException e)
-                {
-                    error("Error parsing command line option: sample size must be an integer number.");
-                }
-            }
-            else
-            {
-                sampleSize = DEFAULT_SAMPLE_SIZE;
-            }
-
-            if (sampleSize < 1)
-            {
-                error("Error: invalid sample size.");
-            }
-
-            if (commandLine.hasOption("max-sample-from"))
-            {
-                try
-                {
-                    maxSampleFrom = Long.parseLong(commandLine.getOptionValue("max-sample-from"));
-                }
-                catch (NumberFormatException e)
-                {
-                    error("Error parsing command line option: maximum number to sample from must be an integer number.");
-                }
-            }
-            else
-            {
-                maxSampleFrom = DEFAULT_MAX_SAMPLE_FROM;
-            }
-
-            if (maxSampleFrom < sampleSize)
-            {
-                error("Error: sample size cannot be greater than the number of records from which to sample.");
-            }
-
-            if (commandLine.hasOption("output-file"))
-            {
-                outputFilename = commandLine.getOptionValue("output-file");
-            }
-
-            if (outputFilename == null)
-            {
-                error("Error: an output file must be specified.");
-            }
-
-            if (commandLine.hasOption("summary-file"))
-            {
-                summaryFilename = commandLine.getOptionValue("summary-file");
-            }
-
-            if (commandLine.hasOption("seq-id-prefix"))
-            {
-                prefix = commandLine.getOptionValue("seq-id-prefix");
-            }
-
-            args = commandLine.getArgs();
-
-            if (args.length == 0)
-            {
-                error("Error parsing command line: missing FASTQ filename.", true);
-            }
-
-            fastqFilenames = args;
+            error("Error: invalid sample size.");
         }
-        catch (ParseException e)
+
+        Number maxSampleFromN = (Number)commandLine.getParsedOptionValue("max-sample-from");
+        maxSampleFrom = maxSampleFromN == null ? DEFAULT_MAX_SAMPLE_FROM : maxSampleFromN.longValue();
+
+        if (maxSampleFrom < sampleSize)
         {
-            error("Error parsing command-line options: " + e.getMessage(), true);
+            error("Error: sample size cannot be greater than the number of records from which to sample.");
         }
+
+        outputFilename = commandLine.getOptionValue("output-file");
+        if (outputFilename == null)
+        {
+            error("Error: an output file must be specified.");
+        }
+
+        summaryFilename = commandLine.getOptionValue("summary-file");
+
+        prefix = commandLine.getOptionValue("seq-id-prefix");
+
+        String[] args = commandLine.getArgs();
+
+        if (args.length == 0)
+        {
+            error("Error parsing command line: missing FASTQ filename.", true);
+        }
+
+        fastqFilenames = args;
     }
 
     /**

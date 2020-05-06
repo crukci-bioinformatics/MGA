@@ -23,6 +23,9 @@
 
 package org.cruk.mga.workflow;
 
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.trim;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -31,9 +34,9 @@ import java.io.IOException;
 import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.Option;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.PatternOptionBuilder;
 import org.cruk.util.CommandLineUtility;
 import org.cruk.workflow.assembly.MetaDataLoader;
 import org.cruk.workflow.util.ApplicationContextFactory;
@@ -69,9 +72,9 @@ public class CreateMetadataFromSampleSheet extends CommandLineUtility
     public static final String DEFAULT_BOWTIE_EXECUTABLE = "bowtie";
     public static final String DEFAULT_EXONERATE_EXECUTABLE = "exonerate";
 
-    public static final int DEFAULT_SAMPLE_SIZE = 100000;
+    public static final long DEFAULT_SAMPLE_SIZE = 100000;
     public static final long DEFAULT_MAX_RECORDS_TO_SAMPLE_FROM = 5000000;
-    public static final int DEFAULT_CHUNK_SIZE = 5000000;
+    public static final long DEFAULT_CHUNK_SIZE = 5000000;
     public static final int DEFAULT_TRIM_START = 1;
     public static final int DEFAULT_TRIM_LENGTH = 36;
 
@@ -94,13 +97,13 @@ public class CreateMetadataFromSampleSheet extends CommandLineUtility
     private String outputDirectory;
     private String bowtieExecutable;
     private String exonerateExecutable;
-    private int sampleSize;
+    private long sampleSize;
     private long maxNumberOfRecordsToSampleFrom;
-    private int chunkSize;
+    private long chunkSize;
     private int trimStart;
     private int trimLength;
     private int plotWidth;
-    private int minimumSequenceCount;
+    private long minimumSequenceCount;
     private boolean separateDatasetReports;
 
     private MetaData meta;
@@ -123,9 +126,7 @@ public class CreateMetadataFromSampleSheet extends CommandLineUtility
         options.addOption(null, "run-id", true, "The run identifier used for naming jobs and as a file prefix (default: " + DEFAULT_RUN_ID + ")");
         options.addOption("o", "output-metadata-file", true, "Output pipeline metadata (configuration) file (default: stdout)");
         options.addOption("m", "mode", true, "The run mode, either local, slurm or lsf (default: " + DEFAULT_MODE + ")");
-        options.addOption("n", "max-cpu-resources", true, "Maximum number of CPU processors to use when running in local mode (default: " + DEFAULT_MAX_CPU_RESOURCES + ")");
         options.addOption("q", "queue", true, "The queue to submit to when using the Slurm or LSF scheduler (default: " + DEFAULT_QUEUE + ")");
-        options.addOption("j", "max-submitted-jobs", true, "Maximum number of submitted jobs when using the Slurm or LSF scheduler (default: " + DEFAULT_MAX_SUBMITTED_JOBS + ")");
         options.addOption("w", "working-directory", true, "The working directory (default: current directory, referred to as ${work})");
         options.addOption("t", "temp-directory", true, "The temporary directory (default: " + DEFAULT_TEMP_DIR + ")");
         options.addOption("r", "resources-directory", true, "The MGA resources directory containing the bowtie-indexes subdirectory, the adaptor sequences and the reference genome mapping (default: " + DEFAULT_RESOURCES_DIR + ", where ${install} refers to the MGA installation directory)");
@@ -133,245 +134,145 @@ public class CreateMetadataFromSampleSheet extends CommandLineUtility
         options.addOption(null, "output-directory", true, "The output directory in which the report is created (default: " + DEFAULT_OUTPUT_DIR + ")");
         options.addOption("b", "bowtie-executable", true, "The path for the bowtie executable (default: " + DEFAULT_BOWTIE_EXECUTABLE + ")");
         options.addOption("e", "exonerate-executable", true, "The path for the exonerate executable (default: " + DEFAULT_EXONERATE_EXECUTABLE + ")");
-        options.addOption("s", "sample-size", true, "The number of FASTQ records to sample for each dataset (default: " + DEFAULT_SAMPLE_SIZE + ")");
-        options.addOption(null, "max-records-to-sample-from", true, "The maximum number of FASTQ records to read (sample from) for each dataset (default: " + DEFAULT_MAX_RECORDS_TO_SAMPLE_FROM + ")");
-        options.addOption("c", "chunk-size", true, "The maximum number of FASTQ records in each chunk/alignment job (default: " + DEFAULT_CHUNK_SIZE + ")");
-        options.addOption(null, "trim-start", true, "The position within sequences from which to start trimming for alignment; any bases before this position will be trimmed (default: " + DEFAULT_TRIM_START + ")");
-        options.addOption(null, "trim-length", true, "The length to trim sequences to for alignment (default: " + DEFAULT_TRIM_LENGTH + ")");
-        options.addOption(null, "plot-width", true, "The width of the stacked bar plot in pixels (default: " + DEFAULT_PLOT_WIDTH + ")");
-        options.addOption(null, "min-sequence-count", true, "The minimum sequence count to use on the y-axis when creating the stacked bar plot (default: " + DEFAULT_MIN_SEQUENCE_COUNT + ")");
         options.addOption(null, "separate-dataset-reports", false, "If separate reports for each dataset are required");
+
+        Option option = new Option("n", "max-cpu-resources", true, "Maximum number of CPU processors to use when running in local mode (default: " + DEFAULT_MAX_CPU_RESOURCES + ")");
+        option.setType(PatternOptionBuilder.NUMBER_VALUE);
+        option.setArgName("<int>");
+        options.addOption(option);
+
+        option = new Option("j", "max-submitted-jobs", true, "Maximum number of submitted jobs when using the Slurm or LSF scheduler (default: " + DEFAULT_MAX_SUBMITTED_JOBS + ")");
+        option.setType(PatternOptionBuilder.NUMBER_VALUE);
+        option.setArgName("<int>");
+        options.addOption(option);
+
+        option = new Option("s", "sample-size", true, "The number of FASTQ records to sample for each dataset (default: " + DEFAULT_SAMPLE_SIZE + ")");
+        option.setType(PatternOptionBuilder.NUMBER_VALUE);
+        option.setArgName("<int>");
+        options.addOption(option);
+
+        option = new Option(null, "max-records-to-sample-from", true, "The maximum number of FASTQ records to read (sample from) for each dataset (default: " + DEFAULT_MAX_RECORDS_TO_SAMPLE_FROM + ")");
+        option.setType(PatternOptionBuilder.NUMBER_VALUE);
+        option.setArgName("<int>");
+        options.addOption(option);
+
+        option = new Option("c", "chunk-size", true, "The maximum number of FASTQ records in each chunk/alignment job (default: " + DEFAULT_CHUNK_SIZE + ")");
+        option.setType(PatternOptionBuilder.NUMBER_VALUE);
+        option.setArgName("<int>");
+        options.addOption(option);
+
+        option = new Option(null, "trim-start", true, "The position within sequences from which to start trimming for alignment; any bases before this position will be trimmed (default: " + DEFAULT_TRIM_START + ")");
+        option.setType(PatternOptionBuilder.NUMBER_VALUE);
+        option.setArgName("<int>");
+        options.addOption(option);
+
+        option = new Option(null, "trim-length", true, "The length to trim sequences to for alignment (default: " + DEFAULT_TRIM_LENGTH + ")");
+        option.setType(PatternOptionBuilder.NUMBER_VALUE);
+        option.setArgName("<int>");
+        options.addOption(option);
+
+        option = new Option(null, "plot-width", true, "The width of the stacked bar plot in pixels (default: " + DEFAULT_PLOT_WIDTH + ")");
+        option.setType(PatternOptionBuilder.NUMBER_VALUE);
+        option.setArgName("<int>");
+        options.addOption(option);
+
+        option = new Option(null, "min-sequence-count", true, "The minimum sequence count to use on the y-axis when creating the stacked bar plot (default: " + DEFAULT_MIN_SEQUENCE_COUNT + ")");
+        option.setType(PatternOptionBuilder.NUMBER_VALUE);
+        option.setArgName("<int>");
+        options.addOption(option);
     }
 
     /**
-     * Parse command line arguments.
-     *
-     * @param args
+     * {@inheritDoc}
      */
     @Override
-    protected void parseCommandLineArguments(String[] args)
+    protected void parseCommandLine(CommandLine commandLine) throws ParseException
     {
-        CommandLineParser parser = new DefaultParser();
+        runId = trim(commandLine.getOptionValue("run-id"));
 
-        mode = DEFAULT_MODE;
-        maxCpuResources = DEFAULT_MAX_CPU_RESOURCES;
-        queue = DEFAULT_QUEUE;
-        maxSubmittedJobs = DEFAULT_MAX_SUBMITTED_JOBS;
-        workingDirectory = DEFAULT_WORKING_DIR;
-        temporaryDirectory = DEFAULT_TEMP_DIR;
-        resourcesDirectory = DEFAULT_RESOURCES_DIR;
-        dataDirectory = DEFAULT_DATA_DIR;
-        outputDirectory = DEFAULT_OUTPUT_DIR;
-        bowtieExecutable = DEFAULT_BOWTIE_EXECUTABLE;
-        exonerateExecutable = DEFAULT_EXONERATE_EXECUTABLE;
-        sampleSize = DEFAULT_SAMPLE_SIZE;
-        maxNumberOfRecordsToSampleFrom = DEFAULT_MAX_RECORDS_TO_SAMPLE_FROM;
-        chunkSize = DEFAULT_CHUNK_SIZE;
-        trimStart = DEFAULT_TRIM_START;
-        trimLength = DEFAULT_TRIM_LENGTH;
-        plotWidth = DEFAULT_PLOT_WIDTH;
-        minimumSequenceCount = DEFAULT_MIN_SEQUENCE_COUNT;
-        separateDatasetReports = DEFAULT_SEPARATE_DATASET_REPORTS;
+        outputFilename = commandLine.getOptionValue("output-metadata-file");
 
-        try
+        mode = commandLine.getOptionValue("mode", DEFAULT_MODE).toLowerCase();
+        switch (mode)
         {
-            CommandLine commandLine = parser.parse(options, args);
+            case "local":
+            case "slurm":
+            case "lsf":
+                // Ok.
+                break;
 
-            if (commandLine.hasOption("run-id"))
-            {
-                runId = commandLine.getOptionValue("run-id").trim();
-            }
-
-            if (commandLine.hasOption("output-metadata-file"))
-            {
-                outputFilename = commandLine.getOptionValue("output-metadata-file");
-            }
-
-            if (commandLine.hasOption("mode"))
-            {
-                mode = commandLine.getOptionValue("mode").toLowerCase();
-                if (!mode.equals("local") && !mode.equals("slurm") && !mode.equals("lsf"))
-                {
-                    error("Error: unrecognized execution mode: " + commandLine.getOptionValue("mode") + " (can be either local, slurm or lsf)");
-                }
-            }
-
-            if (commandLine.hasOption("max-cpu-resources"))
-            {
-                try
-                {
-                    maxCpuResources = Integer.parseInt(commandLine.getOptionValue("max-cpu-resources"));
-                }
-                catch (NumberFormatException e)
-                {
-                    error("Error parsing command line option: max-cpu-resources must be an integer number.");
-                }
-            }
-
-            if (commandLine.hasOption("queue"))
-            {
-                queue = commandLine.getOptionValue("queue");
-            }
-
-            if (commandLine.hasOption("max-submitted-jobs"))
-            {
-                try
-                {
-                    maxSubmittedJobs = Integer.parseInt(commandLine.getOptionValue("max-submitted-jobs"));
-                }
-                catch (NumberFormatException e)
-                {
-                    error("Error parsing command line option: max-submitted-jobs must be an integer number.");
-                }
-            }
-
-            if (commandLine.hasOption("working-directory"))
-            {
-                workingDirectory = commandLine.getOptionValue("working-directory");
-            }
-
-            if (commandLine.hasOption("temp-directory"))
-            {
-                temporaryDirectory = commandLine.getOptionValue("temp-directory");
-            }
-
-            if (commandLine.hasOption("resources-directory"))
-            {
-                resourcesDirectory = commandLine.getOptionValue("resources-directory");
-            }
-
-            if (commandLine.hasOption("data-directory"))
-            {
-                dataDirectory = commandLine.getOptionValue("data-directory");
-            }
-
-            if (commandLine.hasOption("output-directory"))
-            {
-                outputDirectory = commandLine.getOptionValue("output-directory");
-            }
-
-            if (commandLine.hasOption("bowtie-executable"))
-            {
-                bowtieExecutable = commandLine.getOptionValue("bowtie-executable");
-            }
-
-            if (commandLine.hasOption("exonerate-executable"))
-            {
-                exonerateExecutable = commandLine.getOptionValue("exonerate-executable");
-            }
-
-            if (commandLine.hasOption("sample-size"))
-            {
-                try
-                {
-                    sampleSize = Integer.parseInt(commandLine.getOptionValue("sample-size"));
-                }
-                catch (NumberFormatException e)
-                {
-                    error("Error parsing command line option: sample-size must be an integer number.");
-                }
-            }
-
-            if (commandLine.hasOption("max-records-to-sample-from"))
-            {
-                try
-                {
-                    maxNumberOfRecordsToSampleFrom = Long.parseLong(commandLine.getOptionValue("max-records-to-sample-from"));
-                }
-                catch (NumberFormatException e)
-                {
-                    error("Error parsing command line option: max-records-to-sample-from must be an integer number.");
-                }
-            }
-
-            if (commandLine.hasOption("chunk-size"))
-            {
-                try
-                {
-                    chunkSize = Integer.parseInt(commandLine.getOptionValue("chunk-size"));
-                }
-                catch (NumberFormatException e)
-                {
-                    error("Error parsing command line option: chunk-size must be an integer number.");
-                }
-            }
-
-            if (commandLine.hasOption("trim-start"))
-            {
-                try
-                {
-                    trimStart = Integer.parseInt(commandLine.getOptionValue("trim-start"));
-                }
-                catch (NumberFormatException e)
-                {
-                    error("Error parsing command line option: trim-start must be an integer number.");
-                }
-            }
-
-            if (commandLine.hasOption("trim-length"))
-            {
-                try
-                {
-                    trimLength = Integer.parseInt(commandLine.getOptionValue("trim-length"));
-                }
-                catch (NumberFormatException e)
-                {
-                    error("Error parsing command line option: trim-length must be an integer number.");
-                }
-            }
-
-            if (commandLine.hasOption("plot-width"))
-            {
-                try
-                {
-                    plotWidth = Integer.parseInt(commandLine.getOptionValue("plot-width"));
-                }
-                catch (NumberFormatException e)
-                {
-                    error("Error parsing command line option: plot-width must be an integer number.");
-                }
-            }
-
-            if (commandLine.hasOption("min-sequence-count"))
-            {
-                try
-                {
-                    minimumSequenceCount = Integer.parseInt(commandLine.getOptionValue("min-sequence-count"));
-                }
-                catch (NumberFormatException e)
-                {
-                    error("Error parsing command line option: min-sequence-count must be an integer number.");
-                }
-            }
-
-            if (commandLine.hasOption("separate-dataset-reports"))
-            {
-                separateDatasetReports = commandLine.hasOption("separate-dataset-reports");
-            }
-
-            args = commandLine.getArgs();
-
-            if (args.length < 1)
-            {
-                error("Error parsing command line: missing arguments", true);
-            }
-
-            sampleSheetFilename = args[0];
+            default:
+                error("Error: unrecognized execution mode: " + commandLine.getOptionValue("mode") + " (can be either local, slurm or lsf)");
+                break;
         }
-        catch (ParseException e)
+
+        Number maxCpuResourcesN = (Number)commandLine.getParsedOptionValue("max-cpu-resources");
+        maxCpuResources = maxCpuResourcesN == null ? DEFAULT_MAX_CPU_RESOURCES : maxCpuResourcesN.intValue();
+
+        Number maxSubmittedJobsN = (Number)commandLine.getParsedOptionValue("max-submitted-jobs");
+        maxSubmittedJobs = maxSubmittedJobsN == null ? DEFAULT_MAX_SUBMITTED_JOBS : maxSubmittedJobsN.intValue();
+
+        queue = commandLine.getOptionValue("queue", DEFAULT_QUEUE);
+
+        workingDirectory = commandLine.getOptionValue("working-directory", DEFAULT_WORKING_DIR);
+
+        temporaryDirectory = commandLine.getOptionValue("temp-directory", DEFAULT_TEMP_DIR);
+
+        resourcesDirectory = commandLine.getOptionValue("resources-directory", DEFAULT_RESOURCES_DIR);
+
+        dataDirectory = commandLine.getOptionValue("data-directory", DEFAULT_DATA_DIR);
+
+        outputDirectory = commandLine.getOptionValue("output-directory", DEFAULT_OUTPUT_DIR);
+
+        bowtieExecutable = commandLine.getOptionValue("bowtie-executable", DEFAULT_BOWTIE_EXECUTABLE);
+
+        exonerateExecutable = commandLine.getOptionValue("exonerate-executable", DEFAULT_EXONERATE_EXECUTABLE);
+
+        Number sampleSizeN = (Number)commandLine.getParsedOptionValue("sample-size");
+        sampleSize = sampleSizeN == null ? DEFAULT_SAMPLE_SIZE : sampleSizeN.longValue();
+
+        Number maxNumberOfRecordsToSampleFromN = (Number)commandLine.getParsedOptionValue("max-records-to-sample-from");
+        maxNumberOfRecordsToSampleFrom = maxNumberOfRecordsToSampleFromN == null ? DEFAULT_MAX_RECORDS_TO_SAMPLE_FROM : maxNumberOfRecordsToSampleFromN.longValue();
+
+        Number chunkSizeN = (Number)commandLine.getParsedOptionValue("chunk-size");
+        chunkSize = chunkSizeN == null ? DEFAULT_CHUNK_SIZE : chunkSizeN.longValue();
+
+        Number trimStartN = (Number)commandLine.getParsedOptionValue("trim-start");
+        trimStart = trimStartN == null ? DEFAULT_TRIM_START : trimStartN.intValue();
+
+        Number trimLengthN = (Number)commandLine.getParsedOptionValue("trim-length");
+        trimLength = trimLengthN == null ? DEFAULT_TRIM_LENGTH : trimLengthN.intValue();
+
+        Number plotWidthN = (Number)commandLine.getParsedOptionValue("plot-width");
+        plotWidth = plotWidthN == null ? DEFAULT_PLOT_WIDTH : plotWidthN.intValue();
+
+        Number minimumSequenceCountN = (Number)commandLine.getParsedOptionValue("min-sequence-count");
+        minimumSequenceCount = minimumSequenceCountN == null ? DEFAULT_MIN_SEQUENCE_COUNT : minimumSequenceCountN.intValue();
+
+        separateDatasetReports = commandLine.hasOption("separate-dataset-reports");
+
+        String[] args = commandLine.getArgs();
+
+        if (args.length < 1)
         {
-            error("Error parsing command-line options: " + e.getMessage(), true);
+            error("Error parsing command line: missing arguments", true);
         }
+
+        sampleSheetFilename = args[0];
     }
 
     protected void populateMeta()
     {
         readSampleSheet();
 
-        if (runId == null || runId.trim().length() == 0)
+        if (isBlank(runId))
+        {
             runId = DEFAULT_RUN_ID;
+        }
         else
+        {
             runId = runId.trim().replaceAll("\\s+", "_");
+        }
 
         meta.setPipeline("${install}/pipelines/mga.xml");
         meta.setMode(mode);
@@ -406,13 +307,13 @@ public class CreateMetadataFromSampleSheet extends CommandLineUtility
         meta.setVariable("referenceGenomeMappingFile", "${resourcesDir}/reference_genome_mappings.txt");
         meta.setVariable("bowtieExecutable", bowtieExecutable);
         meta.setVariable("exonerateExecutable", exonerateExecutable);
-        meta.setVariable("sampleSize", Integer.toString(sampleSize));
+        meta.setVariable("sampleSize", Long.toString(sampleSize));
         meta.setVariable("maxNumberOfRecordsToSampleFrom", Long.toString(maxNumberOfRecordsToSampleFrom));
-        meta.setVariable("chunkSize", Integer.toString(chunkSize));
+        meta.setVariable("chunkSize", Long.toString(chunkSize));
         meta.setVariable("trimStart", Integer.toString(trimStart));
         meta.setVariable("trimLength", Integer.toString(trimLength));
         meta.setVariable("plotWidth", Integer.toString(plotWidth));
-        meta.setVariable("minimumSequenceCount", Integer.toString(minimumSequenceCount));
+        meta.setVariable("minimumSequenceCount", Long.toString(minimumSequenceCount));
         meta.setVariable("separateDatasetReports", Boolean.toString(separateDatasetReports));
     }
 
