@@ -79,11 +79,11 @@ import nu.xom.ValidityException;
 
 public class CreateReport extends CommandLineUtility
 {
-    private static final String[] SPECIES_PROPERTY_NAMES = new String[] { "Species", "species" };
-    private static final String[] CONTROL_PROPERTY_NAMES = new String[] { "Control", "control" };
+    protected static final String[] SPECIES_PROPERTY_NAMES = new String[] { "Species", "species" };
+    protected static final String[] CONTROL_PROPERTY_NAMES = new String[] { "Control", "control" };
     private static final int DEFAULT_WIDTH = 800;
     private static final int MINIMUM_WIDTH = 600;
-    private static final long MINIMUM_SEQUENCE_COUNT = 10;
+    protected static final long MINIMUM_SEQUENCE_COUNT = 10;
     private static final int[] INTERVALS = new int[] {5, 10, 25};
     private static final int OPTIMUM_NO_INTERVALS = 6;
     private static final float ROW_HEIGHT_SCALING_FACTOR = 1.5f;
@@ -97,29 +97,29 @@ public class CreateReport extends CommandLineUtility
     private static final float MIN_ERROR = 0.0025f;
     private static final float MAX_ERROR = 0.01f;
 
-    private String runId;
-    private Integer trimStart;
-    private Integer trimLength;
-    private String outputPrefix;
-    private String sampleSheetFilename;
-    private String referenceGenomeMappingFilename;
-    private String xslStyleSheetFilename;
-    private boolean separateDatasetReports;
-    private String datasetReportFilenamePrefix;
-    private int plotWidth;
-    private long minimumSequenceCount;
-    private String[] resultsFiles;
+    protected String runId;
+    protected Integer trimStart;
+    protected Integer trimLength;
+    protected String outputPrefix;
+    protected String sampleSheetFilename;
+    protected String referenceGenomeMappingFilename;
+    protected String xslStyleSheetFilename;
+    protected boolean separateDatasetReports;
+    protected String datasetReportFilenamePrefix;
+    protected int plotWidth;
+    protected long minimumSequenceCount;
+    protected String[] resultsFiles;
 
     private Font font = new Font("SansSerif", Font.PLAIN, DEFAULT_FONT_SIZE);
     private Font axisFont = new Font("SansSerif", Font.PLAIN, DEFAULT_AXIS_FONT_SIZE);
     private int gapSize = DEFAULT_GAP_SIZE;
     private float scaleFactor = 1.0f;
 
-    private ReferenceGenomeSpeciesMapping referenceGenomeSpeciesMapping = new ReferenceGenomeSpeciesMapping();
-    private Map<String, MultiGenomeAlignmentSummary> multiGenomeAlignmentSummaries = new TreeMap<String, MultiGenomeAlignmentSummary>();
-    private Map<String, String> datasetDisplayLabels = new HashMap<String, String>();
+    protected ReferenceGenomeSpeciesMapping referenceGenomeSpeciesMapping = new ReferenceGenomeSpeciesMapping();
+    protected Map<String, MultiGenomeAlignmentSummary> multiGenomeAlignmentSummaries = new TreeMap<String, MultiGenomeAlignmentSummary>();
+    protected Map<String, String> datasetDisplayLabels = new HashMap<String, String>();
 
-    private Builder xmlParser = new Builder();
+    protected Builder xmlParser = new Builder();
 
     /**
      * Runs the CreateReport utility with the given command-line arguments.
@@ -137,16 +137,13 @@ public class CreateReport extends CommandLineUtility
      *
      * @param args
      */
-    private CreateReport(String[] args)
+    protected CreateReport(String[] args)
     {
         super("results_files", args);
     }
 
-    @Override
-    protected void parseCommandLineArguments(String[] args)
+    protected void setupOptions()
     {
-        CommandLineParser parser = new DefaultParser();
-
         Option option = new Option("i", "run-id", true, "The run identifier");
         option.setRequired(true);
         options.addOption(option);
@@ -160,6 +157,12 @@ public class CreateReport extends CommandLineUtility
         options.addOption("m", "minimum-sequence-count", true, "The minimum number of sequences to display on the x-axis.");
         options.addOption(null, "trim-start", true, "The position within sequences from which to start trimming for alignment; any bases before this position will be trimmed");
         options.addOption(null, "trim-length", true, "The length to trim sequences to for alignment");
+    }
+
+    @Override
+    protected void parseCommandLineArguments(String[] args)
+    {
+        CommandLineParser parser = new DefaultParser();
 
         outputPrefix = "results";
         separateDatasetReports = false;
@@ -273,11 +276,21 @@ public class CreateReport extends CommandLineUtility
     @Override
     protected void run() throws IOException, ValidityException, ParsingException, TransformerException
     {
+        readSourceFiles();
+        writeReportFiles();
+    }
+
+    protected void readSourceFiles() throws IOException, ValidityException, ParsingException
+    {
         readReferenceGenomeMapping();
         readCountSummaryFiles();
         readSamplingSummaryFiles();
         readAdapterAlignmentFiles();
         readAlignments();
+    }
+
+    protected void writeReportFiles() throws IOException, TransformerException
+    {
         OrderedProperties runProperties = readSampleSheet();
         String imageFilename = outputPrefix + ".png";
         String htmlFilename = outputPrefix + ".html";
@@ -295,11 +308,13 @@ public class CreateReport extends CommandLineUtility
                 String prefix = datasetReportFilenamePrefix + datasetId;
                 htmlFilename = prefix + ".html";
                 imageFilename = prefix + ".png";
-                String xmlFilename = prefix + ".xml";
                 createSummaryPlot(summaries, imageFilename);
-                PrintStream printStream = new PrintStream(new BufferedOutputStream(new FileOutputStream(xmlFilename)));
-                writeReport(summaries, runProperties, printStream, imageFilename, xmlFilename, htmlFilename);
-                printStream.close();
+
+                String xmlFilename = prefix + ".xml";
+                try (PrintStream printStream = new PrintStream(new BufferedOutputStream(new FileOutputStream(xmlFilename))))
+                {
+                    writeReport(summaries, runProperties, printStream, imageFilename, xmlFilename, htmlFilename);
+                }
             }
         }
     }
@@ -310,7 +325,7 @@ public class CreateReport extends CommandLineUtility
      * @throws IOException
      * @throws FileNotFoundException
      */
-    private void readReferenceGenomeMapping() throws FileNotFoundException, IOException
+    protected void readReferenceGenomeMapping() throws FileNotFoundException, IOException
     {
         if (referenceGenomeMappingFilename != null)
         {
@@ -324,7 +339,7 @@ public class CreateReport extends CommandLineUtility
      * @param referenceGenomeId
      * @return
      */
-    private String getReferenceGenomeName(String referenceGenomeId)
+    protected String getReferenceGenomeName(String referenceGenomeId)
     {
         String name = referenceGenomeSpeciesMapping.getSpecies(referenceGenomeId);
         return name == null ? referenceGenomeId : name;
@@ -337,7 +352,7 @@ public class CreateReport extends CommandLineUtility
      * @param species
      * @return
      */
-    private String getPreferredSpeciesName(String species)
+    protected String getPreferredSpeciesName(String species)
     {
         String referenceGenomeId = referenceGenomeSpeciesMapping.getReferenceGenomeId(species);
         if (referenceGenomeId == null)
@@ -353,7 +368,7 @@ public class CreateReport extends CommandLineUtility
     /**
      * Reads the sample sheet and adds sample information to the alignment summaries.
      */
-    private OrderedProperties readSampleSheet()
+    protected OrderedProperties readSampleSheet()
     {
         OrderedProperties properties = new OrderedProperties();
         if (sampleSheetFilename == null || sampleSheetFilename.isEmpty()) return properties;
@@ -422,7 +437,7 @@ public class CreateReport extends CommandLineUtility
                                 value = "No";
                             }
                         }
-                        sampleProperties.setProperty(name, value);
+                        sampleProperties.put(name, value);
                     }
                 }
                 else
@@ -440,7 +455,7 @@ public class CreateReport extends CommandLineUtility
                     {
                         if (fields.length > 1)
                         {
-                            properties.setProperty(fields[0], fields[1]);
+                            properties.put(fields[0], fields[1]);
                         }
                     }
                 }
@@ -472,7 +487,7 @@ public class CreateReport extends CommandLineUtility
      * @throws ParsingException
      * @throws IOException
      */
-    private void readCountSummaryFiles() throws ValidityException, ParsingException, IOException
+    protected void readCountSummaryFiles() throws ValidityException, ParsingException, IOException
     {
         for (String file : resultsFiles)
         {
@@ -492,7 +507,7 @@ public class CreateReport extends CommandLineUtility
      * @throws ParsingException
      * @throws IOException
      */
-    private void readCountSummaryFile(String file) throws ValidityException, ParsingException, IOException
+    protected void readCountSummaryFile(String file) throws ValidityException, ParsingException, IOException
     {
         Document document = xmlParser.build(file);
         Element root = document.getRootElement();
@@ -515,7 +530,7 @@ public class CreateReport extends CommandLineUtility
      * @throws ParsingException
      * @throws IOException
      */
-    private void readSamplingSummaryFiles() throws ValidityException, ParsingException, IOException
+    protected void readSamplingSummaryFiles() throws ValidityException, ParsingException, IOException
     {
         for (String file : resultsFiles)
         {
@@ -534,7 +549,7 @@ public class CreateReport extends CommandLineUtility
      * @throws ParsingException
      * @throws IOException
      */
-    private void readSamplingSummaryFile(String file) throws ValidityException, ParsingException, IOException
+    protected void readSamplingSummaryFile(String file) throws ValidityException, ParsingException, IOException
     {
         Document document = xmlParser.build(file);
         Element root = document.getRootElement();
@@ -559,7 +574,7 @@ public class CreateReport extends CommandLineUtility
      * @param name
      * @return
      */
-    private String getValue(Element parent, String name)
+    protected String getValue(Element parent, String name)
     {
         Element child = parent.getFirstChildElement(name);
         if (child == null)
@@ -577,7 +592,7 @@ public class CreateReport extends CommandLineUtility
      * @param name
      * @return
      */
-    private int getIntegerValue(Element parent, String name)
+    protected int getIntegerValue(Element parent, String name)
     {
         String value = getValue(parent, name);
         int integerValue = 0;
@@ -600,7 +615,7 @@ public class CreateReport extends CommandLineUtility
      * @param name
      * @return
      */
-    private long getLongValue(Element parent, String name)
+    protected long getLongValue(Element parent, String name)
     {
         String value = getValue(parent, name);
         long longValue = 0;
@@ -620,7 +635,7 @@ public class CreateReport extends CommandLineUtility
      *
      * @throws IOException
      */
-    private void readAdapterAlignmentFiles() throws IOException
+    protected void readAdapterAlignmentFiles() throws IOException
     {
         for (String file : resultsFiles)
         {
@@ -637,7 +652,7 @@ public class CreateReport extends CommandLineUtility
      * @param file
      * @throws IOException
      */
-    private void readAdapterAlignmentFile(String file) throws IOException
+    protected void readAdapterAlignmentFile(String file) throws IOException
     {
         Map<String, Set<Integer>> alignedIdsByDataset = new HashMap<String, Set<Integer>>();
         BufferedReader reader = new BufferedReader(new FileReader(file));
@@ -689,7 +704,7 @@ public class CreateReport extends CommandLineUtility
      *
      * @throws IOException
      */
-    private void readAlignments() throws IOException
+    protected void readAlignments() throws IOException
     {
         // determine which results files are bowtie alignment output files
         List<String> alignmentFileList = new ArrayList<String>();
@@ -887,7 +902,9 @@ public class CreateReport extends CommandLineUtility
      * @throws IOException
      * @throws TransformerException
      */
-    private void writeReport(Collection<MultiGenomeAlignmentSummary> multiGenomeAlignmentSummaries, OrderedProperties runProperties, PrintStream out, String imageFilename, String xmlFilename, String htmlFilename)
+    protected void writeReport(Collection<MultiGenomeAlignmentSummary> multiGenomeAlignmentSummaries,
+                               OrderedProperties runProperties, PrintStream out, String imageFilename,
+                               String xmlFilename, String htmlFilename)
             throws IOException, TransformerException
     {
         Element root = new Element("MultiGenomeAlignmentSummaries");
@@ -987,29 +1004,28 @@ public class CreateReport extends CommandLineUtility
         }
     }
 
-    private void addElement(Element parent, String name, String value)
+    protected void addElement(Element parent, String name, String value)
     {
         Element element = new Element(name);
         element.appendChild(value);
         parent.appendChild(element);
     }
 
-    private void addElement(Element parent, String name, int value)
+    protected void addElement(Element parent, String name, int value)
     {
         addElement(parent, name, Integer.toString(value));
     }
 
-    private void addProperties(Element parent, OrderedProperties properties)
+    protected void addProperties(Element parent, OrderedProperties properties)
     {
         Element propertiesElement = new Element("Properties");
         parent.appendChild(propertiesElement);
 
-
-        for (String name : properties.getPropertyNames())
+        for (Map.Entry<String, String> prop : properties.entrySet())
         {
-            String value = properties.getProperty(name);
+            String value = prop.getValue();
             Element propertyElement = new Element("Property");
-            propertyElement.addAttribute(new Attribute("name", name));
+            propertyElement.addAttribute(new Attribute("name", prop.getKey()));
             if (value != null && value.length() > 0)
             {
                 propertyElement.addAttribute(new Attribute("value", value));
@@ -1025,7 +1041,7 @@ public class CreateReport extends CommandLineUtility
      * @param the name of the image file
      * @throws IOException
      */
-    private void createSummaryPlot(Collection<MultiGenomeAlignmentSummary> multiGenomeAlignmentSummaries, String imageFilename) throws IOException
+    protected void createSummaryPlot(Collection<MultiGenomeAlignmentSummary> multiGenomeAlignmentSummaries, String imageFilename) throws IOException
     {
         if (imageFilename == null) return;
 
@@ -1122,7 +1138,7 @@ public class CreateReport extends CommandLineUtility
      * @param multiGenomeAlignmentSummaries
      * @return
      */
-    private long getMaximumSequenceCount(Collection<MultiGenomeAlignmentSummary> multiGenomeAlignmentSummaries)
+    protected long getMaximumSequenceCount(Collection<MultiGenomeAlignmentSummary> multiGenomeAlignmentSummaries)
     {
         long maxSequenceCount = 0;
         for (MultiGenomeAlignmentSummary multiGenomeAlignmentSummary : multiGenomeAlignmentSummaries)

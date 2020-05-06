@@ -117,16 +117,9 @@ public class CreateMetadataFromSampleSheet extends CommandLineUtility
         meta = new MetaData();
     }
 
-    /**
-     * Parse command line arguments.
-     *
-     * @param args
-     */
     @Override
-    protected void parseCommandLineArguments(String[] args)
+    protected void setupOptions()
     {
-        CommandLineParser parser = new DefaultParser();
-
         options.addOption(null, "run-id", true, "The run identifier used for naming jobs and as a file prefix (default: " + DEFAULT_RUN_ID + ")");
         options.addOption("o", "output-metadata-file", true, "Output pipeline metadata (configuration) file (default: stdout)");
         options.addOption("m", "mode", true, "The run mode, either local, slurm or lsf (default: " + DEFAULT_MODE + ")");
@@ -148,6 +141,17 @@ public class CreateMetadataFromSampleSheet extends CommandLineUtility
         options.addOption(null, "plot-width", true, "The width of the stacked bar plot in pixels (default: " + DEFAULT_PLOT_WIDTH + ")");
         options.addOption(null, "min-sequence-count", true, "The minimum sequence count to use on the y-axis when creating the stacked bar plot (default: " + DEFAULT_MIN_SEQUENCE_COUNT + ")");
         options.addOption(null, "separate-dataset-reports", false, "If separate reports for each dataset are required");
+    }
+
+    /**
+     * Parse command line arguments.
+     *
+     * @param args
+     */
+    @Override
+    protected void parseCommandLineArguments(String[] args)
+    {
+        CommandLineParser parser = new DefaultParser();
 
         mode = DEFAULT_MODE;
         maxCpuResources = DEFAULT_MAX_CPU_RESOURCES;

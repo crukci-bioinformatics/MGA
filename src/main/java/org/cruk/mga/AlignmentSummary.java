@@ -23,14 +23,18 @@
 
 package org.cruk.mga;
 
+import java.io.Serializable;
+
 /**
  * Class used to represent the summary of an alignment of a sequence
  * dataset against a specific reference genome.
  *
  * @author eldrid01
  */
-public class AlignmentSummary
+public class AlignmentSummary implements Serializable
 {
+    private static final long serialVersionUID = 1121576146340427575L;
+
     private String referenceGenomeId;
     private int alignedCount = 0;
     private int totalAlignedSequenceLength = 0;

@@ -102,16 +102,20 @@ public class BaseSpaceWrapper extends CommandLineUtility
     }
 
     @Override
-    protected void parseCommandLineArguments(String[] args)
+    protected void setupOptions()
     {
-        CommandLineParser parser = new DefaultParser();
-
         Option option = new Option("p", "project-id", true, "Project identifier.");
         option.setRequired(true);
         options.addOption(option);
         options.addOption("r", "resources-directory", true, "The MGA resources directory containing the bowtie-indexes subdirectory, the adaptor sequences and the reference genome mapping (default: " + CreateMetadataFromSampleSheet.DEFAULT_RESOURCES_DIR + ", where ${install} refers to the MGA installation directory)");
         options.addOption("w", "work-directory", true, "The working directory in which MGA will be run (default: " + DEFAULT_WORKING_DIR + ")");
         options.addOption("c", "control-species", true, "The control species (default: " + DEFAULT_CONTROL_SPECIES  + ")");
+    }
+
+    @Override
+    protected void parseCommandLineArguments(String[] args)
+    {
+        CommandLineParser parser = new DefaultParser();
 
         resourcesDirectory = CreateMetadataFromSampleSheet.DEFAULT_RESOURCES_DIR;
         workingDirectory = DEFAULT_WORKING_DIR;

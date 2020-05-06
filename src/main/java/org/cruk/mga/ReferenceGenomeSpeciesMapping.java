@@ -27,6 +27,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -41,8 +42,10 @@ import java.util.Properties;
  *
  * @author eldrid01
  */
-public class ReferenceGenomeSpeciesMapping
+public class ReferenceGenomeSpeciesMapping implements Serializable
 {
+    private static final long serialVersionUID = 4030199690379891172L;
+
     private Map<String, String> referenceGenomeSpeciesLookup = new HashMap<String, String>();
     private Map<String, String> referenceGenomeIdLookup = new HashMap<String, String>();
 

@@ -31,8 +31,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
-import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipInputStream;
+
+import org.cruk.workflow.util.GzipUtils;
 
 /**
  * Utility class for count lines in a file.
@@ -48,68 +49,31 @@ public class LineCounter
      * @return
      * @throws IOException
      */
-    public long getLineCount(String filename) throws IOException
+    public long getLineCount(File file) throws IOException
     {
-
         long lineCount = 0;
-        try
+
+        InputStream inputStream;
+        if (file.getName().toLowerCase().endsWith(".zip"))
         {
-            lineCount = getLineCountUnix(filename);
+            // assumes single entry in the zip archive
+            ZipInputStream zstream = new ZipInputStream(new FileInputStream(file));
+            zstream.getNextEntry();
+            inputStream = zstream;
         }
-        catch (Exception e)
+        else
         {
-            e.printStackTrace();
+            inputStream = GzipUtils.openInputStream(file);
         }
 
-        if (lineCount == 0)
+        try (LineNumberReader reader = new LineNumberReader(new InputStreamReader(inputStream)))
         {
-            InputStream inputStream = new FileInputStream(filename);
-            if (filename.endsWith(".gz"))
-            {
-                inputStream = new GZIPInputStream(inputStream);
-            }
-            else if (filename.toLowerCase().endsWith(".zip"))
-            {
-                // assumes single entry in the zip archive
-                inputStream = new ZipInputStream(inputStream);
-                ((ZipInputStream)inputStream).getNextEntry();
-            }
-            LineNumberReader reader = new LineNumberReader(new InputStreamReader(inputStream));
-//            while (reader.readLine() != null) {}
+            // while (reader.readLine() != null) {}
             // slightly more efficient than reading the file line by line using readLine
             reader.skip(Long.MAX_VALUE);
             lineCount = reader.getLineNumber();
-            reader.close();
         }
 
-        return lineCount;
-    }
-
-    /**
-     * Using Unix commands, principally wc -l, to obtain the number of lines
-     * in a file.
-     *
-     * Can handle gzipped compressed files.
-     *
-     * @param filename the file name
-     * @return the line count
-     * @throws Exception
-     */
-    private long getLineCountUnix(String filename) throws Exception
-    {
-        String[] command = new String[] { "wc", "-l", filename };
-        if (filename.endsWith(".gz"))
-        {
-            command = new String[] { "sh",  "-c", "gunzip -c " + filename + " | wc -l" };
-        }
-        else if (filename.toLowerCase().endsWith(".zip"))
-        {
-            command = new String[] { "sh",  "-c", "unzip -p " + filename + " | wc -l" };
-        }
-        Process process = new ProcessBuilder(command).start();
-        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-        long lineCount = Long.parseLong(reader.readLine().trim().split("\\s")[0]);
-        reader.close();
         return lineCount;
     }
 
@@ -122,13 +86,12 @@ public class LineCounter
      * @param filename the name of the file.
      * @return an estimate of the number of lines.
      */
-    public long estimateLineCount(String filename) throws IOException
+    public long estimateLineCount(File file) throws IOException
     {
         int n = 1000;
         int count = 0;
-        File file = new File(filename);
-        BufferedReader reader = new BufferedReader(new FileReader(file));
-        try
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(file)))
         {
             for (int i = 0; i < n; i++)
             {
@@ -137,10 +100,6 @@ public class LineCounter
                 count += line.length() + 1;
             }
             return (long)(1000 * (file.length() / (double)count));
-        }
-        finally
-        {
-            reader.close();
         }
     }
 }

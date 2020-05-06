@@ -68,8 +68,14 @@ public abstract class CommandLineUtility
     public CommandLineUtility(String argumentsDisplayString, String[] args)
     {
         this.argumentsDisplayString = argumentsDisplayString;
+        setupOptions();
         parseCommandLineArguments(args);
     }
+
+    /**
+     * Populate the options object held by this utility.
+     */
+    protected abstract void setupOptions();
 
     /**
      * Parses command line arguments. Subclasses should implement this abstract

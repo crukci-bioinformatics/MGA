@@ -23,38 +23,56 @@
 
 package org.cruk.util;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import org.apache.commons.collections4.map.LinkedMap;
 
 /**
  * Simple class for holding name/value properties and which retains the order
- * in which these are inserted.
+ * in which these are inserted. Refactored in release 1.6 to use the {@link LinkedMap}
+ * class as its implementation, which does the same job.
  */
-public class OrderedProperties
+public class OrderedProperties extends LinkedMap<String, String>
 {
-    private List<String> names = new ArrayList<String>();
-    private Map<String, String> values = new HashMap<String, String>();
+    private static final long serialVersionUID = 8837732667981161564L;
 
+    /**
+     * Get the key set as an array.
+     *
+     * @return The key set as an array.
+     *
+     * @deprecated Use {@link #keySet()} instead and work with the collection.
+     */
+    @Deprecated
     public String[] getPropertyNames()
     {
-        return names.toArray(new String[0]);
+        return keySet().toArray(new String[0]);
     }
 
+    /**
+     * Set a key to a value.
+     *
+     * @param name The key.
+     * @param value The value;
+     *
+     * @deprecated Use {@link #put(String, String)} instead.
+     */
+    @Deprecated
     public void setProperty(String name, String value)
     {
-        if (names.contains(name))
-        {
-            names.remove(name);
-        }
-        names.add(name);
-        values.put(name, value);
+        put(name, value);
     }
 
+    /**
+     * Get a value by key.
+     *
+     * @param name The key of the value to get.
+     *
+     * @return The value matching the given key, or null if there is no match.
+     *
+     * @deprecated Use {@link #get(Object)} instead.
+     */
     public String getProperty(String name)
     {
-        return values.get(name);
+        return get(name);
     }
 
     /**
@@ -68,15 +86,23 @@ public class OrderedProperties
     {
         for (String name : names)
         {
-            String value = values.get(name);
+            String value = get(name);
             if (value != null) return value;
         }
         return null;
     }
 
+    /**
+     * Remove a key and value from the map.
+     *
+     * @param name The key.
+     * @return The value removed, or null.
+     *
+     * @deprecated Use {@link #remove(Object)} instead.
+     */
+    @Deprecated
     public String removeProperty(String name)
     {
-        names.remove(name);
-        return values.remove(name);
+        return remove(name);
     }
 }

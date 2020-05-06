@@ -23,16 +23,19 @@
 
 package org.cruk.mga;
 
+import java.io.Serializable;
+
 import org.cruk.common.comparators.numericname.NumericAwareComparator;
 
-public class Alignment implements Comparable<Alignment>
+public class Alignment implements Comparable<Alignment>, Serializable
 {
+    private static final long serialVersionUID = -8470534783944707744L;
+
     private String datasetId;
     private int sequenceId;
     private String referenceGenomeId;
     private int alignedLength;
     private int mismatchCount;
-    private NumericAwareComparator numericAwareComparator = new NumericAwareComparator();
 
     public Alignment(String datasetId, int sequenceId, String referenceGenomeId, int alignedLength, int mismatchCount)
     {
@@ -71,7 +74,7 @@ public class Alignment implements Comparable<Alignment>
     @Override
     public int compareTo(Alignment other)
     {
-        int cmp = numericAwareComparator.compare(datasetId, other.datasetId);
+        int cmp = NumericAwareComparator.instance().compare(datasetId, other.datasetId);
         if (cmp != 0) return cmp;
         cmp = sequenceId - other.sequenceId;
         if (cmp != 0) return cmp;

@@ -23,6 +23,7 @@
 
 package org.cruk.mga;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -37,8 +38,10 @@ import org.cruk.util.OrderedProperties;
  * @author eldrid01
  *
  */
-public class MultiGenomeAlignmentSummary
+public class MultiGenomeAlignmentSummary implements Serializable
 {
+    private static final long serialVersionUID = 7594987898110254817L;
+
     private String datasetId;
     private long sequenceCount;
     private int sampledCount;

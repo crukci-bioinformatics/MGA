@@ -23,6 +23,8 @@
 
 package org.cruk.seq;
 
+import java.io.File;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -66,6 +68,16 @@ public class CountFastq extends CommandLineUtility
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void setupOptions()
+    {
+        options.addOption("i", "dataset-id", true, "Identifier for the sequence dataset.");
+        options.addOption("o", "output-file", true, "Output file to write number of FASTQ records to.");
+    }
+
+    /**
      * Parse command line arguments.
      *
      * @param args
@@ -73,9 +85,6 @@ public class CountFastq extends CommandLineUtility
     protected void parseCommandLineArguments(String[] args)
     {
         CommandLineParser parser = new DefaultParser();
-
-        options.addOption("i", "dataset-id", true, "Identifier for the sequence dataset.");
-        options.addOption("o", "output-file", true, "Output file to write number of FASTQ records to.");
 
         try
         {
@@ -113,11 +122,12 @@ public class CountFastq extends CommandLineUtility
      */
     protected void run() throws Exception
     {
+        LineCounter lineCounter = new LineCounter();
+
         long recordCount = 0;
         for (String fastqFilename : fastqFilenames)
         {
-            LineCounter lineCounter = new LineCounter();
-            long lineCount = lineCounter.getLineCount(fastqFilename);
+            long lineCount = lineCounter.getLineCount(new File(fastqFilename));
             recordCount += lineCount / 4;
         }
 

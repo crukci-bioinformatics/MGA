@@ -75,6 +75,18 @@ public class TrimFastq extends CommandLineUtility
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void setupOptions()
+    {
+        options.addOption("s", "trim-start", true, "Start position for trimmed sequences (default: " + DEFAULT_START + ")");
+        options.addOption("l", "trim-length", true, "Length of trimmed sequences (default: " + DEFAULT_LENGTH + ")");
+        options.addOption("o", "output-file", true, "Output file for trimmed FASTQ sequences (default: stdout)");
+        options.addOption("x", "summary-file", true, "Output file containing trimming summary statistics");
+    }
+
+    /**
      * Parse command line arguments.
      *
      * @param args
@@ -82,11 +94,6 @@ public class TrimFastq extends CommandLineUtility
     protected void parseCommandLineArguments(String[] args)
     {
         CommandLineParser parser = new DefaultParser();
-
-        options.addOption("s", "trim-start", true, "Start position for trimmed sequences (default: " + DEFAULT_START + ")");
-        options.addOption("l", "trim-length", true, "Length of trimmed sequences (default: " + DEFAULT_LENGTH + ")");
-        options.addOption("o", "output-file", true, "Output file for trimmed FASTQ sequences (default: stdout)");
-        options.addOption("x", "summary-file", true, "Output file containing trimming summary statistics");
 
         trimStart = DEFAULT_START;
         trimLength = DEFAULT_LENGTH;

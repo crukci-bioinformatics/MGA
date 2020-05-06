@@ -79,6 +79,20 @@ public class SampleFastq extends CommandLineUtility
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void setupOptions()
+    {
+        options.addOption("i", "dataset-id", true, "Identifier for the sequence dataset.");
+        options.addOption("s", "sample-size", true, "Number of sequences to sample for alignment (default: " + DEFAULT_SAMPLE_SIZE + ")");
+        options.addOption("m", "max-sample-from", true, "Maximum number of sequences to sample from (default: " + DEFAULT_MAX_SAMPLE_FROM + ")");
+        options.addOption("o", "output-file", true, "Output file for sampled FASTQ sequences");
+        options.addOption("x", "summary-file", true, "Output file containing sampling summary statistics");
+        options.addOption("p", "seq-id-prefix", true, "The prefix to use if renaming sequence identifiers");
+    }
+
+    /**
      * Parse command line arguments.
      *
      * @param args
@@ -86,13 +100,6 @@ public class SampleFastq extends CommandLineUtility
     protected void parseCommandLineArguments(String[] args)
     {
         CommandLineParser parser = new DefaultParser();
-
-        options.addOption("i", "dataset-id", true, "Identifier for the sequence dataset.");
-        options.addOption("s", "sample-size", true, "Number of sequences to sample for alignment (default: " + DEFAULT_SAMPLE_SIZE + ")");
-        options.addOption("m", "max-sample-from", true, "Maximum number of sequences to sample from (default: " + DEFAULT_MAX_SAMPLE_FROM + ")");
-        options.addOption("o", "output-file", true, "Output file for sampled FASTQ sequences");
-        options.addOption("x", "summary-file", true, "Output file containing sampling summary statistics");
-        options.addOption("p", "seq-id-prefix", true, "The prefix to use if renaming sequence identifiers");
 
         try
         {

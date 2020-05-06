@@ -69,6 +69,16 @@ public class MergeAndSplitFastq extends CommandLineUtility
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void setupOptions()
+    {
+        options.addOption("p", "output-prefix", true, "The prefix to use for merged/split FASTQ output files (default: " + outputFilePrefix + ")");
+        options.addOption("n", "records-per-file", true, "The maximum number of records per FASTQ output file (default: " + recordsPerFile + ")");
+    }
+
+    /**
      * Parse command line arguments.
      *
      * @param args
@@ -76,9 +86,6 @@ public class MergeAndSplitFastq extends CommandLineUtility
     protected void parseCommandLineArguments(String[] args)
     {
         CommandLineParser parser = new DefaultParser();
-
-        options.addOption("p", "output-prefix", true, "The prefix to use for merged/split FASTQ output files (default: " + outputFilePrefix + ")");
-        options.addOption("n", "records-per-file", true, "The maximum number of records per FASTQ output file (default: " + recordsPerFile + ")");
 
         try
         {
