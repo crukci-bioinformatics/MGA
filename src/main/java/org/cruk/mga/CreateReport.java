@@ -149,6 +149,7 @@ public class CreateReport extends CommandLineUtility
         Option option = new Option("i", "run-id", true, "The run identifier");
         option.setRequired(true);
         options.addOption(option);
+
         options.addOption("o", "output-filename-prefix", true, "File name prefix for output report, image and xml file");
         options.addOption("s", "sample-sheet-file", true, "Sample sheet file");
         options.addOption("r", "reference-genome-mapping-file", true, "Reference genome to species mapping file");
