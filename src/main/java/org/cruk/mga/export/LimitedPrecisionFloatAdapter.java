@@ -8,7 +8,7 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 public class LimitedPrecisionFloatAdapter extends XmlAdapter<String, Number>
 {
-    private static final NumberFormat FIVEDP_FORMAT = NumberFormat.getNumberInstance();
+    static final NumberFormat FIVEDP_FORMAT = NumberFormat.getNumberInstance();
 
     static
     {

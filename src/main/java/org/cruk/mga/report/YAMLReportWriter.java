@@ -8,18 +8,19 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.Writer;
 
-import javax.xml.transform.TransformerException;
-
 import org.apache.commons.io.output.FileWriterWithEncoding;
 import org.cruk.mga.MGAConfig;
 import org.cruk.mga.export.AllMGASummaries;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
 public class YAMLReportWriter extends MGAReportWriter
 {
     protected static YAMLFactory yfactory = new YAMLFactory();
+
+    protected ObjectWriter jacksonWriter;
 
     static
     {
@@ -30,16 +31,22 @@ public class YAMLReportWriter extends MGAReportWriter
 
     public YAMLReportWriter()
     {
+        ObjectMapper mapper = new ObjectMapper(yfactory);
+
+        jacksonWriter = mapper.writerFor(AllMGASummaries.class);
     }
 
     protected void writeTheReport(MGAConfig config, AllMGASummaries summaries)
-    throws IOException, TransformerException
+    throws IOException
     {
-        ObjectMapper mapper = new ObjectMapper(yfactory);
-
         try (Writer writer = new BufferedWriter(new FileWriterWithEncoding(config.getYamlFile(), outputEncoding)))
         {
-            mapper.writeValue(writer, summaries);
+            jacksonWriter.writeValue(writer, summaries);
+        }
+        catch (IOException e)
+        {
+            config.getYamlFile().delete();
+            throw e;
         }
     }
 }

@@ -185,7 +185,7 @@ public class CreateReport extends CommandLineUtility
 
         new XMLReportWriter().writeReport(config, referenceGenomeSpeciesMapping, multiGenomeAlignmentSummaries.values(), datasetDisplayLabels, runProperties);
 
-        // new YAMLReportWriter().writeReport(config, referenceGenomeSpeciesMapping, multiGenomeAlignmentSummaries.values(), datasetDisplayLabels, runProperties);
+        new YAMLReportWriter().writeReport(config, referenceGenomeSpeciesMapping, multiGenomeAlignmentSummaries.values(), datasetDisplayLabels, runProperties);
     }
 
     /**
