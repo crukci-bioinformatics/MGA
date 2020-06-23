@@ -23,28 +23,14 @@
 
 package org.cruk.mga;
 
-import java.awt.AlphaComposite;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Composite;
-import java.awt.Font;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
-import java.awt.image.BufferedImage;
-import java.io.BufferedOutputStream;
+import static org.cruk.mga.MGAConfig.DEFAULT_PLOT_WIDTH;
+
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -52,71 +38,32 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import javax.imageio.ImageIO;
-import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PatternOptionBuilder;
-import org.apache.commons.codec.binary.Base64;
+import org.cruk.mga.report.SummaryPlotter;
+import org.cruk.mga.report.XMLReportWriter;
+import org.cruk.mga.report.YAMLReportWriter;
 import org.cruk.util.CommandLineUtility;
 import org.cruk.util.OrderedProperties;
 
-import nu.xom.Attribute;
 import nu.xom.Builder;
 import nu.xom.Document;
 import nu.xom.Element;
 import nu.xom.ParsingException;
-import nu.xom.Serializer;
 import nu.xom.ValidityException;
 
 public class CreateReport extends CommandLineUtility
 {
-    protected static final String[] SPECIES_PROPERTY_NAMES = new String[] { "Species", "species" };
-    protected static final String[] CONTROL_PROPERTY_NAMES = new String[] { "Control", "control" };
-    private static final int DEFAULT_WIDTH = 800;
-    private static final int MINIMUM_WIDTH = 600;
-    protected static final long MINIMUM_SEQUENCE_COUNT = 10;
-    private static final int[] INTERVALS = new int[] {5, 10, 25};
-    private static final int OPTIMUM_NO_INTERVALS = 6;
-    private static final float ROW_HEIGHT_SCALING_FACTOR = 1.5f;
-    private static final float ROW_GAP_SCALING_FACTOR = 2.0f;
-    private static final int DEFAULT_FONT_SIZE = 12;
-    private static final int DEFAULT_AXIS_FONT_SIZE = 10;
-    private static final int DEFAULT_GAP_SIZE = 10;
-    private static final Color ADAPTER_COLOR = new Color(255, 102, 255);
-    private static final float MAX_ALPHA = 1.0f;
-    private static final float MIN_ALPHA = 0.1f;
-    private static final float MIN_ERROR = 0.0025f;
-    private static final float MAX_ERROR = 0.01f;
-
-    protected String runId;
-    protected Number trimStart;
-    protected Number trimLength;
-    protected String outputPrefix;
-    protected String sampleSheetFilename;
-    protected String referenceGenomeMappingFilename;
-    protected String xslStyleSheetFilename;
-    protected boolean separateDatasetReports;
-    protected String datasetReportFilenamePrefix;
-    protected int plotWidth;
-    protected long minimumSequenceCount;
+    protected MGAConfig config;
     protected String[] resultsFiles;
 
-    private Font font = new Font("SansSerif", Font.PLAIN, DEFAULT_FONT_SIZE);
-    private Font axisFont = new Font("SansSerif", Font.PLAIN, DEFAULT_AXIS_FONT_SIZE);
-    private int gapSize = DEFAULT_GAP_SIZE;
-    private float scaleFactor = 1.0f;
-
     protected ReferenceGenomeSpeciesMapping referenceGenomeSpeciesMapping = new ReferenceGenomeSpeciesMapping();
-    protected Map<String, MultiGenomeAlignmentSummary> multiGenomeAlignmentSummaries = new TreeMap<String, MultiGenomeAlignmentSummary>();
-    protected Map<String, String> datasetDisplayLabels = new HashMap<String, String>();
+    protected Map<String, MultiGenomeAlignmentSummary> multiGenomeAlignmentSummaries = new TreeMap<>();
+    protected Map<String, String> datasetDisplayLabels = new HashMap<>();
 
     protected Builder xmlParser = new Builder();
 
@@ -162,7 +109,7 @@ public class CreateReport extends CommandLineUtility
         option.setArgName("<int>");
         options.addOption(option);
 
-        option = new Option("w", "plot-width", true, "The width of the plot in pixels (default: " + DEFAULT_WIDTH + ")");
+        option = new Option("w", "plot-width", true, "The width of the plot in pixels (default: " + DEFAULT_PLOT_WIDTH + ")");
         option.setType(PatternOptionBuilder.NUMBER_VALUE);
         option.setArgName("<size>");
         options.addOption(option);
@@ -184,34 +131,29 @@ public class CreateReport extends CommandLineUtility
     @Override
     protected void parseCommandLine(CommandLine commandLine) throws ParseException
     {
-        runId = commandLine.getOptionValue("run-id");
+        config = new MGAConfig();
 
-        outputPrefix = commandLine.getOptionValue("output-filename-prefix", "results");
-        outputFilename = outputPrefix + ".xml";
+        config.setRunId(commandLine.getOptionValue("run-id"));
 
-        sampleSheetFilename = commandLine.getOptionValue("sample-sheet-file");
+        config.setOutputPrefix(commandLine.getOptionValue("output-filename-prefix", "results"));
 
-        referenceGenomeMappingFilename = commandLine.getOptionValue("reference-genome-mapping-file");
+        config.setSampleSheetFilename(commandLine.getOptionValue("sample-sheet-file"));
 
-        xslStyleSheetFilename = commandLine.getOptionValue("xsl-stylesheet-file");
+        config.setReferenceGenomeMappingFilename(commandLine.getOptionValue("reference-genome-mapping-file"));
 
-        separateDatasetReports = commandLine.hasOption("separate-dataset-reports");
+        config.setXSLStyleSheetFilename(commandLine.getOptionValue("xsl-stylesheet-file"));
 
-        datasetReportFilenamePrefix = commandLine.getOptionValue("dataset-report-filename-prefix", "results_");
+        config.setSeparateDatasetReports(commandLine.hasOption("separate-dataset-reports"));
 
-        Number plotWidthN = (Number)commandLine.getParsedOptionValue("plot-width");
-        plotWidth = plotWidthN == null ? DEFAULT_WIDTH : plotWidthN.intValue();
-        if (plotWidth < MINIMUM_WIDTH)
-        {
-            log.warn("Minimum width of plot is 400 pixels.");
-            plotWidth = MINIMUM_WIDTH;
-        }
+        config.setDatasetReportFilenamePrefix(commandLine.getOptionValue("dataset-report-filename-prefix", "results_"));
 
-        Number minimumSequenceCountN = (Number)commandLine.getParsedOptionValue("minimum-sequence-count");
-        minimumSequenceCount = minimumSequenceCountN == null ? MINIMUM_SEQUENCE_COUNT : minimumSequenceCountN.longValue();
+        config.setPlotWidth((Number)commandLine.getParsedOptionValue("plot-width"));
 
-        trimStart = (Number)commandLine.getParsedOptionValue("trim-start");
-        trimLength = (Number)commandLine.getParsedOptionValue("trim-length");
+        config.setMinimumSequenceCount((Number)commandLine.getParsedOptionValue("minimum-sequence-count"));
+
+        config.setTrimStart((Number)commandLine.getParsedOptionValue("trim-start"));
+
+        config.setTrimLength((Number)commandLine.getParsedOptionValue("trim-length"));
 
         resultsFiles = commandLine.getArgs();
 
@@ -240,31 +182,12 @@ public class CreateReport extends CommandLineUtility
     protected void writeReportFiles() throws IOException, TransformerException
     {
         OrderedProperties runProperties = readSampleSheet();
-        String imageFilename = outputPrefix + ".png";
-        String htmlFilename = outputPrefix + ".html";
-        createSummaryPlot(multiGenomeAlignmentSummaries.values(), imageFilename);
-        writeReport(multiGenomeAlignmentSummaries.values(), runProperties, out, imageFilename, outputFilename, htmlFilename);
 
-        if (separateDatasetReports)
-        {
-            Collection<MultiGenomeAlignmentSummary> summaries = new ArrayList<MultiGenomeAlignmentSummary>();
-            for (MultiGenomeAlignmentSummary multiGenomeAlignmentSummary : multiGenomeAlignmentSummaries.values())
-            {
-                summaries.clear();
-                summaries.add(multiGenomeAlignmentSummary);
-                String datasetId = multiGenomeAlignmentSummary.getDatasetId();
-                String prefix = datasetReportFilenamePrefix + datasetId;
-                htmlFilename = prefix + ".html";
-                imageFilename = prefix + ".png";
-                createSummaryPlot(summaries, imageFilename);
+        new SummaryPlotter().createSummaryPlot(config, referenceGenomeSpeciesMapping, multiGenomeAlignmentSummaries.values(), datasetDisplayLabels);
 
-                String xmlFilename = prefix + ".xml";
-                try (PrintStream printStream = new PrintStream(new BufferedOutputStream(new FileOutputStream(xmlFilename))))
-                {
-                    writeReport(summaries, runProperties, printStream, imageFilename, xmlFilename, htmlFilename);
-                }
-            }
-        }
+        new XMLReportWriter().writeReport(config, referenceGenomeSpeciesMapping, multiGenomeAlignmentSummaries.values(), datasetDisplayLabels, runProperties);
+
+        new YAMLReportWriter().writeReport(config, referenceGenomeSpeciesMapping, multiGenomeAlignmentSummaries.values(), datasetDisplayLabels, runProperties);
     }
 
     /**
@@ -275,9 +198,9 @@ public class CreateReport extends CommandLineUtility
      */
     protected void readReferenceGenomeMapping() throws FileNotFoundException, IOException
     {
-        if (referenceGenomeMappingFilename != null)
+        if (config.hasReferenceGenomeMapping())
         {
-            referenceGenomeSpeciesMapping.loadFromPropertiesFile(referenceGenomeMappingFilename);
+            referenceGenomeSpeciesMapping.loadFromPropertiesFile(config.getReferenceGenomeMappingFile());
         }
     }
 
@@ -319,109 +242,96 @@ public class CreateReport extends CommandLineUtility
     protected OrderedProperties readSampleSheet()
     {
         OrderedProperties properties = new OrderedProperties();
-        if (sampleSheetFilename == null || sampleSheetFilename.isEmpty()) return properties;
 
-        BufferedReader reader = null;
-        try
+        if (config.hasSampleSheet())
         {
-            reader = new BufferedReader(new FileReader(sampleSheetFilename));
-        }
-        catch (FileNotFoundException e)
-        {
-            error("Error: could not find file " + sampleSheetFilename);
-        }
+            File sampleSheetFile = config.getSampleSheetFile();
 
-        try
-        {
-            boolean inDatasetSection = false;
-            String[] samplePropertyNames = null;
-
-            String line = null;
-            while ((line = reader.readLine()) != null)
+            try (BufferedReader reader = new BufferedReader(new FileReader(sampleSheetFile)))
             {
-                line = line.trim();
-                if (line.startsWith("#")) continue;
+                boolean inDatasetSection = false;
+                String[] samplePropertyNames = null;
 
-                String[] fields = line.split("\\t");
-                if (fields.length == 0) continue;
-                for (int i = 0; i < fields.length; i++)
+                String line = null;
+                while ((line = reader.readLine()) != null)
                 {
-                    fields[i] = fields[i].trim();
-                }
+                    line = line.trim();
+                    if (line.startsWith("#")) continue;
 
-                if (inDatasetSection)
-                {
-                    String datasetDisplayLabel = fields[0].trim();
-                    if (datasetDisplayLabel.length() == 0) continue;
-
-                    String datasetId = datasetDisplayLabel.replaceAll("\\s+", "_");
-                    datasetDisplayLabels.put(datasetId, datasetDisplayLabel);
-
-                    MultiGenomeAlignmentSummary multiGenomeAlignmentSummary = multiGenomeAlignmentSummaries.get(datasetId);
-                    if (multiGenomeAlignmentSummary == null) continue;
-
-                    OrderedProperties sampleProperties = new OrderedProperties();
-                    multiGenomeAlignmentSummary.getSampleProperties().add(sampleProperties);
-
-                    for (int i = 1; i < Math.min(samplePropertyNames.length, fields.length); i++)
+                    String[] fields = line.split("\\t");
+                    if (fields.length == 0) continue;
+                    for (int i = 0; i < fields.length; i++)
                     {
-                        String name = samplePropertyNames[i];
-                        if (name.equalsIgnoreCase("File")) continue;
-                        String value = fields[i].trim();
-                        if (name.equalsIgnoreCase("Species"))
-                        {
-                            name = "Species";
-                            value = getPreferredSpeciesName(value);
-                        }
-                        if (name.equalsIgnoreCase("Control"))
-                        {
-                            name = "Control";
-                            if (value.equalsIgnoreCase("Y") || value.equalsIgnoreCase("Yes"))
-                            {
-                                value = "Yes";
-                            }
-                            else if (value.equalsIgnoreCase("N") || value.equalsIgnoreCase("No"))
-                            {
-                                value = "No";
-                            }
-                        }
-                        sampleProperties.put(name, value);
+                        fields[i] = fields[i].trim();
                     }
-                }
-                else
-                {
-                    if (fields[0].equalsIgnoreCase("DatasetId"))
+
+                    if (inDatasetSection)
                     {
-                        inDatasetSection = true;
-                        samplePropertyNames = fields;
-                        for (int i = 0; i < samplePropertyNames.length; i++)
+                        String datasetDisplayLabel = fields[0].trim();
+                        if (datasetDisplayLabel.length() == 0) continue;
+
+                        String datasetId = datasetDisplayLabel.replaceAll("\\s+", "_");
+                        datasetDisplayLabels.put(datasetId, datasetDisplayLabel);
+
+                        MultiGenomeAlignmentSummary multiGenomeAlignmentSummary = multiGenomeAlignmentSummaries.get(datasetId);
+                        if (multiGenomeAlignmentSummary == null) continue;
+
+                        OrderedProperties sampleProperties = new OrderedProperties();
+                        multiGenomeAlignmentSummary.getSampleProperties().add(sampleProperties);
+
+                        for (int i = 1; i < Math.min(samplePropertyNames.length, fields.length); i++)
                         {
-                            samplePropertyNames[i] = samplePropertyNames[i].trim();
+                            String name = samplePropertyNames[i];
+                            if (name.equalsIgnoreCase("File")) continue;
+                            String value = fields[i].trim();
+                            if (name.equalsIgnoreCase("Species"))
+                            {
+                                name = "Species";
+                                value = getPreferredSpeciesName(value);
+                            }
+                            if (name.equalsIgnoreCase("Control"))
+                            {
+                                name = "Control";
+                                if (value.equalsIgnoreCase("Y") || value.equalsIgnoreCase("Yes"))
+                                {
+                                    value = "Yes";
+                                }
+                                else if (value.equalsIgnoreCase("N") || value.equalsIgnoreCase("No"))
+                                {
+                                    value = "No";
+                                }
+                            }
+                            sampleProperties.put(name, value);
                         }
                     }
                     else
                     {
-                        if (fields.length > 1)
+                        if (fields[0].equalsIgnoreCase("DatasetId"))
                         {
-                            properties.put(fields[0], fields[1]);
+                            inDatasetSection = true;
+                            samplePropertyNames = fields;
+                            for (int i = 0; i < samplePropertyNames.length; i++)
+                            {
+                                samplePropertyNames[i] = samplePropertyNames[i].trim();
+                            }
+                        }
+                        else
+                        {
+                            if (fields.length > 1)
+                            {
+                                properties.put(fields[0], fields[1]);
+                            }
                         }
                     }
                 }
             }
-        }
-        catch (IOException e)
-        {
-            error(e);
-        }
-        finally
-        {
-            try
+            catch (FileNotFoundException e)
             {
-                reader.close();
+                error("Error: could not find file " + sampleSheetFile.getName());
             }
             catch (IOException e)
             {
-                error("Error closing file " + sampleSheetFilename);
+                error(e);
             }
         }
 
@@ -665,7 +575,7 @@ public class CreateReport extends CommandLineUtility
         }
         String[] alignmentFiles = alignmentFileList.toArray(new String[0]);
 
-        AlignmentReader reader = new AlignmentReader(alignmentFiles, runId);
+        AlignmentReader reader = new AlignmentReader(alignmentFiles, config.getRunId());
 
         // initialize reference genome index mapping
         // initialize alignment summary for each reference genome and dataset
@@ -792,7 +702,7 @@ public class CreateReport extends CommandLineUtility
             datasetScores.put(multiGenomeAlignmentSummary.getDatasetId(), scores);
         }
 
-        reader = new AlignmentReader(alignmentFiles, runId);
+        reader = new AlignmentReader(alignmentFiles, config.getRunId());
 
         while (true)
         {
@@ -835,582 +745,6 @@ public class CreateReport extends CommandLineUtility
             alignmentSummary.incrementAssignedCount();
             alignmentSummary.addAssignedSequenceLength(assigned.getAlignedLength());
             alignmentSummary.addAssignedMismatchCount(assigned.getMismatchCount());
-        }
-    }
-
-    /**
-     * Writes the alignment summary report.
-     *
-     * @param multiGenomeAlignmentSummaries
-     * @param runProperties
-     * @param out
-     * @param imageFilename
-     * @param xmlFilename
-     * @param htmlFilename
-     * @throws IOException
-     * @throws TransformerException
-     */
-    protected void writeReport(Collection<MultiGenomeAlignmentSummary> multiGenomeAlignmentSummaries,
-                               OrderedProperties runProperties, PrintStream out, String imageFilename,
-                               String xmlFilename, String htmlFilename)
-            throws IOException, TransformerException
-    {
-        Element root = new Element("MultiGenomeAlignmentSummaries");
-
-        addElement(root, "RunId", runId);
-
-        addProperties(root, runProperties);
-
-        if (trimStart != null) addElement(root, "TrimStart", trimStart.intValue());
-        if (trimLength != null) addElement(root, "TrimLength", trimLength.intValue());
-
-        Set<String> referenceGenomeIds = new HashSet<String>();
-
-        for (MultiGenomeAlignmentSummary multiGenomeAlignmentSummary : multiGenomeAlignmentSummaries)
-        {
-            Element multiGenomeAlignmentSummaryElement = new Element("MultiGenomeAlignmentSummary");
-            root.appendChild(multiGenomeAlignmentSummaryElement);
-
-            String datasetId = multiGenomeAlignmentSummary.getDatasetId();
-            String datasetDisplayLabel = datasetDisplayLabels.get(datasetId);
-
-            addElement(multiGenomeAlignmentSummaryElement, "DatasetId", datasetDisplayLabel);
-            addElement(multiGenomeAlignmentSummaryElement, "SequenceCount", Long.toString(multiGenomeAlignmentSummary.getSequenceCount()));
-            addElement(multiGenomeAlignmentSummaryElement, "SampledCount", multiGenomeAlignmentSummary.getSampledCount());
-            addElement(multiGenomeAlignmentSummaryElement, "AdapterCount", multiGenomeAlignmentSummary.getAdapterCount());
-            addElement(multiGenomeAlignmentSummaryElement, "UnmappedCount", multiGenomeAlignmentSummary.getUnmappedCount());
-
-            Element alignmentSummariesElement = new Element("AlignmentSummaries");
-            multiGenomeAlignmentSummaryElement.appendChild(alignmentSummariesElement);
-
-            for (AlignmentSummary alignmentSummary : multiGenomeAlignmentSummary.getAlignmentSummaries())
-            {
-                Element alignmentSummaryElement = new Element("AlignmentSummary");
-                alignmentSummariesElement.appendChild(alignmentSummaryElement);
-
-                String referenceGenomeId = alignmentSummary.getReferenceGenomeId();
-                referenceGenomeIds.add(referenceGenomeId);
-                Element referenceGenomeElement = new Element("ReferenceGenome");
-                alignmentSummaryElement.appendChild(referenceGenomeElement);
-                referenceGenomeElement.addAttribute(new Attribute("id", referenceGenomeId));
-                referenceGenomeElement.addAttribute(new Attribute("name", getReferenceGenomeName(referenceGenomeId)));
-
-                addElement(alignmentSummaryElement, "AlignedCount", alignmentSummary.getAlignedCount());
-                addElement(alignmentSummaryElement, "ErrorRate", String.format("%.5f", alignmentSummary.getErrorRate()));
-                addElement(alignmentSummaryElement, "UniquelyAlignedCount", alignmentSummary.getUniquelyAlignedCount());
-                addElement(alignmentSummaryElement, "UniquelyAlignedErrorRate", String.format("%.5f", alignmentSummary.getUniquelyAlignedErrorRate()));
-                addElement(alignmentSummaryElement, "PreferentiallyAlignedCount", alignmentSummary.getPreferentiallyAlignedCount());
-                addElement(alignmentSummaryElement, "PreferentiallyAlignedErrorRate", String.format("%.5f", alignmentSummary.getPreferentiallyAlignedErrorRate()));
-                addElement(alignmentSummaryElement, "AssignedCount", alignmentSummary.getAssignedCount());
-                addElement(alignmentSummaryElement, "AssignedErrorRate", String.format("%.5f", alignmentSummary.getAssignedErrorRate()));
-            }
-
-            Element samplesElement = new Element("Samples");
-            multiGenomeAlignmentSummaryElement.appendChild(samplesElement);
-
-            for (OrderedProperties sampleProperties : multiGenomeAlignmentSummary.getSampleProperties())
-            {
-                Element sampleElement = new Element("Sample");
-                samplesElement.appendChild(sampleElement);
-                addProperties(sampleElement, sampleProperties);
-            }
-        }
-
-        Element referenceGenomesElement = new Element("ReferenceGenomes");
-        root.appendChild(referenceGenomesElement);
-        for (String referenceGenomeId : referenceGenomeIds)
-        {
-            Element referenceGenomeElement = new Element("ReferenceGenome");
-            referenceGenomesElement.appendChild(referenceGenomeElement);
-            referenceGenomeElement.addAttribute(new Attribute("id", referenceGenomeId));
-            referenceGenomeElement.addAttribute(new Attribute("name", getReferenceGenomeName(referenceGenomeId)));
-        }
-
-        Document document = new Document(root);
-
-        Serializer serializer = new Serializer(out, "ISO-8859-1");
-        serializer.setIndent(2);
-        serializer.setLineSeparator("\n");
-        serializer.write(document);
-        out.close();
-
-        if (xslStyleSheetFilename != null)
-        {
-            File imageFile = new File(imageFilename);
-            FileInputStream imageInputStream = new FileInputStream(imageFile);
-            byte imageByteArray[] = new byte[(int)imageFile.length()];
-            imageInputStream.read(imageByteArray);
-            imageInputStream.close();
-
-            String imageBase64String = Base64.encodeBase64String(imageByteArray);
-            TransformerFactory factory = TransformerFactory.newInstance();
-            Source xslt = new StreamSource(new File(xslStyleSheetFilename));
-            Transformer transformer = factory.newTransformer(xslt);
-            transformer.setParameter("image", imageBase64String);
-            Source xmlSource = new StreamSource(new File(xmlFilename));
-            transformer.transform(xmlSource, new StreamResult(new File(htmlFilename)));
-        }
-    }
-
-    protected void addElement(Element parent, String name, String value)
-    {
-        Element element = new Element(name);
-        element.appendChild(value);
-        parent.appendChild(element);
-    }
-
-    protected void addElement(Element parent, String name, int value)
-    {
-        addElement(parent, name, Integer.toString(value));
-    }
-
-    protected void addProperties(Element parent, OrderedProperties properties)
-    {
-        Element propertiesElement = new Element("Properties");
-        parent.appendChild(propertiesElement);
-
-        for (Map.Entry<String, String> prop : properties.entrySet())
-        {
-            String value = prop.getValue();
-            Element propertyElement = new Element("Property");
-            propertyElement.addAttribute(new Attribute("name", prop.getKey()));
-            if (value != null && value.length() > 0)
-            {
-                propertyElement.addAttribute(new Attribute("value", value));
-            }
-            propertiesElement.appendChild(propertyElement);
-        }
-    }
-
-    /**
-     * Creates a summary plot for the given set of multi-genome alignment summaries.
-     *
-     * @param multiGenomeAlignmentSummaries
-     * @param the name of the image file
-     * @throws IOException
-     */
-    protected void createSummaryPlot(Collection<MultiGenomeAlignmentSummary> multiGenomeAlignmentSummaries, String imageFilename) throws IOException
-    {
-        if (imageFilename == null) return;
-
-        int n = multiGenomeAlignmentSummaries.size();
-        log.debug("Number of summaries = " + n);
-
-        scaleForPlotWidth();
-
-        int fontHeight = getFontHeight();
-        int rowHeight = (int)(fontHeight * ROW_HEIGHT_SCALING_FACTOR);
-        int labelOffset = (rowHeight - fontHeight) / 2;
-        int rowGap = (int)(fontHeight * ROW_GAP_SCALING_FACTOR);
-        int height = (rowHeight + rowGap) * (n + 3);
-        int rowSeparation = rowHeight + rowGap;
-
-        BufferedImage image = new BufferedImage(plotWidth, height, BufferedImage.TYPE_INT_ARGB);
-
-        Graphics2D g2 = image.createGraphics();
-
-        g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-        g2.setStroke(new BasicStroke(Math.max(1.0f, 0.65f * scaleFactor)));
-
-        g2.setFont(font);
-
-        g2.setColor(Color.WHITE);
-        g2.fillRect(0, 0, plotWidth, height);
-        g2.setColor(Color.BLACK);
-
-        int offset = rowGap + rowHeight - labelOffset;
-        int x0 = drawLabels(g2, offset, rowSeparation, multiGenomeAlignmentSummaries);
-
-        long maxSequenceCount = getMaximumSequenceCount(multiGenomeAlignmentSummaries);
-        log.debug("Maximum sequence count: " + maxSequenceCount);
-
-        maxSequenceCount = Math.max(maxSequenceCount, minimumSequenceCount);
-
-        long tickInterval = (int)getTickInterval(maxSequenceCount);
-        log.debug("Tick interval: " + tickInterval);
-        int tickIntervals = (int)(Math.max(1, maxSequenceCount) / tickInterval);
-        if (maxSequenceCount % tickInterval != 0) tickIntervals += 1;
-        maxSequenceCount = tickIntervals * tickInterval;
-        log.debug("No. tick intervals: " + tickIntervals);
-        log.debug("Maximum sequence count: " + maxSequenceCount);
-
-        int y = rowGap + n * rowSeparation;
-        int x1 = drawAxisAndLegend(g2, x0, y, tickIntervals, maxSequenceCount);
-
-        offset = rowGap;
-        drawAlignmentBars(g2, offset, rowHeight, rowSeparation, x0, x1, maxSequenceCount, multiGenomeAlignmentSummaries);
-
-        BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(imageFilename));
-        ImageIO.write(image, "png", out);
-        out.close();
-    }
-
-    /**
-     * Scale the font and gap sizes for the size of the plot.
-     */
-    private void scaleForPlotWidth()
-    {
-        if (plotWidth > DEFAULT_WIDTH)
-        {
-            scaleFactor = ((float)plotWidth) / DEFAULT_WIDTH;
-
-            int fontSize = (int)(scaleFactor * DEFAULT_FONT_SIZE);
-            font = new Font("SansSerif", Font.PLAIN, fontSize);
-
-            int axisFontSize = (int)(scaleFactor * DEFAULT_AXIS_FONT_SIZE);
-            axisFont = new Font("SansSerif", Font.PLAIN, axisFontSize);
-
-            gapSize = (int)(scaleFactor * DEFAULT_GAP_SIZE);
-        }
-    }
-
-    /**
-     * Returns the FONT height.
-     *
-     * @return
-     */
-    private int getFontHeight()
-    {
-        BufferedImage image = new BufferedImage(plotWidth, plotWidth, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g2 = image.createGraphics();
-        g2.setFont(font);
-        int fontHeight = g2.getFontMetrics().getAscent();
-        g2.dispose();
-
-        return fontHeight;
-    }
-
-    /**
-     * Returns the maximum sequence count for the given alignment summaries.
-     *
-     * @param multiGenomeAlignmentSummaries
-     * @return
-     */
-    protected long getMaximumSequenceCount(Collection<MultiGenomeAlignmentSummary> multiGenomeAlignmentSummaries)
-    {
-        long maxSequenceCount = 0;
-        for (MultiGenomeAlignmentSummary multiGenomeAlignmentSummary : multiGenomeAlignmentSummaries)
-        {
-            maxSequenceCount = Math.max(maxSequenceCount, multiGenomeAlignmentSummary.getSequenceCount());
-        }
-        log.debug("Maximum sequence read count: " + maxSequenceCount);
-        return maxSequenceCount;
-    }
-
-    /**
-     * Returns a reasonable choice for the interval on the x-axis
-     * corresponding to the number of sequences given a maximum value.
-     *
-     * @param max the maximum number of sequences.
-     * @return
-     */
-    private long getTickInterval(long max)
-    {
-        if (max <= 10) return 1l;
-        long scaleFactor = 1l;
-        while (true)
-        {
-            for (int i : INTERVALS)
-            {
-                long interval = i * scaleFactor;
-                if (max / interval <= OPTIMUM_NO_INTERVALS) return interval;
-            }
-            scaleFactor *= 10;
-        }
-    }
-
-    /**
-     * Draws the labels for each dataset ID, returning the x coordinate for
-     * subsequent drawing for each row.
-     *
-     * @param g2
-     * @param offset
-     * @param separation
-     * @param multiGenomeAlignmentSummaries
-     * @return
-     */
-    private int drawLabels(Graphics2D g2, int offset, int separation, Collection<MultiGenomeAlignmentSummary> multiGenomeAlignmentSummaries)
-    {
-        int n = multiGenomeAlignmentSummaries.size();
-        boolean drawNumbers = false;
-        if (n > 1)
-        {
-            int i = 0;
-            for (MultiGenomeAlignmentSummary multiGenomeAlignmentSummary : multiGenomeAlignmentSummaries)
-            {
-                i++;
-                String datasetId = multiGenomeAlignmentSummary.getDatasetId();
-                String datasetDisplayLabel = datasetDisplayLabels.get(datasetId);
-                if (!Integer.toString(i).equals(datasetDisplayLabel))
-                {
-                    drawNumbers = true;
-                    break;
-                }
-            }
-        }
-        int x = gapSize;
-        int y = offset;
-        int maxWidth = 0;
-        if (drawNumbers)
-        {
-            for (int i = 1; i <= n; i++)
-            {
-                String s = Integer.toString(i) + ".";
-                g2.drawString(s, x, y);
-                maxWidth = Math.max(maxWidth, g2.getFontMetrics().stringWidth(s));
-                y += separation;
-            }
-            x += maxWidth + gapSize / 2;
-        }
-        y = offset;
-        maxWidth = 0;
-        for (MultiGenomeAlignmentSummary multiGenomeAlignmentSummary : multiGenomeAlignmentSummaries)
-        {
-            String datasetId = multiGenomeAlignmentSummary.getDatasetId();
-            String datasetDisplayLabel = datasetDisplayLabels.get(datasetId);
-            g2.drawString(datasetDisplayLabel, x, y);
-            maxWidth = Math.max(maxWidth, g2.getFontMetrics().stringWidth(datasetDisplayLabel));
-            y += separation;
-        }
-        int acceptableWidth = (int)(0.15 * plotWidth);
-        if (maxWidth > acceptableWidth)
-        {
-            Composite origComposite = g2.getComposite();
-            y = offset - g2.getFontMetrics().getHeight() - separation / 4;
-            for (int i = 0; i < n; i++)
-            {
-                g2.setColor(Color.WHITE);
-                g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.8f));
-                g2.fillRect(x + acceptableWidth, y, gapSize, separation);
-                g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
-                g2.fillRect(x + acceptableWidth + gapSize, y, plotWidth - x - acceptableWidth - gapSize, separation);
-                y += separation;
-            }
-            maxWidth = acceptableWidth;
-            g2.setComposite(origComposite);
-        }
-        return x + maxWidth + gapSize;
-    }
-
-    /**
-     * Draws the x-axis for the number of sequences and the legend.
-     *
-     * @param g2
-     * @param x0
-     * @param y
-     * @param tickIntervals
-     * @param maxSequenceCount
-     * @return
-     */
-    private int drawAxisAndLegend(Graphics2D g2, int x0, int y, int tickIntervals, long maxSequenceCount)
-    {
-        g2.setColor(Color.BLACK);
-        g2.setFont(axisFont);
-
-        boolean millions = maxSequenceCount / tickIntervals >= 1000000;
-        long largestTickValue = maxSequenceCount;
-        if (millions) largestTickValue /= 1000000;
-        int w = g2.getFontMetrics().stringWidth(Long.toString(largestTickValue));
-        int x1 = plotWidth - (w / 2) - gapSize;
-        g2.drawLine(x0, y, x1, y);
-
-        int tickFontHeight = g2.getFontMetrics().getAscent();
-        int tickHeight = tickFontHeight / 2;
-        for (int i = 0; i <= tickIntervals; i++)
-        {
-            int x = x0 + i * (x1 - x0) / tickIntervals;
-            g2.drawLine(x, y, x, y + tickHeight);
-            long tickValue = i * maxSequenceCount / tickIntervals;
-            if (millions) tickValue /= 1000000;
-            String s = Long.toString(tickValue);
-            int xs = x - g2.getFontMetrics().stringWidth(s) / 2 + 1;
-            int ys = y + tickHeight + tickFontHeight + 1;
-            g2.drawString(s, xs, ys);
-        }
-
-        g2.setFont(font);
-        int fontHeight = g2.getFontMetrics().getAscent();
-        String s = "Number of sequences";
-        if (millions) s += " (millions)";
-        int xs = x0 + (x1 - x0 - g2.getFontMetrics().stringWidth(s)) / 2;
-        int ys = y + tickHeight + tickFontHeight + fontHeight + fontHeight / 3;
-        g2.drawString(s, xs, ys);
-
-        int yl = ys + fontHeight * 2;
-        int xl = x0;
-
-        int barHeight = (int)(fontHeight * 0.7f);
-        int barWidth = 3 * barHeight;
-        int yb = yl + (int)(fontHeight * 0.3f);
-        int gap = (int)(fontHeight * 0.4f);
-
-        g2.setColor(Color.GREEN);
-        g2.fillRect(xl, yb, barWidth,  barHeight);
-        g2.setColor(Color.BLACK);
-        g2.drawRect(xl, yb, barWidth,  barHeight);
-        g2.setFont(axisFont);
-        String label = "Sequenced species/genome";
-        xl += barWidth + gap;
-        g2.drawString(label, xl, yl + fontHeight);
-        xl += g2.getFontMetrics().stringWidth(label) + gap * 3;
-
-        g2.setColor(Color.ORANGE);
-        g2.fillRect(xl, yb, barWidth,  barHeight);
-        g2.setColor(Color.BLACK);
-        g2.drawRect(xl, yb, barWidth,  barHeight);
-        label = "Control";
-        xl += barWidth + gap;
-        g2.drawString(label, xl, yl + fontHeight);
-        xl += g2.getFontMetrics().stringWidth(label) + gap * 3;
-
-        g2.setColor(Color.RED);
-        g2.fillRect(xl, yb, barWidth,  barHeight);
-        g2.setColor(Color.BLACK);
-        g2.drawRect(xl, yb, barWidth,  barHeight);
-        label = "Contaminant";
-        xl += barWidth + gap;
-        g2.drawString(label, xl, yl + fontHeight);
-        xl += g2.getFontMetrics().stringWidth(label) + gap * 3;
-
-        g2.setColor(ADAPTER_COLOR);
-        g2.fillRect(xl, yb, barWidth,  barHeight);
-        g2.setColor(Color.BLACK);
-        g2.drawRect(xl, yb, barWidth,  barHeight);
-        label = "Adapter";
-        xl += barWidth + gap;
-        g2.drawString(label, xl, yl + fontHeight);
-        xl += g2.getFontMetrics().stringWidth(label) + gap * 3;
-
-        g2.setColor(Color.BLACK);
-        g2.drawRect(xl, yb, barWidth,  barHeight);
-        label = "Unmapped";
-        xl += barWidth + gap;
-        g2.drawString(label, xl, yl + fontHeight);
-        xl += g2.getFontMetrics().stringWidth(label) + gap * 3;
-
-        g2.setColor(Color.GRAY);
-        g2.fillRect(xl, yb, barWidth,  barHeight);
-        g2.setColor(Color.BLACK);
-        g2.drawRect(xl, yb, barWidth,  barHeight);
-        label = "Unknown";
-        xl += barWidth + gap;
-        g2.drawString(label, xl, yl + fontHeight);
-
-        return x1;
-    }
-
-    /**
-     * Draws bars representing the total number of sequences for each dataset
-     * and the assigned subsets for each species/reference genome to which
-     * these have been aligned.
-     *
-     * @param g2
-     * @param offset
-     * @param height
-     * @param separation
-     * @param x0
-     * @param x1
-     * @param maxSequenceCount
-     * @param multiGenomeAlignmentSummaries
-     */
-    private void drawAlignmentBars(Graphics2D g2, int offset, int height, int separation, int x0, int x1, long maxSequenceCount, Collection<MultiGenomeAlignmentSummary> multiGenomeAlignmentSummaries)
-    {
-        AlignmentSummaryComparator alignmentSummaryComparator = new AlignmentSummaryComparator();
-
-        g2.setColor(Color.BLACK);
-
-        int y = offset;
-        for (MultiGenomeAlignmentSummary multiGenomeAlignmentSummary : multiGenomeAlignmentSummaries)
-        {
-            int sampledCount = multiGenomeAlignmentSummary.getSampledCount();
-            long sequenceCount = multiGenomeAlignmentSummary.getSequenceCount();
-            log.debug(multiGenomeAlignmentSummary.getDatasetId() + " " + sequenceCount);
-
-            Set<String> species = new HashSet<String>();
-            Set<String> controls = new HashSet<String>();
-            for (OrderedProperties sampleProperties : multiGenomeAlignmentSummary.getSampleProperties())
-            {
-                String value = sampleProperties.getProperty(SPECIES_PROPERTY_NAMES);
-                if (value != null) species.add(value);
-                String control = sampleProperties.getProperty(CONTROL_PROPERTY_NAMES);
-                if ("Yes".equals(control)) controls.add(value);
-            }
-
-            double width = (double)sequenceCount * (x1 - x0) / maxSequenceCount;
-
-            int total = 0;
-            int x = x0;
-
-            // iterate over alignments for various reference genomes drawing bar for each
-            List<AlignmentSummary> alignmentSummaryList = Arrays.asList(multiGenomeAlignmentSummary.getAlignmentSummaries());
-            Collections.sort(alignmentSummaryList, alignmentSummaryComparator);
-            for (AlignmentSummary alignmentSummary : alignmentSummaryList)
-            {
-                total += alignmentSummary.getAssignedCount();
-                int w = (int)(width * total / sampledCount) - x + x0;
-
-                String referenceGenomeId = alignmentSummary.getReferenceGenomeId();
-                String referenceGenomeName = getReferenceGenomeName(referenceGenomeId);
-                Color color = Color.RED;
-                if (controls.contains(referenceGenomeName))
-                {
-                    color = Color.ORANGE;
-                }
-                else if (species.contains(referenceGenomeName))
-                {
-                    color = Color.GREEN;
-                }
-                else if (species.isEmpty() || species.contains("Other") || species.contains("other"))
-                {
-                    color = Color.GRAY;
-                }
-
-                float alpha = MAX_ALPHA - (MAX_ALPHA - MIN_ALPHA) * (alignmentSummary.getAssignedErrorRate() - MIN_ERROR) / (MAX_ERROR - MIN_ERROR);
-                alpha = Math.max(alpha, MIN_ALPHA);
-                alpha = Math.min(alpha, MAX_ALPHA);
-                if (alignmentSummary.getAssignedCount() >= 100)
-                    log.debug(alignmentSummary.getReferenceGenomeId() + "\t" + alignmentSummary.getAssignedCount() + "\t" + alignmentSummary.getErrorRate() * 100.0f + "\t" + alpha);
-
-                Composite origComposite = g2.getComposite();
-                g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
-                g2.setColor(color);
-                g2.fillRect(x, y, w, height);
-                g2.setComposite(origComposite);
-
-                g2.setColor(Color.BLACK);
-                g2.drawRect(x, y, w, height);
-                x += w;
-            }
-
-            // bar for all sequences
-            g2.drawRect(x0, y, (int)width, height);
-
-            // bar for adapter sequences
-            int adapterCount = multiGenomeAlignmentSummary.getAdapterCount();
-            log.debug("Adapter count: " + adapterCount + " / " + sampledCount);
-            int ya = y + height + height / 5;
-            double wa = width * adapterCount / sampledCount;
-            if (wa > 2)
-            {
-                int ha = height / 3;
-                g2.setColor(ADAPTER_COLOR);
-                g2.fillRect(x0, ya, (int)wa, ha);
-                g2.setColor(Color.BLACK);
-                g2.drawRect(x0, ya, (int)wa, ha);
-            }
-
-            y += separation;
-        }
-    }
-
-    /**
-     * Comparator for alignment summaries based on assigned counts.
-     */
-    private class AlignmentSummaryComparator implements Comparator<AlignmentSummary>
-    {
-        public int compare(AlignmentSummary alignmentSummary0, AlignmentSummary alignmentSummary1)
-        {
-            return alignmentSummary1.getAssignedCount() - alignmentSummary0.getAssignedCount();
         }
     }
 }

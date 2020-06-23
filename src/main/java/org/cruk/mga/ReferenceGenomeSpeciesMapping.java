@@ -23,6 +23,7 @@
 
 package org.cruk.mga;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -57,7 +58,7 @@ public class ReferenceGenomeSpeciesMapping implements Serializable
      * @throws FileNotFoundException
      * @throws IOException
      */
-    public void loadFromPropertiesFile(String referenceGenomeMappingFile) throws FileNotFoundException, IOException
+    public void loadFromPropertiesFile(File referenceGenomeMappingFile) throws FileNotFoundException, IOException
     {
         try (InputStream fileStream = new FileInputStream(referenceGenomeMappingFile))
         {
