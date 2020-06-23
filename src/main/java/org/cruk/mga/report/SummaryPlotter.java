@@ -1,6 +1,6 @@
 package org.cruk.mga.report;
 
-import static org.cruk.mga.MGAConfig.*;
+import static org.cruk.mga.MGAConfig.DEFAULT_PLOT_WIDTH;
 
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
@@ -171,7 +171,8 @@ public class SummaryPlotter
                            Map<String, String> datasetDisplayLabels,
                            Collection<MultiGenomeAlignmentSummary> multiGenomeAlignmentSummaries)
     {
-        int n = multiGenomeAlignmentSummaries.size();
+        final int offset = config.rowGap + config.rowHeight - config.labelOffset;
+        final int n = multiGenomeAlignmentSummaries.size();
         boolean drawNumbers = false;
         if (n > 1)
         {
@@ -189,7 +190,7 @@ public class SummaryPlotter
             }
         }
         int x = config.gapSize;
-        int y = config.offset;
+        int y = offset;
         int maxWidth = 0;
         if (drawNumbers)
         {
@@ -202,7 +203,7 @@ public class SummaryPlotter
             }
             x += maxWidth + config.gapSize / 2;
         }
-        y = config.offset;
+        y = offset;
         maxWidth = 0;
         for (MultiGenomeAlignmentSummary multiGenomeAlignmentSummary : multiGenomeAlignmentSummaries)
         {
@@ -216,7 +217,7 @@ public class SummaryPlotter
         if (maxWidth > acceptableWidth)
         {
             Composite origComposite = g2.getComposite();
-            y = config.offset - g2.getFontMetrics().getHeight() - config.rowSeparation / 4;
+            y = offset - g2.getFontMetrics().getHeight() - config.rowSeparation / 4;
             for (int i = 0; i < n; i++)
             {
                 g2.setColor(Color.WHITE);
@@ -374,9 +375,15 @@ public class SummaryPlotter
             for (OrderedProperties sampleProperties : multiGenomeAlignmentSummary.getSampleProperties())
             {
                 String value = sampleProperties.getProperty(SPECIES_PROPERTY_NAMES);
-                if (value != null) species.add(value);
+                if (value != null)
+                {
+                    species.add(value);
+                }
                 String control = sampleProperties.getProperty(CONTROL_PROPERTY_NAMES);
-                if ("Yes".equals(control)) controls.add(value);
+                if ("Yes".equalsIgnoreCase(control))
+                {
+                    controls.add(value);
+                }
             }
 
             double width = (double)sequenceCount * (x1 - x0) / maxSequenceCount;
@@ -417,16 +424,16 @@ public class SummaryPlotter
                 Composite origComposite = g2.getComposite();
                 g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
                 g2.setColor(color);
-                g2.fillRect(x, y, w, config.height);
+                g2.fillRect(x, y, w, config.rowHeight);
                 g2.setComposite(origComposite);
 
                 g2.setColor(Color.BLACK);
-                g2.drawRect(x, y, w, config.height);
+                g2.drawRect(x, y, w, config.rowHeight);
                 x += w;
             }
 
             // bar for all sequences
-            g2.drawRect(x0, y, (int)width, config.height);
+            g2.drawRect(x0, y, (int)width, config.rowHeight);
 
             // bar for adapter sequences
             int adapterCount = multiGenomeAlignmentSummary.getAdapterCount();
@@ -467,7 +474,6 @@ public class SummaryPlotter
 
         int width;
         int height;
-        int offset;
 
         int fontHeight;
         int rowHeight;
@@ -487,8 +493,6 @@ public class SummaryPlotter
             rowGap = (int)(fontHeight * ROW_GAP_SCALING_FACTOR);
             height = (rowHeight + rowGap) * (numberOfSummaries + 3);
             rowSeparation = rowHeight + rowGap;
-
-            offset = rowGap + rowHeight - labelOffset;
         }
 
         /**
