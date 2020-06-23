@@ -38,8 +38,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import javax.xml.transform.TransformerException;
-
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.ParseException;
@@ -164,7 +162,7 @@ public class CreateReport extends CommandLineUtility
     }
 
     @Override
-    protected void run() throws IOException, ValidityException, ParsingException, TransformerException
+    protected void run() throws Exception
     {
         readSourceFiles();
         writeReportFiles();
@@ -179,7 +177,7 @@ public class CreateReport extends CommandLineUtility
         readAlignments();
     }
 
-    protected void writeReportFiles() throws IOException, TransformerException
+    protected void writeReportFiles() throws Exception
     {
         OrderedProperties runProperties = readSampleSheet();
 
@@ -187,7 +185,7 @@ public class CreateReport extends CommandLineUtility
 
         new XMLReportWriter().writeReport(config, referenceGenomeSpeciesMapping, multiGenomeAlignmentSummaries.values(), datasetDisplayLabels, runProperties);
 
-        //new YAMLReportWriter().writeReport(config, referenceGenomeSpeciesMapping, multiGenomeAlignmentSummaries.values(), datasetDisplayLabels, runProperties);
+        // new YAMLReportWriter().writeReport(config, referenceGenomeSpeciesMapping, multiGenomeAlignmentSummaries.values(), datasetDisplayLabels, runProperties);
     }
 
     /**
