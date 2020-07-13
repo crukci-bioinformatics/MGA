@@ -12,44 +12,34 @@ import javax.xml.bind.annotation.XmlType;
 
 import org.cruk.mga.MultiGenomeAlignmentSummary;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(propOrder = { "datasetId", "sequenceCount", "sampledCount", "adapterCount", "unmappedCount", "alignmentSummaries", "samples" })
-@JsonPropertyOrder({ "datasetId", "sequenceCount", "sampledCount", "adapterCount", "unmappedCount", "alignmentSummaries", "samples" })
 public class MGASummary implements Serializable
 {
     private static final long serialVersionUID = 7436117996232221147L;
 
     @XmlElement(name = "DatasetId", required = true)
-    @JsonProperty(value = "DatasetId", required = true)
     private String datasetId;
 
     @XmlElement(name = "SequenceCount")
-    @JsonProperty("SequenceCount")
     private long sequenceCount;
 
     @XmlElement(name = "SampledCount")
-    @JsonProperty("SampledCount")
     private long sampledCount;
 
     @XmlElement(name = "AdapterCount")
-    @JsonProperty("AdapterCount")
     private long adapterCount;
 
     @XmlElement(name = "UnmappedCount")
-    @JsonProperty("UnmappedCount")
     private long unmappedCount;
 
     @XmlElementWrapper(name = "AlignmentSummaries")
     @XmlElement(name = "AlignmentSummary")
-    @JsonProperty("AlignmentSummaries")
     private List<MGAAlignmentSummary> alignmentSummaries;
 
     @XmlElementWrapper(name = "Samples")
     @XmlElement(name = "Sample")
-    @JsonProperty("Samples")
     private List<Sample> samples;
 
     public MGASummary()

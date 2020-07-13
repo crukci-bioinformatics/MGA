@@ -9,57 +9,39 @@ import javax.xml.bind.annotation.XmlType;
 
 import org.cruk.mga.AlignmentSummary;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(propOrder = { "referenceGenome", "alignedCount", "errorRate", "uniquelyAlignedCount", "uniquelyAlignedErrorRate",
                        "preferentiallyAlignedCount", "preferentiallyAlignedErrorRate", "assignedCount", "assignedErrorRate" })
-@JsonPropertyOrder({ "referenceGenome", "alignedCount", "errorRate", "uniquelyAlignedCount", "uniquelyAlignedErrorRate",
-                     "preferentiallyAlignedCount", "preferentiallyAlignedErrorRate", "assignedCount", "assignedErrorRate" })
 public class MGAAlignmentSummary implements Serializable
 {
     private static final long serialVersionUID = -1759073805638011218L;
 
     @XmlElement(name = "ReferenceGenome")
-    @JsonProperty("ReferenceGenome")
     private ReferenceGenome referenceGenome;
 
     @XmlElement(name = "AlignedCount")
-    @JsonProperty("AlignedCount")
     private long alignedCount;
 
     @XmlElement(name = "ErrorRate")
-    @JsonProperty("ErrorRate")
-    @JsonSerialize(using = LimitedPrecisionFloatSerializer.class)
     private float errorRate;
 
     @XmlElement(name = "UniquelyAlignedCount")
-    @JsonProperty("UniquelyAlignedCount")
     private long uniquelyAlignedCount;
 
     @XmlElement(name = "UniquelyAlignedErrorRate")
-    @JsonProperty("UniquelyAlignedErrorRate")
-    @JsonSerialize(using = LimitedPrecisionFloatSerializer.class)
     private float uniquelyAlignedErrorRate;
 
     @XmlElement(name = "PreferentiallyAlignedCount")
-    @JsonProperty("PreferentiallyAlignedCount")
     private long preferentiallyAlignedCount;
 
     @XmlElement(name = "PreferentiallyAlignedErrorRate")
-    @JsonProperty("PreferentiallyAlignedErrorRate")
-    @JsonSerialize(using = LimitedPrecisionFloatSerializer.class)
     private float preferentiallyAlignedErrorRate;
 
     @XmlElement(name = "AssignedCount")
-    @JsonProperty("AssignedCount")
     private long assignedCount;
 
     @XmlElement(name = "AssignedErrorRate")
-    @JsonProperty("AssignedErrorRate")
-    @JsonSerialize(using = LimitedPrecisionFloatSerializer.class)
     private float assignedErrorRate;
 
     public MGAAlignmentSummary()

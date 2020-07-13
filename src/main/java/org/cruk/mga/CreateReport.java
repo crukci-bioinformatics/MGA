@@ -44,7 +44,6 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PatternOptionBuilder;
 import org.cruk.mga.report.SummaryPlotter;
 import org.cruk.mga.report.XMLReportWriter;
-import org.cruk.mga.report.YAMLReportWriter;
 import org.cruk.util.CommandLineUtility;
 import org.cruk.util.OrderedProperties;
 
@@ -184,8 +183,6 @@ public class CreateReport extends CommandLineUtility
         new SummaryPlotter().createSummaryPlot(config, referenceGenomeSpeciesMapping, multiGenomeAlignmentSummaries.values(), datasetDisplayLabels);
 
         new XMLReportWriter().writeReport(config, referenceGenomeSpeciesMapping, multiGenomeAlignmentSummaries.values(), datasetDisplayLabels, runProperties);
-
-        new YAMLReportWriter().writeReport(config, referenceGenomeSpeciesMapping, multiGenomeAlignmentSummaries.values(), datasetDisplayLabels, runProperties);
     }
 
     /**

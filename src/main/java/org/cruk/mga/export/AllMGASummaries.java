@@ -14,42 +14,31 @@ import javax.xml.bind.annotation.XmlType;
 import org.cruk.mga.MGAConfig;
 import org.cruk.util.OrderedProperties;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.fasterxml.jackson.annotation.JsonRootName;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(propOrder = { "runId", "properties", "trimStart", "trimLength", "summaries", "referenceGenomes" })
 @XmlRootElement(name = "MultiGenomeAlignmentSummaries")
-@JsonPropertyOrder({ "runId", "properties", "trimStart", "trimLength", "summaries", "referenceGenomes" })
-@JsonRootName("MultiGenomeAlignmentSummaries")
 public class AllMGASummaries implements Serializable
 {
     private static final long serialVersionUID = -3897311196228179946L;
 
     @XmlElement(name = "RunID", required = true)
-    @JsonProperty(value = "RunID", required = true)
     private String runId;
 
     @XmlElement(name = "Properties")
-    @JsonProperty("Properties")
     private Properties properties;
 
     @XmlElement(name = "TrimStart")
-    @JsonProperty("TrimStart")
     private Integer trimStart;
 
     @XmlElement(name = "TrimLength")
-    @JsonProperty("TrimLength")
     private Integer trimLength;
 
     @XmlElement(name = "MultiGenomeAlignmentSummary")
-    @JsonProperty("MultiGenomeAlignmentSummary")
     private List<MGASummary> summaries;
 
     @XmlElementWrapper(name = "ReferenceGenomes")
     @XmlElement(name = "ReferenceGenome")
-    @JsonProperty("ReferenceGenomes")
     private List<ReferenceGenome> referenceGenomes;
 
     public AllMGASummaries()
