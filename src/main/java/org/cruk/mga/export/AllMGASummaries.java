@@ -22,7 +22,7 @@ public class AllMGASummaries implements Serializable
 {
     private static final long serialVersionUID = -3897311196228179946L;
 
-    @XmlElement(name = "RunID", required = true)
+    @XmlElement(name = "RunId", required = true)
     private String runId;
 
     @XmlElement(name = "Properties")
