@@ -345,9 +345,6 @@
                         <link>https://eclipse.org/aspectj/doc/released/runtime-api/</link>
                         <link>https://eclipse.org/aspectj/doc/released/aspectj5rt-api/</link>
                         <link>http://ehcache.org/apidocs/2.6.9/</link>
-                        <link>https://fasterxml.github.io/jackson-annotations/javadoc/2.11</link>
-                        <link>https://fasterxml.github.io/jackson-core/javadoc/2.11</link>
-                        <link>https://fasterxml.github.io/jackson-databind/javadoc/2.11/</link>
                         <link>http://internal-bioinformatics.cruk.cam.ac.uk/docs/cruk-commons/apidocs</link>
                         <link>http://internal-bioinformatics.cruk.cam.ac.uk/docs/pipelinetools/apidocs</link>
                         <link>http://internal-bioinformatics.cruk.cam.ac.uk/docs/workflow-1.8/apidocs</link>
@@ -363,14 +360,6 @@
                 <groupId>org.cruk.workflow</groupId>
                 <artifactId>workflow-bom</artifactId>
                 <version>1.8.1</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>com.fasterxml.jackson</groupId>
-                <artifactId>jackson-bom</artifactId>
-                <version>2.11.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -431,11 +420,6 @@
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
             <version>20171018</version>
-        </dependency>
-        
-        <dependency>
-            <groupId>com.fasterxml.jackson.dataformat</groupId>
-            <artifactId>jackson-dataformat-yaml</artifactId>
         </dependency>
     </dependencies>
 </project>
