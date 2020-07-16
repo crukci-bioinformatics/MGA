@@ -25,6 +25,9 @@ package org.cruk.mga;
 
 import java.io.Serializable;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+
 /**
  * Class used to represent the summary of an alignment of a sequence
  * dataset against a specific reference genome.
@@ -304,5 +307,14 @@ public class AlignmentSummary implements Serializable
     public float getAssignedErrorRate()
     {
         return totalAssignedSequenceLength == 0 ? 0.0f : (float)totalAssignedMismatchCount / totalAssignedSequenceLength;
+    }
+
+    @Override
+    public String toString()
+    {
+        ToStringBuilder sb = new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE);
+        sb.append("referenceGenomeId", referenceGenomeId);
+        sb.append("alignedCount", alignedCount);
+        return sb.toString();
     }
 }
