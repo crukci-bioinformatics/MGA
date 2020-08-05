@@ -290,6 +290,70 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>appassembler-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>assemble</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <assembleDirectory>${project.build.directory}/${application.name}</assembleDirectory>
+                    <copyConfigurationDirectory>true</copyConfigurationDirectory>
+                    <repositoryLayout>flat</repositoryLayout>
+                    <repositoryName>lib</repositoryName>
+                    <platforms>
+                        <platform>unix</platform>
+                    </platforms>
+                    <programs>
+                        <program>
+                            <mainClass>org.cruk.workflow.PipelineRunner</mainClass>
+                            <name>run-pipeline</name>
+                        </program>
+                        <program>
+                            <mainClass>org.cruk.mga.workflow.CreateMetadataFromSampleSheet</mainClass>
+                            <name>prepare-pipeline</name>
+                        </program>
+                        <program>
+                            <mainClass>org.cruk.seq.SampleFastq</mainClass>
+                            <name>sample-fastq</name>
+                        </program>
+                        <program>
+                            <mainClass>org.cruk.seq.TrimFastq</mainClass>
+                            <name>trim-fastq</name>
+                        </program>
+                        <program>
+                            <mainClass>org.cruk.seq.FastqToFasta</mainClass>
+                            <name>fastq-to-fasta</name>
+                        </program>
+                    </programs>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <descriptors>
+                        <descriptor>src/main/assembly/assembly.xml</descriptor>
+                    </descriptors>
+                    <tarLongFileMode>posix</tarLongFileMode>
+                    <attach>false</attach>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
