@@ -29,6 +29,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.cruk.util.OrderedProperties;
 
 /**
@@ -190,5 +193,21 @@ public class MultiGenomeAlignmentSummary implements Serializable
     public List<OrderedProperties> getSampleProperties()
     {
         return sampleProperties;
+    }
+
+    @Override
+    public String toString()
+    {
+        ToStringBuilder sb = new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE);
+        sb.append("datasetId", datasetId);
+        sb.append("sequenceCount", sequenceCount);
+        sb.append("sampledCount", sampledCount);
+        sb.append("adapterCount", adapterCount);
+        sb.append("alignedCount", alignedCount);
+        if (alignmentSummaries != null && !alignmentSummaries.isEmpty())
+        {
+            sb.append("alignmentSummaries", StringUtils.join(alignmentSummaries.keySet(), ","));
+        }
+        return sb.toString();
     }
 }

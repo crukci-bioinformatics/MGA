@@ -25,6 +25,8 @@ package org.cruk.mga;
 
 import java.io.Serializable;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.cruk.common.comparators.numericname.NumericAwareComparator;
 
 public class Alignment implements Comparable<Alignment>, Serializable
@@ -75,11 +77,32 @@ public class Alignment implements Comparable<Alignment>, Serializable
     public int compareTo(Alignment other)
     {
         int cmp = NumericAwareComparator.instance().compare(datasetId, other.datasetId);
-        if (cmp != 0) return cmp;
-        cmp = sequenceId - other.sequenceId;
-        if (cmp != 0) return cmp;
-        cmp = mismatchCount - other.mismatchCount;
-        if (cmp != 0) return cmp;
-        return referenceGenomeId.compareTo(other.referenceGenomeId);
+        if (cmp == 0)
+        {
+            cmp = sequenceId - other.sequenceId;
+
+            if (cmp == 0)
+            {
+                cmp = mismatchCount - other.mismatchCount;
+
+                if (cmp == 0)
+                {
+                    cmp = referenceGenomeId.compareTo(other.referenceGenomeId);
+                }
+            }
+        }
+        return cmp;
+    }
+
+    @Override
+    public String toString()
+    {
+        ToStringBuilder sb = new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE);
+        sb.append("datasetId", datasetId);
+        sb.append("sequenceId", sequenceId);
+        sb.append("referenceGenomeId", referenceGenomeId);
+        sb.append("alignedLength", alignedLength);
+        sb.append("mismatchCount", mismatchCount);
+        return sb.toString();
     }
 }
