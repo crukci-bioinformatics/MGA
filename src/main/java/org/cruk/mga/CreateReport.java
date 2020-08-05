@@ -23,13 +23,17 @@
 
 package org.cruk.mga;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.cruk.mga.MGAConfig.DEFAULT_PLOT_WIDTH;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -46,6 +50,12 @@ import org.cruk.mga.report.SummaryPlotter;
 import org.cruk.mga.report.XMLReportWriter;
 import org.cruk.util.CommandLineUtility;
 import org.cruk.util.OrderedProperties;
+
+import com.opencsv.CSVParserBuilder;
+import com.opencsv.CSVReader;
+import com.opencsv.CSVReaderBuilder;
+import com.opencsv.ICSVParser;
+import com.opencsv.exceptions.CsvValidationException;
 
 import nu.xom.Builder;
 import nu.xom.Document;
@@ -242,61 +252,68 @@ public class CreateReport extends CommandLineUtility
         {
             File sampleSheetFile = config.getSampleSheetFile();
 
-            try (BufferedReader reader = new BufferedReader(new FileReader(sampleSheetFile)))
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(sampleSheetFile), UTF_8)))
             {
+                ICSVParser parser = new CSVParserBuilder().withSeparator('\t').withIgnoreLeadingWhiteSpace(true).build();
+                CSVReader csv = new CSVReaderBuilder(reader).withCSVParser(parser).build();
+
                 boolean inDatasetSection = false;
                 String[] samplePropertyNames = null;
 
-                String line = null;
-                while ((line = reader.readLine()) != null)
+                String[] fields;
+                while ((fields = csv.readNext()) != null)
                 {
-                    line = line.trim();
-                    if (line.startsWith("#")) continue;
-
-                    String[] fields = line.split("\\t");
-                    if (fields.length == 0) continue;
                     for (int i = 0; i < fields.length; i++)
                     {
                         fields[i] = fields[i].trim();
                     }
 
+                    // An empty or comment line.
+                    if (isEmpty(fields[0]) || fields[0].startsWith("#"))
+                    {
+                        continue;
+                    }
+
                     if (inDatasetSection)
                     {
-                        String datasetDisplayLabel = fields[0].trim();
-                        if (datasetDisplayLabel.length() == 0) continue;
+                        String datasetDisplayLabel = fields[0];
 
                         String datasetId = datasetDisplayLabel.replaceAll("\\s+", "_");
                         datasetDisplayLabels.put(datasetId, datasetDisplayLabel);
 
                         MultiGenomeAlignmentSummary multiGenomeAlignmentSummary = multiGenomeAlignmentSummaries.get(datasetId);
-                        if (multiGenomeAlignmentSummary == null) continue;
-
-                        OrderedProperties sampleProperties = new OrderedProperties();
-                        multiGenomeAlignmentSummary.getSampleProperties().add(sampleProperties);
-
-                        for (int i = 1; i < Math.min(samplePropertyNames.length, fields.length); i++)
+                        if (multiGenomeAlignmentSummary != null)
                         {
-                            String name = samplePropertyNames[i];
-                            if (name.equalsIgnoreCase("File")) continue;
-                            String value = fields[i].trim();
-                            if (name.equalsIgnoreCase("Species"))
+                            OrderedProperties sampleProperties = new OrderedProperties();
+                            multiGenomeAlignmentSummary.getSampleProperties().add(sampleProperties);
+
+                            for (int i = 1; i < Math.min(samplePropertyNames.length, fields.length); i++)
                             {
-                                name = "Species";
-                                value = getPreferredSpeciesName(value);
-                            }
-                            if (name.equalsIgnoreCase("Control"))
-                            {
-                                name = "Control";
-                                if (value.equalsIgnoreCase("Y") || value.equalsIgnoreCase("Yes"))
+                                String name = samplePropertyNames[i];
+                                if (name.equalsIgnoreCase("File"))
                                 {
-                                    value = "Yes";
+                                    continue;
                                 }
-                                else if (value.equalsIgnoreCase("N") || value.equalsIgnoreCase("No"))
+                                String value = fields[i];
+                                if (name.equalsIgnoreCase("Species"))
                                 {
-                                    value = "No";
+                                    name = "Species";
+                                    value = getPreferredSpeciesName(value);
                                 }
+                                if (name.equalsIgnoreCase("Control"))
+                                {
+                                    name = "Control";
+                                    if (value.equalsIgnoreCase("Y") || value.equalsIgnoreCase("Yes"))
+                                    {
+                                        value = "Yes";
+                                    }
+                                    else if (value.equalsIgnoreCase("N") || value.equalsIgnoreCase("No"))
+                                    {
+                                        value = "No";
+                                    }
+                                }
+                                sampleProperties.put(name, value);
                             }
-                            sampleProperties.put(name, value);
                         }
                     }
                     else
@@ -305,10 +322,6 @@ public class CreateReport extends CommandLineUtility
                         {
                             inDatasetSection = true;
                             samplePropertyNames = fields;
-                            for (int i = 0; i < samplePropertyNames.length; i++)
-                            {
-                                samplePropertyNames[i] = samplePropertyNames[i].trim();
-                            }
                         }
                         else
                         {
@@ -323,6 +336,12 @@ public class CreateReport extends CommandLineUtility
             catch (FileNotFoundException e)
             {
                 error("Error: could not find file " + sampleSheetFile.getName());
+            }
+            catch (CsvValidationException e)
+            {
+                // Should never happen because we're not validating the sample sheet.
+                error("Invalid information in the sample sheet " + sampleSheetFile.getName() + " at line " +
+                      e.getLineNumber() + ": " + e.getMessage());
             }
             catch (IOException e)
             {
