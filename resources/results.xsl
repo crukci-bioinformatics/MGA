@@ -369,7 +369,8 @@ another genome with fewer mismatches.
 <p/>
 Reads that align uniquely to a genome are assigned to that genome. Reads that
 align equally well to multiple genomes are assigned to the genome with the
-highest number of reads in the 'Best' column.
+highest number of reads in the 'Best' column or to the control species is this
+is among the genomes with the best alignments.
 <p/>
 Note that because reads are trimmed prior to alignment with Bowtie, it is
 possible for a read to be counted both as aligned to one or more of the
