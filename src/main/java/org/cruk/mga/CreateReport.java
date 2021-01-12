@@ -173,25 +173,13 @@ public class CreateReport extends CommandLineUtility
     @Override
     protected void run() throws Exception
     {
-        readSourceFiles();
-        writeReportFiles();
-    }
-
-    protected void readSourceFiles() throws IOException, ValidityException, ParsingException
-    {
         readReferenceGenomeMapping();
         readCountSummaryFiles();
         readSamplingSummaryFiles();
         readAdapterAlignmentFiles();
-        readAlignments();
-    }
-
-    protected void writeReportFiles() throws Exception
-    {
         OrderedProperties runProperties = readSampleSheet();
-
+        readAlignments();
         new SummaryPlotter().createSummaryPlot(config, referenceGenomeSpeciesMapping, multiGenomeAlignmentSummaries.values(), datasetDisplayLabels);
-
         new XMLReportWriter().writeReport(config, referenceGenomeSpeciesMapping, multiGenomeAlignmentSummaries.values(), datasetDisplayLabels, runProperties);
     }
 
@@ -287,32 +275,47 @@ public class CreateReport extends CommandLineUtility
                             OrderedProperties sampleProperties = new OrderedProperties();
                             multiGenomeAlignmentSummary.getSampleProperties().add(sampleProperties);
 
+                            String referenceGenomeId = null;
+                            boolean isControl = false;
+
                             for (int i = 1; i < Math.min(samplePropertyNames.length, fields.length); i++)
                             {
                                 String name = samplePropertyNames[i];
+
                                 if (name.equalsIgnoreCase("File"))
                                 {
                                     continue;
                                 }
+
                                 String value = fields[i];
+
                                 if (name.equalsIgnoreCase("Species"))
                                 {
                                     name = "Species";
                                     value = getPreferredSpeciesName(value);
+                                    referenceGenomeId = referenceGenomeSpeciesMapping.getReferenceGenomeId(value);
                                 }
+
                                 if (name.equalsIgnoreCase("Control"))
                                 {
                                     name = "Control";
                                     if (value.equalsIgnoreCase("Y") || value.equalsIgnoreCase("Yes"))
                                     {
                                         value = "Yes";
+                                        isControl = true;
                                     }
                                     else if (value.equalsIgnoreCase("N") || value.equalsIgnoreCase("No"))
                                     {
                                         value = "No";
                                     }
                                 }
+
                                 sampleProperties.put(name, value);
+                            }
+
+                            if (isControl && referenceGenomeId != null)
+                            {
+                                multiGenomeAlignmentSummary.addControlReferenceGenomeId(referenceGenomeId);
                             }
                         }
                     }
@@ -729,19 +732,37 @@ public class CreateReport extends CommandLineUtility
 
             MultiGenomeAlignmentSummary multiGenomeAlignmentSummary = multiGenomeAlignmentSummaries.get(datasetId);
 
+            // only consider best alignments for the current sequence, i.e. those with the fewest mismatches
             List<Alignment> bestAlignments = new ArrayList<Alignment>();
+            List<Alignment> bestControlAlignments = new ArrayList<Alignment>();
+
             for (Alignment alignment : alignments)
             {
                 if (alignment.getMismatchCount() == mismatchCount)
+                {
                     bestAlignments.add(alignment);
+                    // check is the reference genome id is one of the control species
+                    if (multiGenomeAlignmentSummary.isControlReferenceGenome(alignment.getReferenceGenomeId()))
+                    {
+                        bestControlAlignments.add(alignment);
+                    }
+                }
                 else
+                {
                     break;
+                }
             }
 
             List<Double> scores = datasetScores.get(datasetId);
 
             Alignment assigned = null;
             double assignedScore = 0.0;
+
+            // preferentially select a control species if it is among those
+            // with the fewest mismatches
+            if (!bestControlAlignments.isEmpty()) {
+                bestAlignments = bestControlAlignments;
+            }
 
             for (Alignment alignment : bestAlignments)
             {
