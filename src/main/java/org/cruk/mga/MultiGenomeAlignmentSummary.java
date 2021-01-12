@@ -26,8 +26,10 @@ package org.cruk.mga;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -53,6 +55,7 @@ public class MultiGenomeAlignmentSummary implements Serializable
     private int alignedCount;
     private Map<String, AlignmentSummary> alignmentSummaries = new HashMap<String, AlignmentSummary>();
     private List<OrderedProperties> sampleProperties = new ArrayList<OrderedProperties>();
+    private Set<String> controlReferenceGenomeIds = new HashSet<String>();
 
     /**
      * @return the datasetId
@@ -193,6 +196,26 @@ public class MultiGenomeAlignmentSummary implements Serializable
     public List<OrderedProperties> getSampleProperties()
     {
         return sampleProperties;
+    }
+
+    /**
+     * Adds the given reference genome to the set of controls for this dataset.
+     *
+     * @param referenceGenomeId
+     */
+    public void addControlReferenceGenomeId(String referenceGenomeId) {
+        controlReferenceGenomeIds.add(referenceGenomeId);
+    }
+
+    /**
+     * Determines if the given reference genome is a control for this dataset.
+     * 
+     * @param referenceGenomeId
+     * @return
+     */
+    public boolean isControlReferenceGenome(String referenceGenomeId)
+    {
+        return controlReferenceGenomeIds.contains(referenceGenomeId);
     }
 
     @Override
