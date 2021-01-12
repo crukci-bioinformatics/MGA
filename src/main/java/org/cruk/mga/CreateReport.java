@@ -55,7 +55,6 @@ import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import com.opencsv.ICSVParser;
-import com.opencsv.exceptions.CsvValidationException;
 
 import nu.xom.Builder;
 import nu.xom.Document;
@@ -339,12 +338,6 @@ public class CreateReport extends CommandLineUtility
             catch (FileNotFoundException e)
             {
                 error("Error: could not find file " + sampleSheetFile.getName());
-            }
-            catch (CsvValidationException e)
-            {
-                // Should never happen because we're not validating the sample sheet.
-                error("Invalid information in the sample sheet " + sampleSheetFile.getName() + " at line " +
-                      e.getLineNumber() + ": " + e.getMessage());
             }
             catch (IOException e)
             {
