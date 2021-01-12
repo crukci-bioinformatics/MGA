@@ -28,7 +28,7 @@ Installation
 The following software needs to be installed (versions currently in use at CRUK-CI
 are shown in parentheses):
 - Java SE 8 or above
-- Bowtie 1 (1.2.1.1)
+- Bowtie 1 (1.3.0)
 - Exonerate (2.2.0)
 - bash shell
 
