@@ -18,8 +18,8 @@ public class MGAConfig
     private static Logger log = LoggerFactory.getLogger(MGAConfig.class);
 
     private String runId;
-    private Number trimStart;
-    private Number trimLength;
+    private Integer trimStart;
+    private Integer trimLength;
     private String outputPrefix;
     private String sampleSheetFilename;
     private String referenceGenomeMappingFilename;
@@ -43,24 +43,24 @@ public class MGAConfig
         this.runId = runId;
     }
 
-    public Number getTrimStart()
+    public Integer getTrimStart()
     {
         return trimStart;
     }
 
     public void setTrimStart(Number trimStart)
     {
-        this.trimStart = trimStart;
+        this.trimStart = trimStart == null ? null : trimStart.intValue();
     }
 
-    public Number getTrimLength()
+    public Integer getTrimLength()
     {
         return trimLength;
     }
 
     public void setTrimLength(Number trimLength)
     {
-        this.trimLength = trimLength;
+        this.trimLength = trimLength == null ? null : trimLength.intValue();
     }
 
     public String getOutputPrefix()
