@@ -275,9 +275,6 @@ public class CreateReport extends CommandLineUtility
                             OrderedProperties sampleProperties = new OrderedProperties();
                             multiGenomeAlignmentSummary.getSampleProperties().add(sampleProperties);
 
-                            String referenceGenomeId = null;
-                            boolean isControl = false;
-
                             for (int i = 1; i < Math.min(samplePropertyNames.length, fields.length); i++)
                             {
                                 String name = samplePropertyNames[i];
@@ -293,7 +290,11 @@ public class CreateReport extends CommandLineUtility
                                 {
                                     name = "Species";
                                     value = getPreferredSpeciesName(value);
-                                    referenceGenomeId = referenceGenomeSpeciesMapping.getReferenceGenomeId(value);
+                                    String referenceGenomeId = referenceGenomeSpeciesMapping.getReferenceGenomeId(value);
+                                    if (referenceGenomeId != null)
+                                    {
+                                        multiGenomeAlignmentSummary.addExpectedReferenceGenomeId(referenceGenomeId);
+                                    }
                                 }
 
                                 if (name.equalsIgnoreCase("Control"))
@@ -302,7 +303,6 @@ public class CreateReport extends CommandLineUtility
                                     if (value.equalsIgnoreCase("Y") || value.equalsIgnoreCase("Yes"))
                                     {
                                         value = "Yes";
-                                        isControl = true;
                                     }
                                     else if (value.equalsIgnoreCase("N") || value.equalsIgnoreCase("No"))
                                     {
@@ -311,11 +311,6 @@ public class CreateReport extends CommandLineUtility
                                 }
 
                                 sampleProperties.put(name, value);
-                            }
-
-                            if (isControl && referenceGenomeId != null)
-                            {
-                                multiGenomeAlignmentSummary.addControlReferenceGenomeId(referenceGenomeId);
                             }
                         }
                     }
@@ -741,8 +736,8 @@ public class CreateReport extends CommandLineUtility
                 if (alignment.getMismatchCount() == mismatchCount)
                 {
                     bestAlignments.add(alignment);
-                    // check is the reference genome id is one of the control species
-                    if (multiGenomeAlignmentSummary.isControlReferenceGenome(alignment.getReferenceGenomeId()))
+                    // check is the reference genome id is one of the expected species
+                    if (multiGenomeAlignmentSummary.isExpectedReferenceGenome(alignment.getReferenceGenomeId()))
                     {
                         bestControlAlignments.add(alignment);
                     }
@@ -758,7 +753,7 @@ public class CreateReport extends CommandLineUtility
             Alignment assigned = null;
             double assignedScore = 0.0;
 
-            // preferentially select a control species if it is among those
+            // preferentially select an expected species if one is among those
             // with the fewest mismatches
             if (!bestControlAlignments.isEmpty()) {
                 bestAlignments = bestControlAlignments;

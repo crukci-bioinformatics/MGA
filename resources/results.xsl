@@ -362,15 +362,17 @@ the number of reads aligning uniquely to the reference genome and and the
 associated error rate for those unique reads.
 <p/>
 The 'Best' column and accompanying error rate refer to those reads that align
-preferentially to the given reference genome, i.e. with the fewest mismatches.
-These reads will include those that align uniquely and those that also align
-to other genomes with the same number of mismatches but which do not align to
-another genome with fewer mismatches.
+to a given reference genome with fewer mismatches than to other genomes.
+Included are reads that align uniquely to the genome and those for which there
+is a tie-break, aligning equally well to more than one genome. In the latter
+case, a read will contribute to the 'Best' column for each of the genomes to
+which it aligns the best. The sum of read counts in the 'Best' column can
+therefore exceed the total number of sampled reads.
 <p/>
-Reads that align uniquely to a genome are assigned to that genome. Reads that
-align equally well to multiple genomes are assigned to the genome with the
-highest number of reads in the 'Best' column or to the control species is this
-is among the genomes with the best alignments.
+Reads that align uniquely to a genome are assigned unambiguously to that genome.
+Tie-breaks in which reads align equally well to multiple genomes are assigned
+preferentially to one of the expected species for this sequence dataset and/or
+to the genome with the highest read count in the 'Best' column.
 <p/>
 Note that because reads are trimmed prior to alignment with Bowtie, it is
 possible for a read to be counted both as aligned to one or more of the

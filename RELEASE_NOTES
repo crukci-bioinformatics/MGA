@@ -1,12 +1,18 @@
-Version 1.7 (TBD)
------------
+Version 1.7.0 (13 January 2021)
+-------------
 
-* Change to assignment of sampled reads to genomes in the event of a tie-break
-  in which one or more of the alignments with the fewest mismatches is to a
-  control species, e.g. PhiX, in which case the control will be assigned to
-  preferentially; this is to allow for a collection of reference genomes, e.g.
-  those for viruses, to contain the control species and eases the management of
-  these collections.
+* Change to the assignment of sampled reads to genomes in the event of a
+  tie-break in which a read aligns equally well, i.e. with fewest mismatches, to
+  more than one genome; in such cases reads will be preferentially assigned to
+  (one of) the expected species within that dataset and, if still tied, to the
+  genome that has the highest number of best alignments for all other sampled
+  reads. This change was motivated by an update to the viruses collection from
+  NCBI used at CRUK CI as a single genomic reference and which now contains
+  several genomic sequences that share considerable sequence similarity to the
+  PhiX control added to every lane of sequencing carried out at the CRUK CI
+  Genomics facility; reads aligning to PhiX control will preferentially be
+  assigned to the PhiX reference genome over the virus genome collection without
+  the need to exclude homologous viral genomes from the virus collection.
 
 
 Version 1.6.0 (5 August 2020)

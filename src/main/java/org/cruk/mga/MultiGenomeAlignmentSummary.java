@@ -55,7 +55,7 @@ public class MultiGenomeAlignmentSummary implements Serializable
     private int alignedCount;
     private Map<String, AlignmentSummary> alignmentSummaries = new HashMap<String, AlignmentSummary>();
     private List<OrderedProperties> sampleProperties = new ArrayList<OrderedProperties>();
-    private Set<String> controlReferenceGenomeIds = new HashSet<String>();
+    private Set<String> expectedReferenceGenomeIds = new HashSet<String>();
 
     /**
      * @return the datasetId
@@ -199,12 +199,12 @@ public class MultiGenomeAlignmentSummary implements Serializable
     }
 
     /**
-     * Adds the given reference genome to the set of controls for this dataset.
+     * Adds the given reference genome to the set of Expecteds for this dataset.
      *
      * @param referenceGenomeId
      */
-    public void addControlReferenceGenomeId(String referenceGenomeId) {
-        controlReferenceGenomeIds.add(referenceGenomeId);
+    public void addExpectedReferenceGenomeId(String referenceGenomeId) {
+        expectedReferenceGenomeIds.add(referenceGenomeId);
     }
 
     /**
@@ -213,9 +213,9 @@ public class MultiGenomeAlignmentSummary implements Serializable
      * @param referenceGenomeId
      * @return
      */
-    public boolean isControlReferenceGenome(String referenceGenomeId)
+    public boolean isExpectedReferenceGenome(String referenceGenomeId)
     {
-        return controlReferenceGenomeIds.contains(referenceGenomeId);
+        return expectedReferenceGenomeIds.contains(referenceGenomeId);
     }
 
     @Override
