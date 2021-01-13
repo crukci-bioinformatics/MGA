@@ -29,10 +29,10 @@ public class AllMGASummaries implements Serializable
     private Properties properties;
 
     @XmlElement(name = "TrimStart")
-    private Integer trimStart;
+    private int trimStart;
 
     @XmlElement(name = "TrimLength")
-    private Integer trimLength;
+    private int trimLength;
 
     @XmlElement(name = "MultiGenomeAlignmentSummary")
     private List<MGASummary> summaries;
@@ -48,8 +48,8 @@ public class AllMGASummaries implements Serializable
     public AllMGASummaries(MGAConfig config)
     {
         runId = config.getRunId();
-        trimStart = config.getTrimStart() == null ? null : config.getTrimStart().intValue();
-        trimLength = config.getTrimLength() == null ? null : config.getTrimLength().intValue();
+        trimStart = config.getTrimStart() == null ? 0 : config.getTrimStart().intValue();
+        trimLength = config.getTrimLength() == null ? 0 : config.getTrimLength().intValue();
     }
 
     public AllMGASummaries(MGAConfig config, OrderedProperties runProperties)
@@ -69,22 +69,22 @@ public class AllMGASummaries implements Serializable
         this.runId = runId;
     }
 
-    public Integer getTrimStart()
+    public int getTrimStart()
     {
         return trimStart;
     }
 
-    public void setTrimStart(Integer trimStart)
+    public void setTrimStart(int trimStart)
     {
         this.trimStart = trimStart;
     }
 
-    public Integer getTrimLength()
+    public int getTrimLength()
     {
         return trimLength;
     }
 
-    public void setTrimLength(Integer trimLength)
+    public void setTrimLength(int trimLength)
     {
         this.trimLength = trimLength;
     }
