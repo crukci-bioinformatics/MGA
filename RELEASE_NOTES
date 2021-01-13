@@ -14,6 +14,12 @@ Version 1.7.0 (13 January 2021)
   assigned to the PhiX reference genome over the virus genome collection without
   the need to exclude homologous viral genomes from the virus collection.
 
+* Fix issue with formatting of the trim start and length as floating point
+  numbers in the report instead of whole numbers.
+
+* Updated adapter contaminant list using contaminant sequences taken from FastQC
+  v0.11.9.
+
 
 Version 1.6.0 (5 August 2020)
 -------------
