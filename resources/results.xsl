@@ -72,8 +72,8 @@
 
 <br/>
 Sequences were sampled<xsl:if test="$trimLength != ''">,
-trimmed to <xsl:value-of select="$trimLength"/> bases</xsl:if><xsl:if test="$trimStart != ''">
-starting from position <xsl:value-of select="$trimStart"/>,</xsl:if>
+trimmed to <xsl:value-of select="format-number($trimLength, '0')"/> bases</xsl:if><xsl:if test="$trimStart != ''">
+starting from position <xsl:value-of select="format-number($trimStart, '0')"/>,</xsl:if>
 and mapped to <xsl:value-of select="$referenceGenomeCount"/>
 reference genomes (see <a href="#referenceGenomes">list</a> below) using Bowtie.
 Sequences containing adapters were found by ungapped alignment of the full length
