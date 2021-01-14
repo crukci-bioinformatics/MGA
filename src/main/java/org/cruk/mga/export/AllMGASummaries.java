@@ -48,8 +48,8 @@ public class AllMGASummaries implements Serializable
     public AllMGASummaries(MGAConfig config)
     {
         runId = config.getRunId();
-        trimStart = config.getTrimStart() == null ? null : config.getTrimStart().intValue();
-        trimLength = config.getTrimLength() == null ? null : config.getTrimLength().intValue();
+        trimStart = config.getTrimStart();
+        trimLength = config.getTrimLength();
     }
 
     public AllMGASummaries(MGAConfig config, OrderedProperties runProperties)
