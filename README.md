@@ -1,3 +1,6 @@
+
+# The original version of MGA has been archived and is no longer being maintained - please see [mga2](https://github.com/crukci-bioinformatics/mga2) instead.
+
 MGA: Multi-genome alignment contaminant screen for high-throughput sequence data
 ================================================================================
 
